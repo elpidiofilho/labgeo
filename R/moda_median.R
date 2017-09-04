@@ -1,0 +1,33 @@
+# Moda Mediana
+#'
+#' @title moda_median
+#' @description This function calculates moda or median for each column of a dataframe
+#' @param df dataframe
+#' @keywords moda median
+#' @details
+#' @examples
+#' moda_median(df)
+
+
+
+moda_median <- function(df){
+  DF <- as.data.frame(df)
+  #x = DF[,2]
+  MODE2 <- function(x){
+    if (is.numeric(x) == FALSE){
+      df <- as.data.frame(table(x))
+      df <- df[order(df$Freq), ]
+      m <- max(df$Freq)
+      MODE1 <- as.vector(as.character(subset(df, Freq == m)[, 1]))
+      if (sum(df$Freq)/length(df$Freq)==1){
+        warning("No Mode: Frequency of all values is 1", call. = FALSE)
+      }else{
+        return(MODE1)
+      }
+
+    }else{
+      df <- median(x, na.rm = T)
+    }
+  }
+  return(as.vector(lapply(DF, MODE2)))
+}
