@@ -57,6 +57,7 @@ run_models_performance <- function(fit.run.model, df.valida, verbose = FALSE) {
   }
 }
 
+getwd()
 
 rmp_regressao <- function(fit.run.model, df.valida, verbose = FALSE) {
   nm = length(fit.run.model)
