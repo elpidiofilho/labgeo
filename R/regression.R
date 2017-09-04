@@ -71,13 +71,13 @@ regression <- function(df.train,
     doParallel::registerDoParallel(cl)
   }
   set.seed(313)
-  fit <- caret::train(formula,
+  fit <- suppressMessages(caret::train(formula,
                       data = df.train,
                       method = regressor,
                       metric = metric,
                       trControl = tc,
                       tuneLength = tune_length,
-                      preProcess = preprocess)
+                      preProcess = preprocess))
   if (!is.null(cl)) {
     parallel::stopCluster(cl)
   }
