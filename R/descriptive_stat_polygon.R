@@ -1,9 +1,11 @@
 # Descriptive statistics polygon
-#'
+#
+
 #' @title Descriptive statistics polygon
 #' @description This function calculates Descriptive statistics for samples collected in polygon
 #' @param df dataframe
 #' @param poligon_id name of column thats contains polygon id
+#' @param desc parameters os descritive statistics to be calculated.Choices are : c("min", "median", "mean", "max", "sd","skewness", "kurtosis", "p1", "p10", "p25","p33", "p66", "p75", "p90", "p99")
 #' @importFrom dplyr group_by
 #' @importFrom dplyr select
 #' @importFrom dplyr summarise_all
@@ -22,12 +24,11 @@
 
 
 
-descriptive_stat_polygon <- function(df, poligon_id) {
+descriptive_stat_polygon <- function(df, poligon_id, desc = c('min', 'mean', 'max', 'sd')) {
 
+#  c("min", "median", "mean", "max", "sd","skewness", "kurtosis", "p1", "p10", "p25","p33", "p66", "p75", "p90", "p99")
   dnum <- df %>% dplyr::group_by(!!poligon_id) %>% dplyr::select_if(is.numeric) %>%
-    dplyr::summarise_all(c("min", "median", "mean", "max", "sd",
-                    "skewness", "kurtosis", "p1", "p10", "p25",
-                    "p33", "p66", "p75", "p90", "p99"))
+    dplyr::summarise_all(desc)
 
   dcat = df %>% dplyr::group_by(!!poligon_id) %>% dplyr::select_if(is.factor) %>%
     dplyr::summarise_all(moda) %>% dplyr::mutate_if(is.character, as.factor)
@@ -100,6 +101,10 @@ moda <- function(x) {
   return(names(w1)[1])
 }
 
+
+sums <- function(x, pot) {
+  return(sum((x - mean(x)) ^ pot))
+}
 
 kurtosis <- function(x) {
   if(!is.numeric(x)) {

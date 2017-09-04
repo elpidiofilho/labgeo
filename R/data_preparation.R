@@ -7,24 +7,31 @@
 #' @param prune suppress variables with significance above this level
 #' @param seed seed
 #' @keywords data prepartion vtreat
-#' @import vtreat
-#' @import caret
-#' @import dplyr
-#' @export
+#' @importFrom vtreat prepare designTreatmentsN
+#' @importFrom caret createDataPartition
+#' @importFrom  dplyr everything select one_of
 #' @author Elpidio Filho, \email{elpidio@ufv.br}
 #' @examples
-#' data_prepatarion(df, 0.75)
+#' \dontrun{
+#' dp = data_preparation(df = c_stock, p = 0.75, prune = 0.99)
+#' treino = dp$treino
+#' teste = dp$teste
+#' }
+#' @export
 
-data_preparation <- function(df, prune = 0.99, p = 0.75 , seed = 313) {
-  outcome = df[,1]
-  nome.out = names(df)[1]
-  names(outcome) = nome.out
+data_preparation <- function(df, prune = 0.99, p = 0.75, seed = 313) {
+  outcome <- df[, 1]
+  nome.out <- names(df)[1]
+  names(outcome) <- nome.out
   set.seed(seed)
-  cp = createDataPartition(outcome, p=p, list=F, group = 6)
-  dTrainN = df[cp,]
-  dTestN =  df[-cp,]
-  treatmentsN = designTreatmentsN(dTrainN,colnames(dTrainN),nome.out,verbose = F)
-  treino <- prepare(treatmentsN,dTrainN,pruneSig=prune) %>% select(one_of(nome.out), everything())
-  teste <- prepare(treatmentsN,dTestN,pruneSig=prune) %>% select(one_of(nome.out), everything())
-  return(list(treino = treino, teste = teste, tratamento = treatmentsN ))
+  cp <- caret::createDataPartition(outcome, p = p, list = FALSE, group = 6)
+  dtrainn <- df[cp, ]
+  dtestn <-  df[-cp, ]
+  treatmentsn <- vtreat::designTreatmentsN(dtrainn, colnames(dtrainn),
+                                   nome.out, verbose = FALSE)
+  treino <- vtreat::prepare(treatmentsn, dtrainn, pruneSig = prune) %>%
+    dplyr::select(one_of(nome.out), everything())
+  teste <- vtreat::prepare(treatmentsn, dtestn, pruneSig = prune) %>%
+    dplyr::select(one_of(nome.out), everything())
+  return(list(treino = treino, teste = teste, tratamento = treatmentsn))
 }

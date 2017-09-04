@@ -1,7 +1,7 @@
 Package: labgeo
 Type: Package
 Title: Collection of functions to land use and soil mapping
-Version: 0.1.7.1
+Version: 0.1.8.1
 Author: Elpidio I. Fernandes Filho
 Maintainer: Elpidio Filho <elpidio@ufv.br>
 Description: More about what it does (maybe more than one line)
@@ -9,6 +9,6 @@ Description: More about what it does (maybe more than one line)
 License: GPL-2
 Encoding: UTF-8
 Depends: R (>= 3.3.0)
-Imports: caret,doParallel,dplyr,ggplot2,parallel, Rtsne, plotrix, MASS, glcm, knitr, tidyr, corrplot, viridis, stringr, raster, rgdal, sp, vtreat
+Imports: caret,doParallel,dplyr,ggplot2,parallel, Rtsne, plotrix, glcm, knitr, tidyr, corrplot, viridis, stringr, raster, rgdal, sp, vtreat
 LazyData: false
 RoxygenNote: 6.0.1

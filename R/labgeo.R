@@ -2,8 +2,5 @@
 #'
 #'
 #' @section Data Import and Export:
-#' @import caret
-#' @import vtreat
-#' @import raster sp
-#' @import doParallel
 NULL
+#devtools::document()

@@ -3,7 +3,7 @@
 \docType{data}
 \name{c_stock}
 \alias{c_stock}
-\title{Brazilian Soil Stock Carbon Data}
+\title{Brazilian Soil Stock Carbon Data.}
 \format{A dataframe with 8156 rows and 67 columns}
 \usage{
 data(c_stock)

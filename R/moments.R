@@ -6,33 +6,35 @@
 #' @param na.rm   remove nodata before calcululate moments
 #' @details details
 #' @description code from moments package https://cran.r-project.org/web/packages/moments/index.html
-#' @export
 #' @examples
+#' \dontrun{
 #' vt = c(12,22,34,26,5,19)
 #' print(moments(v))
+#' }
+#' @export
 
 
 
 
-moments <- function(x, plot = FALSE, na.rm = T) {
+moments <- function(x, plot = FALSE, na.rm = TRUE) {
   if (!length(x) >= 3)
     stop("Not enought values to represent a distribution")
   .skew <- function(x, na.rm = FALSE) {
     if (na.rm)
       x <- x[!is.na(x)]
-    sum((x - mean(x))^3)/(length(x) * stats::sd(x)^3)
+    sum((x - mean(x)) ^ 3)/(length(x) * stats::sd(x) ^ 3)
   }
   .kurt <- function(x, na.rm = FALSE) {
     if (na.rm)
       x <- x[!is.na(x)]
-    sum((x - mean(x))^4)/(length(x) * stats::var(x)^2) - 3
+    sum((x - mean(x)) ^ 4) / (length(x) * stats::var(x) ^ 2) - 3
   }
   .cv <- function(x) {
-    (stats::sd(x)/mean(x)) * 100
+    (stats::sd(x) / mean(x)) * 100
   }
   .means <- function(x) {
     arithmetic <- function(x) {
-      sum(x)/length(x)
+      sum(x) / length(x)
     }
     (x <- c(arithmetic(x)))
   }

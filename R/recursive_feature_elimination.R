@@ -8,45 +8,75 @@
 #' @param sizes A numeric vector of integers corresponding to the number of features that should be retained
 #' @param fun A list of functions for model fitting, prediction and variable importance
 #' @param cpu_cores  Number of CPU cores to be used in parallel processing
+#' @param metric metric used to evaluate model fit. For numeric outcome ("RMSE", "Rsquared) and for categorical outcome ("Accuracy","Kappa")
+#' @param seeds seeds
+#' @param verbose verbose
 #' @keywords Recursive Feature Elimination
-#' @export
+#' @details  details
+#' @importFrom parallel makePSOCKcluster stopCluster
+#' @importFrom doParallel registerDoParallel
+#' @importFrom caret trainControl rfe rfeControl rfFuncs
+#' @importFrom stats as.formula
+#' @author Elpidio Filho, \email{elpidio@ufv.br}
 #' @examples
-#' rfe(df,sizes = c(2:10,12,15,20), ncores = 4)
+#' \dontrun{
+#' rfe(df,sizes = c(2:10,12,15,20), cpu_cores = 4)
+#' }
+#' @export
 
 
-
-
-recursive_feature_elimination <- function(df, sizes = c(2:5,10), index = NULL, nfolds = 5,
-                                          fun = rfFuncs, ncores = 6) {
-  suppressPackageStartupMessages(require(caret))
-  suppressPackageStartupMessages(require(doParallel))
+recursive_feature_elimination <- function(df,
+                                          sizes = c(2:5, 10),
+                                          index = NULL,
+                                          nfolds = 5,
+                                          fun = rfFuncs,
+                                          cpu_cores = 6,
+                                          metric = ifelse(is.factor(df[,1]),"Kappa", "Rsquared"),
+                                          seeds = NULL,
+                                          verbose = TRUE){
+  if (is.null(metric)){
+    if (is.numeric(df[, 1])) {
+      metric <- "Rsquared"
+    } else {
+      metric <- "Kappa"
+    }
+  }
+  if (nfolds == 0 ){
+    method <- "none"
+    tune_length <- NULL
+  } else {
+    if (nfolds >= nrow(df)){
+      method <- "LOOCV"
+    } else {
+      method <- "CV"
+    }
+  }
   if (!is.data.frame(df)) stop("df is not a dataframe")
-  inicio = Sys.time()
-  set.seed(313)
-  #if (is.null(index)) index = createFolds(df[,1], nfolds)
-  seeds <- vector(mode = "list", length = nfolds + 1)
-  for(i in 1:nfolds) seeds[[i]] = sample.int(n=1000, 50)
-  seeds[[nfolds + 1]] <- sample.int(1000, 1)
+  inicio <- Sys.time()
   #index = createFolds(df[,1], k = nfolds, list = T, returnTrain = T)
-  formula = as.formula(paste(names(df)[1],"~ .",sep = ""))
-  if (ncores > 0) {
-    cl <- makePSOCKcluster(cpu_cores)
-    registerDoParallel(cl)
+  formula <- as.formula(paste(names(df)[1], "~ .", sep = ""))
+  if (cpu_cores > 0) {
+    cl <- parallel::makePSOCKcluster(cpu_cores)
+    doParallel::registerDoParallel(cl)
   }
   if (is.null(index)) {
-  rfProfile <- rfe(formula = formula, data = df,  sizes = sizes,
-                   rfeControl = rfeControl(method = "cv",functions = fun, number = nfolds,
+  rfProfile <- caret::rfe(formula = formula, data = df,  sizes = sizes, metric = metric,
+                   rfeControl = rfeControl(method = "cv", functions = fun, number = nfolds,
                                            seeds = seeds))
   } else {
-    rfProfile <- rfe(formula = formula, data = df,  sizes = sizes,
-                     rfeControl = rfeControl(method = "cv",functions = fun, number = nfolds,
+    rfProfile <- caret::rfe(formula = formula, data = df,  sizes = sizes, metric = metric,
+                     rfeControl = rfeControl(method = "cv", functions = fun, number = nfolds,
                                              seeds = seeds, index = index))
 
   }
   if (!is.null(cl)) {
-    stopCluster(cl)
+    parallel::stopCluster(cl)
   }
-
-  print(paste("time elapsed :", Sys.time() - inicio))
+  if (verbose == TRUE) {
+    print("=======================================================================")
+    print(paste("outcome : ",names(df)[1],sep=""))
+    print(paste('Selected vars :',paste(rfProfile$optVariables, collapse = ",")))
+    print(paste("time elapsed :", round((Sys.time() - inicio),3)))
+  }
   return(rfProfile)
 }

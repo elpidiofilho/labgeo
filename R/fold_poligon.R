@@ -9,22 +9,26 @@
 #' @param seed number tp seed generator
 #' @return  A list with folds;. Each fold contains line number of data to be uses in cross validation
 #' @details details
-#' @export
+#' @importFrom caret createFolds
+#' @importFrom dplyr filter
 #' @examples
+#' \dontrun{
 #' fold_poligon(nfold = 10, poligon =df$poligon)
+#' }
+#' @export
 
 
 fold_poligon <- function(nfold, poligon, seed = 123) {
-  lfold = list(nfold)
-  dfdata = data.frame(id = 1:length(poligon), poligon)
+  lfold <- list(nfold)
+  dfdata <- data.frame(id = seq_len(length(poligon)), poligon)
   set.seed(seed)
-  vu = unique(poligon)
-  dp = caret::createFolds(vu,nfold ,returnTrain = T)
-  i = 1
-  for (i in 1:nfold) {
-    v = vu[dp[[i]]]
-    vp = (dfdata %>% dplyr::filter(poligon %in% v))[,1]
-    lfold[[i]] = vp
+  vu <- unique(poligon)
+  dp <- caret::createFolds(vu, nfold, returnTrain = TRUE)
+
+  for (i in seq_len(nfold)) {
+    v <- vu[dp[[i]]]
+    vp <- (dfdata %>% dplyr::filter(poligon %in% v))[, 1]
+    lfold[[i]] <- vp
   }
   return(lfold)
 }

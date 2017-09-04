@@ -23,7 +23,7 @@
 #' }
 
 run_models <- function(df,
-                       models = c("gbm", "rf"),
+                       models = c("svmPoly", "rf", "gbm", "C5.0"),
                        formula = NULL,
                        preprocess = NULL,
                        nfolds = 10,
@@ -33,6 +33,7 @@ run_models <- function(df,
                        metric = ifelse(is.factor(df[,1]),"Kappa", "Rsquared"),
                        seeds = NULL) {
 
+  if (class(df) != "data.frame") stop("df is not a data frame.")
   inicio = Sys.time()
   if(is.factor(df[,1]) == TRUE) {
     mod = 1
