@@ -50,8 +50,7 @@
 
 
 run_models_performance <- function(fit.run.model, df.valida, verbose = FALSE) {
-  fit = NULL
-  if (fit[[1]]$modelType == "Classification"){
+  if (fit.run.model[[1]]$modelType == "Classification"){
     return(rmp_classificacao(fit.run.model, df.valida, verbose))
   } else {
     return(rmp_regressao(fit.run.model, df.valida, verbose))
