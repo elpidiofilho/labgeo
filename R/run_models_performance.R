@@ -50,10 +50,19 @@
 
 
 run_models_performance <- function(fit.run.model, df.valida, verbose = FALSE) {
+  package.inicio <- search()[ifelse(unlist(gregexpr("package:",search()))==1,TRUE,FALSE)]
   if (fit.run.model[[1]]$modelType == "Classification"){
-    return(rmp_classificacao(fit.run.model, df.valida, verbose))
+    result = rmp_classificacao(fit.run.model, df.valida, verbose)
+    package.fim =  search()[ifelse(unlist(gregexpr("package:",search()))==1,TRUE,FALSE)]
+    package.list <- setdiff(package.fim, package.inicio)
+    if (length(package.list)>0)  for (package in package.list) detach(package, character.only=TRUE)
+    return(result)
   } else {
-    return(rmp_regressao(fit.run.model, df.valida, verbose))
+    result = rmp_regressao(fit.run.model, df.valida, verbose)
+    package.fim =  search()[ifelse(unlist(gregexpr("package:",search()))==1,TRUE,FALSE)]
+    package.list <- setdiff(package.fim, package.inicio)
+    if (length(package.list)>0)  for (package in package.list) detach(package, character.only=TRUE)
+    return(result)
   }
 }
 
@@ -68,7 +77,8 @@ rmp_regressao <- function(fit.run.model, df.valida, verbose = FALSE) {
                              var_exp = numeric(nm),
                              grafic1 = list(nm), grafic2 = list(nm))
 
-  for (i in 1:length(fit.run.model)) {
+
+ for (i in 1:length(fit.run.model)) {
     fit.md = fit.run.model[[i]]
     v = predict(fit.md, df.valida)
     ddd = data.frame(observado = df.valida[, 1], predito = v, residuo = abs(v - df.valida[,1]))
@@ -112,6 +122,7 @@ rmp_regressao <- function(fit.run.model, df.valida, verbose = FALSE) {
             ggplot2::geom_text(aes(label = round(valor,3)), size = 3, vjust=1.5) +
             ggplot2::facet_wrap(~var, scales = "free"))
   }
+
   return(summ_model)
 }
 
@@ -215,11 +226,11 @@ rmp_classificacao <- function(fit.run.model, df.valida, verbose = FALSE) {
                 color="black",size = 1, fill = "red", alpha = 0.2) +
       geom_text(aes(label = confusion$Freq), vjust = 1) +
       ggtitle(fit.md$method)
-
+    vv = rescale(c(0, 50, 100))
     g2 = ggplot(ddd, mapping = aes(x = Reference, y = Prediction)) +
       geom_tile(aes(fill = valor), colour = "white") +
       scale_fill_gradientn(colours=c("lightyellow2","white","palegreen"),
-                            values  = rescale(c(0, 50, 100))) +
+                            values  = vv) +
       scale_x_discrete(name="Actual Class") + scale_y_discrete(name="Predicted Class") +
       labs(fill="Normalized\nFrequency") +
       geom_text(aes(label = round(ddd$valor, 2)), vjust = 1) +
