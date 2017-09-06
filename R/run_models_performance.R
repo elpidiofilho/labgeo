@@ -218,7 +218,7 @@ rmp_classificacao <- function(fit.run.model, df.valida, verbose = FALSE) {
 
     g2 = ggplot(ddd, mapping = aes(x = Reference, y = Prediction)) +
       geom_tile(aes(fill = valor), colour = "white") +
-      scale_fill_gradi1entn(colours=c("lightyellow2","white","palegreen"),
+      scale_fill_gradientn(colours=c("lightyellow2","white","palegreen"),
                             values  = rescale(c(0, 50, 100))) +
       scale_x_discrete(name="Actual Class") + scale_y_discrete(name="Predicted Class") +
       labs(fill="Normalized\nFrequency") +
