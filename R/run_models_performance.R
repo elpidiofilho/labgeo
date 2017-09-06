@@ -42,7 +42,7 @@
 # 'models = c("ridge", "rf", "cubist","pls")
 # 'fit_models = run_models(df = dfsel, models = models,
 #'                         cpu_cores = 7, tune_length = 5, metric = "Rsquared")
-# 'dfresult = run_models_performance(fit_models, df.valida = teste, verbose = F)
+# 'dfresult = run_models_performance(fit_models, df.valida = teste, verbose = T)
 # 'head(dfresult)
 #' }
 #' @export
@@ -50,6 +50,7 @@
 
 
 run_models_performance <- function(fit.run.model, df.valida, verbose = FALSE) {
+  fit = NULL
   if (fit[[1]]$modelType == "Classification"){
     return(rmp_classificacao(fit.run.model, df.valida, verbose))
   } else {
@@ -60,12 +61,13 @@ run_models_performance <- function(fit.run.model, df.valida, verbose = FALSE) {
 getwd()
 
 rmp_regressao <- function(fit.run.model, df.valida, verbose = FALSE) {
+  predito = observado = model = mbe = mae = rmse = nse = r2 = var_exp = var = valor = NULL
   nm = length(fit.run.model)
   summ_model = dplyr::tibble(model = character(nm), fit = list(nm), dfpredobs = list(nm),
-                      mbe = numeric(nm), mae = numeric(nm),
-                       r2 = numeric(nm), rmse = numeric(nm), nse = numeric(nm),
-                      var_exp = numeric(nm),
-                      grafic1 = list(nm), grafic2 = list(nm))
+                             mbe = numeric(nm), mae = numeric(nm),
+                             r2 = numeric(nm), rmse = numeric(nm), nse = numeric(nm),
+                             var_exp = numeric(nm),
+                             grafic1 = list(nm), grafic2 = list(nm))
 
   for (i in 1:length(fit.run.model)) {
     fit.md = fit.run.model[[i]]
@@ -87,7 +89,7 @@ rmp_regressao <- function(fit.run.model, df.valida, verbose = FALSE) {
     summ_model$grafic1[i] = list(ggplot2::ggplot(ddd, aes(x= predito, y = observado)) +
                                    ggplot2::geom_point() +
                                    ggplot2::ggtitle(paste(fit.md$method, " R2 = ",
-                                                 round(summ_model$r2[i], 3))) +
+                                                          round(summ_model$r2[i], 3))) +
                                    ggplot2::xlim(c(0,maxvalue)) + ggplot2::ylim(c(0, maxvalue))+
                                    ggplot2::geom_abline(slope = 1, intercept = 0, color = "red"))
 
@@ -122,6 +124,43 @@ get_density <- function(x, y, n = 100) {
   return(dens$z[ii])
 }
 
+
+bandwidth.nrd <- function (x)
+{
+  r <- quantile(x, c(0.25, 0.75))
+  h <- (r[2L] - r[1L])/1.34
+  4 * 1.06 * min(sqrt(var(x)), h) * length(x)^(-1/5)
+}
+
+
+## from library MASS
+## https://github.com/cran/MASS/blob/master/R/kde2d.R
+kde2d <- function(x, y, h, n = 25, lims = c(range(x), range(y)) )
+{
+  dnorm = NULL
+  nx <- length(x)
+  if(length(y) != nx)
+    stop("data vectors must be the same length")
+  if(any(!is.finite(x)) || any(!is.finite(y)))
+    stop("missing or infinite values in the data are not allowed")
+  if(any(!is.finite(lims)))
+    stop("only finite values are allowed in 'lims'")
+  n <- rep(n, length.out = 2L)
+  gx <- seq.int(lims[1L], lims[2L], length.out = n[1L])
+  gy <- seq.int(lims[3L], lims[4L], length.out = n[2L])
+  h <- if (missing(h)) c(bandwidth.nrd(x), bandwidth.nrd(y))
+  else rep(h, length.out = 2L)
+  if (any(h <= 0))
+    stop("bandwidths must be strictly positive")
+  h <- h/4                            # for S's bandwidth scale
+  ax <- outer(gx, x, "-" )/h[1L]
+  ay <- outer(gy, y, "-" )/h[2L]
+  z <- base::tcrossprod(matrix(dnorm(ax), , nx), matrix(dnorm(ay), , nx))/ (nx * h[1L] * h[2L])
+  list(x = gx, y = gy, z = z)
+}
+
+MASS::bandwidth.nrd
+
 pred_acc <- function (obs, pred) {
   mu <- mean(obs)
   mbe <- mean(obs - pred)              ## mean bias error ()
@@ -133,8 +172,8 @@ pred_acc <- function (obs, pred) {
   rrmse <- rmse / mu * 100             ## relative root mean square error
   mo = mean((obs - mu) ^ 2)
   nse = 1 -  (mse / mo)                ## Nash-Sutcliffe efficiency
-  r2 = cor(obs,pred) ^ 2
-  t = t.test(obs,pred,paired=TRUE)
+  r2 = stats::cor(obs,pred) ^ 2
+  t = stats::t.test(obs,pred,paired=TRUE)
   vecv <- (1 - sum((obs - pred) ^ 2) /
              sum((obs - mean(obs)) ^ 2)) * 100 ## variance explained by predictive models
 
@@ -146,6 +185,7 @@ pred_acc <- function (obs, pred) {
 
 
 rmp_classificacao <- function(fit.run.model, df.valida, verbose = FALSE) {
+  Freq = var = valor = Prediction = Reference = model = NULL
   nm = length(fit.run.model)
   summ_model = dplyr::tibble(model = character(nm), fit = list(nm), dfpredobs = list(nm),
                              accuracy = numeric(nm), Kappa = numeric(nm), byclass = list(nm), cf = list(nm),
@@ -179,8 +219,8 @@ rmp_classificacao <- function(fit.run.model, df.valida, verbose = FALSE) {
 
     g2 = ggplot(ddd, mapping = aes(x = Reference, y = Prediction)) +
       geom_tile(aes(fill = valor), colour = "white") +
-      scale_fill_gradientn(colours=c("lightyellow2","white","palegreen"),
-                           values  = rescale(c(0, 50, 100))) +
+      scale_fill_gradi1entn(colours=c("lightyellow2","white","palegreen"),
+                            values  = rescale(c(0, 50, 100))) +
       scale_x_discrete(name="Actual Class") + scale_y_discrete(name="Predicted Class") +
       labs(fill="Normalized\nFrequency") +
       geom_text(aes(label = round(ddd$valor, 2)), vjust = 1) +
@@ -197,11 +237,41 @@ rmp_classificacao <- function(fit.run.model, df.valida, verbose = FALSE) {
   }
   if (verbose == TRUE) {
     dfresult = data.frame(model = summ_model$model, accuracy = summ_model$accuracy, kappa = summ_model$Kappa) %>%
-    print %>%
-    tidyr::gather(key = var, value = valor, -model)
+      print %>%
+      tidyr::gather(key = var, value = valor, -model)
     print(ggplot(dfresult, aes(x = model, y = valor, fill = model)) + geom_col() +
-      geom_text(aes(label = round(valor, 3)), vjust = 1.5) +  facet_wrap(~ var))
+            geom_text(aes(label = round(valor, 3)), vjust = 1.5) +  facet_wrap(~ var))
   }
   return(summ_model)
+}
+
+
+## from scales package
+## https://github.com/hadley/scales
+
+zero_range <- function (x, tol = 1000 * .Machine$double.eps)
+{
+  if (length(x) == 1)
+    return(TRUE)
+  if (length(x) != 2)
+    stop("x must be length 1 or 2")
+  if (any(is.na(x)))
+    return(NA)
+  if (x[1] == x[2])
+    return(TRUE)
+  if (all(is.infinite(x)))
+    return(FALSE)
+  m <- min(abs(x))
+  if (m == 0)
+    return(FALSE)
+  abs((x[1] - x[2])/m) < tol
+}
+
+rescale <- function (x, to = c(0, 1), from = range(x, na.rm = TRUE, finite = TRUE))
+{
+  if (zero_range(from) || zero_range(to)) {
+    return(ifelse(is.na(x), NA, mean(to)))
+  }
+  (x - from[1])/diff(from) * diff(to) + to[1]
 }
 
