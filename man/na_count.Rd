@@ -4,10 +4,13 @@
 \alias{na_count}
 \title{na_count}
 \usage{
-na_count(df)
+na_count(df, verbose = TRUE)
 }
 \arguments{
 \item{df}{dataframe}
+
+\item{verbose}{if TRUE plot graphics of values NA absolute and relative
+by variable}
 }
 \description{
 This function counts NA by column and calculate relative value of NA
