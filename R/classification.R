@@ -59,7 +59,7 @@ classification <- function(df.train,
     cl <- parallel::makePSOCKcluster(cpu_cores)
     doParallel::registerDoParallel(cl)
   }
-  if(classifier == "mlc") classifier <- mlcCaret
+
   set.seed(313)
   fit <- suppressMessages(caret::train(formula, data = df.train, method = classifier,
                       metric = metric,

@@ -15,3 +15,7 @@ devtools::check(document = TRUE, check_version = TRUE, force_suggests = TRUE, ar
 
 # turn on/off development mode
 devtools::dev_mode()
+
+gp()
+gp(".")
+getwd()

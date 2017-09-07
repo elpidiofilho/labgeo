@@ -34,6 +34,7 @@ run_models <- function(df,
                        seeds = NULL) {
 
   if (class(df) != "data.frame") stop("df is not a data frame.")
+  package.inicio <- search()[ifelse(unlist(gregexpr("package:", search())) == 1, TRUE, FALSE)]
   inicio = Sys.time()
   if(is.factor(df[,1]) == TRUE) {
     mod = 1
@@ -70,5 +71,8 @@ run_models <- function(df,
     }
   }
   print(paste("time elapsed", round(Sys.time() - inicio, 3)))
+  package.fim =  search()[ifelse(unlist(gregexpr("package:",search())) == 1, TRUE, FALSE)]
+  package.list <- setdiff(package.fim, package.inicio)
+  if (length(package.list) > 0)  for (package in package.list) detach(package, character.only = TRUE)
   return(list.model)
 }

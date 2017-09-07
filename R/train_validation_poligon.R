@@ -19,6 +19,7 @@
 #' @export
 
 train_validation_poligon <- function(dfall, p = 0.75, seed = 313) {
+  '.' <- poligono <- NULL
   stopifnot(is.data.frame(dfall), p > 0, p < 1)
   idam = NULL
   dfuy <- dplyr::select(dfall,1:2) %>% dplyr::mutate(idam = seq_len(nrow(.)))

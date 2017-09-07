@@ -19,6 +19,7 @@
 
 
 t_SNE_plot <- function(dx, y) {
+  V1 = V2 = Class = NULL
   tsne <- Rtsne::Rtsne(as.matrix(dx), check_duplicates = FALSE, pca = TRUE,
                perplexity = 30, theta = 0.5, dims = 5)
 
