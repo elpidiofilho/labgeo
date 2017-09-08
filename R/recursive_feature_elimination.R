@@ -1,22 +1,35 @@
-# Recursive Feature Elimination
+#' Recursive Feature Elimination
+#'
+#' This function performs an recursive feature elimination using the rfe function from caret package.
+#' This implentation of RFE uses parallel processing
+#'
+#' This function implements backwards selection of predictors based on
+#' predictor importance ranking. The predictors are ranked and the less
+#' important ones are sequentially eliminated prior to modeling. The goal is to
+#' find a subset of predictors that can be used to produce an accurate model.
+#' The web page \url{http://topepo.github.io/caret/recursive-feature-elimination.html#rfe}
+#' has more details and examples related to this function.
 #'
 #'
-#' This function performs an recursive feature elimination using the rfe function from caret package
 #' @param df   dataframe, with income variable in the first column
 #' @param index  Users cross validation folds. Default = NULL
-#' @param nfolds   Number of folds to be build in cross-validation
-#' @param sizes A numeric vector of integers corresponding to the number of features that should be retained
-#' @param fun A list of functions for model fitting, prediction and variable importance
-#' @param cpu_cores  Number of CPU cores to be used in parallel processing
-#' @param metric metric used to evaluate model fit. For numeric outcome ("RMSE", "Rsquared) and for categorical outcome ("Accuracy","Kappa")
+#' @param nfolds   Number of folds to be build in cross-validation. Default = 10
+#' @param sizes A numeric vector of integers corresponding to the number of features
+#'  that should be retained. Default = c(2:5,10)
+#' @param fun Default = rfFuncs , get importance values from Random Forest model.
+#' @param cpu_cores  Number of CPU cores to be used in parallel processing.
+#'                   Default = 6. For avoid parallel execution set this parameter to zero.
+#' @param metric metric used to evaluate model fit. For numeric outcome possible values are
+#'               ("RMSE", "Rsquared) and for categorical outcome ("Accuracy","Kappa")
 #' @param seeds seeds
-#' @param verbose verbose
+#' @param verbose  print results and execution time of function
 #' @keywords Recursive Feature Elimination
 #' @details  details
 #' @importFrom parallel makePSOCKcluster stopCluster
 #' @importFrom doParallel registerDoParallel
 #' @importFrom caret trainControl rfe rfeControl rfFuncs
 #' @importFrom stats as.formula
+#' @author RFE by Max Kuhn
 #' @author Elpidio Filho, \email{elpidio@ufv.br}
 #' @examples
 #' \dontrun{
@@ -34,6 +47,7 @@ recursive_feature_elimination <- function(df,
                                           metric = ifelse(is.factor(df[,1]),"Kappa", "Rsquared"),
                                           seeds = NULL,
                                           verbose = TRUE){
+  if (!is.data.frame(df)) stop("df is not a dataframe")
   if (is.null(metric)){
     if (is.numeric(df[, 1])) {
       metric <- "Rsquared"
@@ -51,22 +65,31 @@ recursive_feature_elimination <- function(df,
       method <- "CV"
     }
   }
-  if (!is.data.frame(df)) stop("df is not a dataframe")
+
+  if (is.null(seeds)) {
+    seedsvec = NULL
+  } else {
+    set.seed(seeds)
+    seedsvec <- vector(mode = "list", length = nfolds + 1)
+    for (i in 1:nfolds) seedsvec[[i]] <- sample.int(n = 1000, 400)
+    seedsvec[[nfolds + 1]] <- sample.int(1000, 1)
+  }
+
+
   inicio <- Sys.time()
-  #index = createFolds(df[,1], k = nfolds, list = T, returnTrain = T)
   formula <- as.formula(paste(names(df)[1], "~ .", sep = ""))
   if (cpu_cores > 0) {
     cl <- parallel::makePSOCKcluster(cpu_cores)
     doParallel::registerDoParallel(cl)
   }
   if (is.null(index)) {
-  rfProfile <- caret::rfe(formula = formula, data = df,  sizes = sizes, metric = metric,
-                   rfeControl = rfeControl(method = "cv", functions = fun, number = nfolds,
-                                           seeds = seeds))
+    rfProfile <- caret::rfe(formula = formula, data = df,  sizes = sizes, metric = metric,
+                            rfeControl = rfeControl(method = "cv", functions = fun, number = nfolds,
+                                                    seeds = seedsvec))
   } else {
     rfProfile <- caret::rfe(formula = formula, data = df,  sizes = sizes, metric = metric,
-                     rfeControl = rfeControl(method = "cv", functions = fun, number = nfolds,
-                                             seeds = seeds, index = index))
+                            rfeControl = rfeControl(method = "cv", functions = fun, number = nfolds,
+                                                    seeds = seedsvec, index = index))
 
   }
   if (!is.null(cl)) {
@@ -74,9 +97,10 @@ recursive_feature_elimination <- function(df,
   }
   if (verbose == TRUE) {
     print("=======================================================================")
-    print(paste("outcome : ",names(df)[1],sep=""))
-    print(paste('Selected vars :',paste(rfProfile$optVariables, collapse = ",")))
-    print(paste("time elapsed :", round((Sys.time() - inicio),3)))
+    print("Recursive Feature Elimination")
+    print(paste("outcome : ", names(df)[1], sep = ""))
+    print(paste('Selected vars :', paste(rfProfile$optVariables, collapse = ",")))
+    print(paste("time elapsed :", round((Sys.time() - inicio), 3)))
   }
   return(rfProfile)
 }
