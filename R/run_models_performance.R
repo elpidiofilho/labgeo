@@ -203,7 +203,7 @@ rmp_classificacao <- function(fit.run.model, df.valida, verbose = FALSE) {
                              g1 = list(nm), g2 = list(nm))
   for (i in 1:length(fit.run.model)) {
     fit.md = fit.run.model[[i]]
-    v = predict(fit.md, df.valida)
+    v = suppressMessages(predict(fit.md, df.valida))
     ddd = data.frame(observado = df.valida[, 1], predito = v)
     summ_model$model[i] = fit.md$method
     summ_model$fit[i] = list(fit.md)
@@ -217,7 +217,7 @@ rmp_classificacao <- function(fit.run.model, df.valida, verbose = FALSE) {
     confusion = data.frame(cf$table)
     freqcols = prop.table(cf$table,2) %>% data.frame() %>% dplyr::rename(freq_col = Freq)
     freqrows = prop.table(cf$table,1) %>% data.frame() %>% dplyr::rename(freq_row = Freq)
-    ddd = dplyr::left_join(freqcols, freqrows) %>% tidyr::gather(key =var, value = valor, -Prediction, -Reference)
+    ddd = dplyr::left_join(freqcols, freqrows, by = c("Prediction", "Reference")) %>% tidyr::gather(key =var, value = valor, -Prediction, -Reference)
 
     g1 = ggplot(confusion, mapping = aes(x = Reference, y = Prediction)) +
       geom_tile(colour = "white", fill = "lightyellow2") +
