@@ -14,16 +14,11 @@
 
 
 factor_detect <- function(df, max.unique = 20) {
-  name.col <- names(df)
-  vf <- as.integer()
-  for (i in seq_len(ncol(df))){
-    if ( (is.numeric(df[, i]) == TRUE) | (is.character(df[, i]) == TRUE)) {
-      unique.val <- length(unique(df[, i]))
-      if (unique.val <= max.unique) {
-        vf <- c(vf, i)
-        print(name.col[i])
-      }
-    }
+  vunique <- sapply(df, function(y) length(unique(y)))
+  vf = vunique[vunique <= max.unique]
+  vn = match(names(vf),names(df))
+  if (length(vn) > 0) {
+    print(names(df)[vn])
   }
-  return(vf)
+  return(vn)
 }
