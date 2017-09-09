@@ -15,8 +15,8 @@
 
 factor_detect <- function(df, max.unique = 20) {
   vunique <- sapply(df, function(y) length(unique(y)))
-  vf = vunique[vunique <= max.unique]
-  vn = match(names(vf),names(df))
+  vf <- vunique[vunique <= max.unique]
+  vn <- match(names(vf), names(df))
   if (length(vn) > 0) {
     print(names(df)[vn])
   }
