@@ -27,6 +27,7 @@
 descriptive_stat_polygon <- function(df, poligon_id, desc = c('min', 'mean', 'max', 'sd')) {
 
 #  c("min", "median", "mean", "max", "sd","skewness", "kurtosis", "p1", "p10", "p25","p33", "p66", "p75", "p90", "p99")
+  inicio = Sys.time()
   dnum <- df %>% dplyr::group_by(!!poligon_id) %>% dplyr::select_if(is.numeric) %>%
     dplyr::summarise_all(desc)
 
@@ -34,6 +35,7 @@ descriptive_stat_polygon <- function(df, poligon_id, desc = c('min', 'mean', 'ma
     dplyr::summarise_all(moda) %>% dplyr::mutate_if(is.character, as.factor)
 
   df = dplyr::left_join(dcat,dnum)
+  print(paste("time elapsed", hms_span(inicio,Sys.time())))
   return(df)
 }
 

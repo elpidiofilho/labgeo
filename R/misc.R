@@ -54,3 +54,17 @@ kde2d <- function(x, y, h, n = 25, lims = c(range(x), range(y))) {
   z <- tcrossprod(matrix(dnorm(ax),, nx), matrix(dnorm(ay),, nx)) / (nx * h[1L] * h[2L])
   list(x = gx, y = gy, z = z)
 }
+
+## code by Nathan Russell https://github.com/nathan-russell
+## https://stackoverflow.com/questions/32100133/print-the-time-a-script-has-been-running-in-r
+
+hms_span <- function(start, end) {
+  dsec <- as.numeric(difftime(end, start, unit = "secs"))
+  hours <- floor(dsec / 3600)
+  minutes <- floor((dsec - 3600 * hours) / 60)
+  seconds <- dsec - 3600*hours - 60*minutes
+  paste0(
+    sapply(c(hours, minutes, seconds), function(x) {
+      formatC(x, width = 2, format = "d", flag = "0")
+    }), collapse = ":")
+}

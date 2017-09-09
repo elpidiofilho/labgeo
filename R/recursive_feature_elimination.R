@@ -100,7 +100,7 @@ recursive_feature_elimination <- function(df,
     print("Recursive Feature Elimination")
     print(paste("outcome : ", names(df)[1], sep = ""))
     print(paste('Selected vars :', paste(rfProfile$optVariables, collapse = ",")))
-    print(paste("time elapsed :", round((Sys.time() - inicio), 3)))
+    print(paste("time elapsed", hms_span(inicio,Sys.time())))
   }
   return(rfProfile)
 }

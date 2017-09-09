@@ -80,6 +80,7 @@ run_models <- function(df,
   package.fim =  search()[ifelse(unlist(gregexpr("package:",search())) == 1, TRUE, FALSE)]
   package.list <- setdiff(package.fim, package.inicio)
   if (length(package.list) > 0)  for (package in package.list) detach(package, character.only = TRUE)
-  print(paste("time elapsed", round(Sys.time() - inicio, 3)))
+
+  print(paste("time elapsed", hms_span(inicio,Sys.time())))
   return(list.model)
 }
