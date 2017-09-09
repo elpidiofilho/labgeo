@@ -198,12 +198,12 @@ pred_acc <- function (obs, pred) {
 rmp_classificacao <- function(fit.run.model, df.valida, verbose = FALSE) {
   Freq = var = valor = Prediction = Reference = model = NULL
   nm = length(fit.run.model)
-  summ_model = dplyr::tibble(model = character(nm), accuracy = numeric(nm), Kappa = numeric(nm),
-                             fit = list(nm), dfpredobs = list(nm), byclass = list(nm),
-                             cf = list(nm), g1 = list(nm), g2 = list(nm))
+  summ_model = dplyr::tibble(model = character(nm), fit = list(nm), dfpredobs = list(nm),
+                             accuracy = numeric(nm), Kappa = numeric(nm), byclass = list(nm), cf = list(nm),
+                             g1 = list(nm), g2 = list(nm))
   for (i in 1:length(fit.run.model)) {
     fit.md = fit.run.model[[i]]
-    v = suppressMessages(predict(fit.md, df.valida))
+    v = predict(fit.md, df.valida)
     ddd = data.frame(observado = df.valida[, 1], predito = v)
     summ_model$model[i] = fit.md$method
     summ_model$fit[i] = list(fit.md)
@@ -217,7 +217,7 @@ rmp_classificacao <- function(fit.run.model, df.valida, verbose = FALSE) {
     confusion = data.frame(cf$table)
     freqcols = prop.table(cf$table,2) %>% data.frame() %>% dplyr::rename(freq_col = Freq)
     freqrows = prop.table(cf$table,1) %>% data.frame() %>% dplyr::rename(freq_row = Freq)
-    ddd = dplyr::left_join(freqcols, freqrows, by = c("Prediction", "Reference")) %>% tidyr::gather(key =var, value = valor, -Prediction, -Reference)
+    ddd = dplyr::left_join(freqcols, freqrows) %>% tidyr::gather(key =var, value = valor, -Prediction, -Reference)
 
     g1 = ggplot(confusion, mapping = aes(x = Reference, y = Prediction)) +
       geom_tile(colour = "white", fill = "lightyellow2") +
@@ -227,11 +227,11 @@ rmp_classificacao <- function(fit.run.model, df.valida, verbose = FALSE) {
                 color="black",size = 1, fill = "red", alpha = 0.2) +
       geom_text(aes(label = confusion$Freq), vjust = 1) +
       ggtitle(fit.md$method)
-    vv = rescale(c(0, 50, 100))
+
     g2 = ggplot(ddd, mapping = aes(x = Reference, y = Prediction)) +
       geom_tile(aes(fill = valor), colour = "white") +
       scale_fill_gradientn(colours=c("lightyellow2","white","palegreen"),
-                            values  = vv) +
+                            values  = rescale(c(0, 50, 100))) +
       scale_x_discrete(name="Actual Class") + scale_y_discrete(name="Predicted Class") +
       labs(fill="Normalized\nFrequency") +
       geom_text(aes(label = round(ddd$valor, 2)), vjust = 1) +
