@@ -44,10 +44,12 @@ run_models <- function(df,
   if (is.null(seeds)) {
     seedsvec = NULL
   } else {
-    set.seed(seeds)
-    seedsvec <- vector(mode = "list", length = nfolds + 1)
-    for (i in 1:nfolds) seedsvec[[i]] <- sample.int(n = 1000, 400)
-    seedsvec[[nfolds + 1]] <- sample.int(1000, 1)
+    if (class(seedsvec) != "list") {
+      set.seed(seeds)
+      seedsvec <- vector(mode = "list", length = nfolds + 1)
+      for (i in 1:nfolds) seedsvec[[i]] <- sample.int(n = 1000, 400)
+      seedsvec[[nfolds + 1]] <- sample.int(1000, 1)
+    }
   }
 
   nr = length(models)

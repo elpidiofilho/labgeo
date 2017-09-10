@@ -42,7 +42,7 @@ easy_fit(dy, dx, nfolds = 10, repeats = 1, metric = ifelse(is.factor(dy[,
 
 \item{preprocess}{pre process}
 
-\item{seeds}{seeds}
+\item{myseeds}{seeds}
 }
 \description{
 This function performs the training of the chosen models to a group of outcomes (y)
