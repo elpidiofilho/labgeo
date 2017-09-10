@@ -68,3 +68,22 @@ hms_span <- function(start, end) {
       formatC(x, width = 2, format = "d", flag = "0")
     }), collapse = ":")
 }
+
+
+#' @export
+to_table <- function(txt, n.col) {
+  n.col = 4
+  num.elem = length(txt)
+  divint = ceiling(num.elem / n.col) * n.col
+  dif = divint - ncol(dff)
+  if (dif > 0) {
+    complete = rep(" ", times = dif)
+    txt_complete = c(txt,complete)
+  } else {
+    txt_complete = txt
+  }
+  mx = matrix(txt_complete, ncol = n.col)
+  names(mx) = 1:n.col
+  dd = knitr::kable(mx, col.names = 1:n.col)
+  return(dd)
+}

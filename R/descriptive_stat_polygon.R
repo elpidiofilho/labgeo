@@ -12,6 +12,8 @@
 #' @importFrom dplyr select_if
 #' @importFrom dplyr mutate_if
 #' @importFrom dplyr left_join
+#' @importFrom dplyr collect
+#' @importFrom multidplyr cluster_copy partition
 #' @importFrom stats quantile
 #' @author Elpidio Filho, \email{elpidio@ufv.br}
 #' @keywords statics polygon
@@ -24,82 +26,111 @@
 
 
 
-descriptive_stat_polygon <- function(df, poligon_id, desc = c('min', 'mean', 'max', 'sd')) {
-
-#  c("min", "median", "mean", "max", "sd","skewness", "kurtosis", "p1", "p10", "p25","p33", "p66", "p75", "p90", "p99")
-  inicio = Sys.time()
-  dnum <- df %>% dplyr::group_by(!!poligon_id) %>% dplyr::select_if(is.numeric) %>%
-    dplyr::summarise_all(desc)
-
-  dcat = df %>% dplyr::group_by(!!poligon_id) %>% dplyr::select_if(is.factor) %>%
-    dplyr::summarise_all(moda) %>% dplyr::mutate_if(is.character, as.factor)
-
-  df = dplyr::left_join(dcat,dnum)
-  print(paste("time elapsed", hms_span(inicio,Sys.time())))
+descriptive_stat_polygon <- function(df, poligon_id, desc = c("min", "mean", "max", "sd")) {
+  #  c("min", "median", "mean", "max", "sd","skewness", "kurtosis", "p1", "p10", "p25","p33", "p66", "p75", "p90", "p99")
+  inicio <- Sys.time()
+  vpc <- c("p1", "p10", "p25", "p33", "p66", "p75", "p90", "p99")
+  pdesc <- desc[vpc %in% desc]
+  dfselnum <- dff %>%
+    dplyr::select_if(is.numeric)
+  d1 <- multidplyr::partition(dfselnum, polig)
+  multidplyr::cluster_copy(d1, p1)
+  multidplyr::cluster_copy(d1, p10)
+  multidplyr::cluster_copy(d1, p25)
+  multidplyr::cluster_copy(d1, p33)
+  multidplyr::cluster_copy(d1, p66)
+  multidplyr::cluster_copy(d1, p75)
+  multidplyr::cluster_copy(d1, p90)
+  multidplyr::cluster_copy(d1, p99)
+  multidplyr::cluster_copy(d1, px)
+  dnum <- d1 %>%
+    dplyr::summarise_all(desc) %>%
+    dplyr::collect()
+  dcat <- df %>%
+    dplyr::group_by(!! poligon_id) %>%
+    dplyr::select_if(is.factor) %>%
+    dplyr::summarise_all(moda) %>%
+    dplyr::mutate_if(is.character, as.factor)
+  df <- dplyr::left_join(dcat, dnum)
+  print(paste("time elapsed", hms_span(inicio, Sys.time())))
   return(df)
 }
 
-p1 <- function(x) {
-  if(!is.numeric(x)) {
-    stop('x must be numeric')
+px <- function(x, q) {
+  n <- length(x)
+  vs <- sort(x, method = "shell")
+  np <- round(q * length(x), 0)
+  if (np > 1) {
+    vq <- vs[np]
+    names(vq) <- paste(q, "%", sep = "")
+    return(vq)
+  } else {
+    return(NA)
   }
-  quantile(x, 0.01)
+}
+
+
+p1 <- function(x) {
+  if (!is.numeric(x)) {
+    stop("x must be numeric")
+  }
+  px(x, 0.01)
 }
 
 p10 <- function(x) {
-  if(!is.numeric(x)) {
-    stop('x must be numeric')
+  if (!is.numeric(x)) {
+    stop("x must be numeric")
   }
-  quantile(x, 0.10)
+  px(x, 0.10)
 }
 
 p25 <- function(x) {
-  if(!is.numeric(x)) {
-    stop('x must be numeric')
+  if (!is.numeric(x)) {
+    stop("x must be numeric")
   }
-  quantile(x, 0.25)
+  px(x, 0.25)
 }
 
 p33 <- function(x) {
-  if(!is.numeric(x)) {
-    stop('x must be numeric')
+  if (!is.numeric(x)) {
+    stop("x must be numeric")
   }
-  quantile(x, 0.33)
+  px(x, 0.33)
 }
 
 p66 <- function(x) {
-  if(!is.numeric(x)) {
-    stop('x must be numeric')
+  if (!is.numeric(x)) {
+    stop("x must be numeric")
   }
-  quantile(x, 0.66)
+  px(x, 0.66)
 }
 
 
 p75 <- function(x) {
-  if(!is.numeric(x)) {
-    stop('x must be numeric')
+  if (!is.numeric(x)) {
+    stop("x must be numeric")
   }
-  quantile(x, 0.75)
+  px(x, 0.75)
 }
 
 p90 <- function(x) {
-  if(!is.numeric(x)) {
-    stop('x must be numeric')
+  if (!is.numeric(x)) {
+    stop("x must be numeric")
   }
-  quantile(x, 0.90)
+  px(x, 0.90)
 }
 
 p99 <- function(x) {
-  if(!is.numeric(x)) {
-    stop('x must be numeric')
+  if (!is.numeric(x)) {
+    stop("x must be numeric")
   }
-  quantile(x, 0.99)
+  px(x, 0.99)
 }
 
 
 moda <- function(x) {
-  w = table(x);
-  w1 = w[max(w)==w]
+  w <- table(x)
+  w1 <- w[max(w) == w]
   return(names(w1)[1])
 }
 
@@ -109,8 +140,8 @@ sums <- function(x, pot) {
 }
 
 kurtosis <- function(x) {
-  if(!is.numeric(x)) {
-    stop('x must be numeric')
+  if (!is.numeric(x)) {
+    stop("x must be numeric")
   }
   summ <- sums(x, 4)
   n <- length(x)
@@ -122,8 +153,8 @@ kurtosis <- function(x) {
 
 
 skewness <- function(x) {
-  if(!is.numeric(x)) {
-    stop('x must be numeric')
+  if (!is.numeric(x)) {
+    stop("x must be numeric")
   }
   summ <- sums(x, 3)
   n <- length(x)
