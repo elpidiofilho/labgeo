@@ -54,10 +54,12 @@ easy_fit <- function(dy, dx,
   ###-------------------------------------------------------------------------
 
   if (is.null(seeds)) {
-    set.seed(313)
-    seeds <- vector(mode = "list", length = (nfolds*repeats) + 1)
-    for (i in 1:(nfolds*repeats)) seeds[[i]] <- sample.int(n = 1000, 400)
-    seeds[[(nfolds*repeats) + 1]] <- sample.int(1000, 1)
+    seedsvec = NULL
+  } else {
+    set.seed(seeds)
+    seedsvec <- vector(mode = "list", length = nfolds + 1)
+    for (i in 1:nfolds) seedsvec[[i]] <- sample.int(n = 1000, 400)
+    seedsvec[[nfolds + 1]] <- sample.int(1000, 1)
   }
   ###-------------------------------------------------------------------------
   ny = ncol(dy)
@@ -90,7 +92,7 @@ easy_fit <- function(dy, dx,
                                         cpu_cores = cpu_cores,
                                         nfolds = nfolds_RFE,
                                         metric = metric_RFE,
-                                        seeds = seeds)
+                                        seeds = seedsvec)
     if (tolerance_RFE > 0) {
       tol5 <- caret::pickSizeTolerance(fit$results, metric = "Rsquared",
                                        tol = tolerance_RFE, maximize = maximize)
@@ -109,7 +111,7 @@ easy_fit <- function(dy, dx,
                          tune_length = tune_length,
                          nfolds = nfolds,
                          repeats = repeats,
-                         seeds = seeds)
+                         seeds = seedsvec)
 
     list.model$var[i] = el
     list.model$selec[i] = list(vs)
