@@ -9,7 +9,7 @@ easy_fit(dy, dx, nfolds = 10, repeats = 1, metric = ifelse(is.factor(dy[,
   fun_RFE = rfFuncs, repeats_RFE = 1, metric_RFE = ifelse(is.factor(dy[,
   1]), "Kappa", "Rsquared"), nfolds_RFE = 5, sizes_RFE = c(2:10, 15),
   tolerance_RFE = 0, models = c("ridge", "rf", "cubist", "pls", "foba",
-  "gbm", "glmboost"), preprocess = NULL, seeds = NULL)
+  "gbm", "glmboost"), preprocess = NULL, seeds = NULL, verbose = TRUE)
 }
 \arguments{
 \item{dy}{outcomes}
@@ -41,6 +41,8 @@ easy_fit(dy, dx, nfolds = 10, repeats = 1, metric = ifelse(is.factor(dy[,
 \item{models}{vector of models to be fitted. Uses  algortims names from Caret package.}
 
 \item{preprocess}{pre process}
+
+\item{verbose}{show results and messages from processing functions}
 
 \item{myseeds}{seeds}
 }

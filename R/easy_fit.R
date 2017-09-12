@@ -18,6 +18,7 @@
 #' @param sizes_RFE A numeric vector of integers corresponding to the number of features that should be retained
 #' @param metric_RFE metric to recursive feature elimination
 #' @param preprocess pre process
+#' @param verbose show results and messages from processing functions
 #' @keywords Train kappa
 #' @importFrom caret pickSizeTolerance
 #' @importFrom caret rfFuncs
@@ -49,7 +50,8 @@ easy_fit <- function(dy, dx,
                      tolerance_RFE = 0,
                      models = c("ridge", "rf", "cubist",'pls','foba','gbm','glmboost'),
                      preprocess = NULL,
-                     seeds = NULL) {
+                     seeds = NULL,
+                     verbose = TRUE) {
 
   ###-------------------------------------------------------------------------
 if (is.null(seeds)) {
@@ -91,7 +93,8 @@ if (is.null(seeds)) {
                                         cpu_cores = cpu_cores,
                                         nfolds = nfolds_RFE,
                                         metric = metric_RFE,
-                                        seeds = seedsvec)
+                                        seeds = seedsvec,
+                                        verbose = verbose)
     if (tolerance_RFE > 0) {
       tol5 <- caret::pickSizeTolerance(fit$results, metric = "Rsquared",
                                        tol = tolerance_RFE, maximize = maximize)

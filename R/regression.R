@@ -53,7 +53,7 @@ regression <- function(df.train,
   }
   if (repeats > 1) method = "repeatedcv"
 
-  beg <- Sys.time()
+  inicio <- Sys.time()
   if (is.null(formula)) {
     formula <- as.formula(paste(names(df.train)[1], "~ ."))
   }
@@ -82,7 +82,7 @@ regression <- function(df.train,
     parallel::stopCluster(cl)
   }
   if (verbose == TRUE) {
-    print(paste("Execution time: ", round((Sys.time() - beg),4)))
+    print(paste("time elapsed : ", hms_span(inicio,Sys.time())))
     print(caret::getTrainPerf(fit))
   }
   return(fit)

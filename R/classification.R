@@ -48,7 +48,7 @@ classification <- function(df.train,
     method <- "CV"
   }
 
-  beg <- Sys.time()
+  inicio <- Sys.time()
   if (is.null(formula)) {
     formula <- as.formula(paste(names(df.train)[1], "~ ."))
   }
@@ -70,7 +70,8 @@ classification <- function(df.train,
     parallel::stopCluster(cl)
   }
   if (verbose == TRUE) {
-    print(paste("Execution time: ", round((Sys.time() - beg), 3)))
+    print(paste("Classification variable ", names(df.train)[1]))
+    print(paste("time elapsed : ", hms_span(inicio,Sys.time())))
     print(caret::getTrainPerf(fit))
   }
   return(fit)
