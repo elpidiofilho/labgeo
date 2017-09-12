@@ -38,51 +38,55 @@ regression <- function(df.train,
                        cpu_cores = 3,
                        tune_length = 5,
                        metric = "Rsquared",
-                      seeds = NULL,
-                      verbose = FALSE){
-  #library(doParallel)
-  #library(caret)
-  if (nfolds == 0 ){
+                       seeds = NULL,
+                       verbose = FALSE) {
+  # library(doParallel)
+  # library(caret)
+  if (nfolds == 0) {
     method <- "none"
     tune_length <- NULL
   }
-  if (nfolds >= nrow(df.train)){
+  if (nfolds >= nrow(df.train)) {
     method <- "LOOCV"
   } else {
     method <- "CV"
   }
-  if (repeats > 1) method = "repeatedcv"
+  if (repeats > 1) method <- "repeatedcv"
 
   inicio <- Sys.time()
   if (is.null(formula)) {
     formula <- as.formula(paste(names(df.train)[1], "~ ."))
   }
-  tc <- caret::trainControl(method = method,
-                            number = nfolds,
-                            repeats = repeats,
-                            index = index,
-                            savePredictions = "final",
-                            returnResamp = "final",
-                            seeds = seeds,
-                            verbose = FALSE)
+  tc <- caret::trainControl(
+    method = method,
+    number = nfolds,
+    repeats = repeats,
+    index = index,
+    savePredictions = "final",
+    returnResamp = "final",
+    seeds = seeds,
+    verbose = FALSE
+  )
 
   if (cpu_cores > 0) {
     cl <- parallel::makePSOCKcluster(cpu_cores)
     doParallel::registerDoParallel(cl)
   }
   set.seed(313)
-  fit <- suppressMessages(caret::train(formula,
-                      data = df.train,
-                      method = regressor,
-                      metric = metric,
-                      trControl = tc,
-                      tuneLength = tune_length,
-                      preProcess = preprocess))
+  fit <- suppressMessages(caret::train(
+    formula,
+    data = df.train,
+    method = regressor,
+    metric = metric,
+    trControl = tc,
+    tuneLength = tune_length,
+    preProcess = preprocess
+  ))
   if (!is.null(cl)) {
     parallel::stopCluster(cl)
   }
   if (verbose == TRUE) {
-    print(paste("time elapsed : ", hms_span(inicio,Sys.time())))
+    print(paste("time elapsed : ", hms_span(inicio, Sys.time())))
     print(caret::getTrainPerf(fit))
   }
   return(fit)
