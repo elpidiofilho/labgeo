@@ -230,10 +230,10 @@ rmp_classificacao <- function(fit_run_model, df_valida, verbose = FALSE) {
     summ_model$byclass[i] <- list(cf$byClass)
     summ_model$cf[i] <- list(cf$table)
     confusion <- data.frame(cf$table)
-    freqcols <- prop_table(cf$table, 2) %>%
+    freqcols <- prop.table(cf$table, 2) %>%
       data.frame() %>%
       dplyr::rename(freq_col = Freq)
-    freqrows <- prop_table(cf$table, 1) %>%
+    freqrows <- prop.table(cf$table, 1) %>%
       data.frame() %>%
       dplyr::rename(freq_row = Freq)
     ddd <- dplyr::left_join(freqcols, freqrows, by = c("Prediction", "Reference")) %>%
@@ -245,7 +245,7 @@ rmp_classificacao <- function(fit_run_model, df_valida, verbose = FALSE) {
       scale_y_discrete(name = "Predicted Class") +
       geom_tile(
         aes(x = Reference, y = Prediction),
-        data = subset(confusion, as_character(Reference) == as_character(Prediction)),
+        data = subset(confusion, as.character(Reference) == as.character(Prediction)),
         color = "black", size = 1, fill = "red", alpha = 0.2
       ) +
       geom_text(aes(label = confusion$Freq), vjust = 1) +
