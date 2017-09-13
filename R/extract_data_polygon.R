@@ -27,32 +27,39 @@
 #' df = extrai_poligono_raster(pathraster = "./bandas", extensao = "*.asc",
 #'                             pathpoligono = "./amostragem", filepoligono = "poligonos",
 #'                             fieldclasse = "gridcode", fieldpoligono = "Id")
-#'}
+#' }
 #' @export
 
-extract_data_polygon  <- function(path_raster, raster_type = ".asc", path_poligon, name_poligon,
-                                  field_class = "gridcode", field_poligon = "Id", remove_NA = TRUE){
-  inicio = Sys.time()
-  l <- list.files(path_raster, pattern = raster_type,include.dirs = T, full.names = T)
+extract_data_polygon <- function(path_raster, raster_type = ".asc",
+                                 path_poligon, name_poligon,
+                                 field_class = "gridcode",
+                                 field_poligon = "Id", remove_NA = TRUE) {
+  inicio <- Sys.time()
+  l <- list.files(path_raster, pattern = raster_type,
+                  include.dirs = T, full.names = T)
   st <- raster::stack(l)
   shpfile <- rgdal::readOGR(path_poligon, name_poligon)
   r <- raster::raster(extent(shpfile))
   raster::res(r) <- raster::res(st)
   rclasse <- raster::rasterize(shpfile, field = field_class, r)
-  rpolig  <- raster::rasterize(shpfile, field = field_poligon, r)
-  pclasse <- raster::rasterToPoints(rclasse) %>% data.frame()
-  ppolig <-  raster::rasterToPoints(rpolig) %>% data.frame()
+  rpolig <- raster::rasterize(shpfile, field = field_poligon, r)
+  pclasse <- raster::rasterToPoints(rclasse) %>%
+    data.frame()
+  ppolig <- raster::rasterToPoints(rpolig) %>%
+    data.frame()
   names(pclasse)[3] <- "classe"
   names(ppolig)[3] <- "polig"
-  pt <- dplyr::left_join(pclasse, ppolig) %>% data.frame()
-  xy <- pt[, c(1,2)]
-  spdf <- sp::SpatialPointsDataFrame(coords = xy, data = pt, proj4string = shpfile@proj4string)
+  pt <- dplyr::left_join(pclasse, ppolig) %>%
+    data.frame()
+  xy <- pt[, c(1, 2)]
+  spdf <- sp::SpatialPointsDataFrame(coords = xy, data = pt,
+                                     proj4string = shpfile@proj4string)
   dp <- raster::extract(st, spdf)
   dp <- data.frame(pt, dp)
   if (remove_NA == TRUE) {
     dp <- na.omit(dp)
   }
 
-  print(paste("time elapsed:",Sys.time() - inicio))
+  print(paste("time elapsed:", Sys.time() - inicio))
   return(dp)
 }

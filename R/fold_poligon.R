@@ -27,7 +27,8 @@ fold_poligon <- function(nfold, poligon, seed = 123) {
 
   for (i in seq_len(nfold)) {
     v <- vu[dp[[i]]]
-    vp <- (dfdata %>% dplyr::filter(poligon %in% v))[, 1]
+    vp <- (dfdata %>%
+      dplyr::filter(poligon %in% v))[, 1]
     lfold[[i]] <- vp
   }
   return(lfold)

@@ -4,12 +4,12 @@
 \alias{descriptive_stat_polygon}
 \title{Descriptive statistics polygon}
 \usage{
-descriptive_stat_polygon(df, poligon_id, desc = c("min", "mean", "max", "sd"))
+descriptive_stat_polygon(df, poligon, desc = c("min", "mean", "max", "sd"))
 }
 \arguments{
 \item{df}{dataframe}
 
-\item{poligon_id}{name of column thats contains polygon id}
+\item{poligon}{name of column thats contains polygon id}
 
 \item{desc}{parameters os descritive statistics to be calculated.Choices are : c("min", "median", "mean", "max", "sd","skewness", "kurtosis", "p1", "p10", "p25","p33", "p66", "p75", "p90", "p99")}
 }

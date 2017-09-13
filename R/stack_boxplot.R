@@ -22,7 +22,7 @@
 #' @export
 
 
-stack_boxplot <- function (x, y, y.limit, name1, name2, color1, color2, title){
+stack_boxplot <- function(x, y, y.limit, name1, name2, color1, color2, title) {
   boxplot(x, main = title, col = color1, ylim = y.limit)
   par(new = TRUE)
   boxplot(y, main = "", col = color2, ylim = y.limit)

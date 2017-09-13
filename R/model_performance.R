@@ -13,25 +13,26 @@
 #' @export
 
 model_performance <- function(list_fit) {
-  nr = length(list_fit$models)
-  nmodels = length(list_fit$models[[1]])
-  nt = nr * nmodels
-  df.result = data.frame(variable = character(nt), method = character(nt), selec = character(nt),
-                            r2 = numeric(nt), rmse = numeric(nt), stringsAsFactors = FALSE)
-  cont = 1
+  nr <- length(list_fit$models)
+  nmodels <- length(list_fit$models[[1]])
+  nt <- nr * nmodels
+  df.result <- data.frame(
+    variable = character(nt), method = character(nt), selec = character(nt),
+    r2 = numeric(nt), rmse = numeric(nt), stringsAsFactors = FALSE
+  )
+  cont <- 1
   for (i in 1:nr) {
-    ddd = list_fit$models[[i]]
-    n = length(ddd)
+    ddd <- list_fit$models[[i]]
+    n <- length(ddd)
     for (j in 1:n) {
-      dddd = ddd[[j]]
-      df.result$variable[cont] = unlist(list_fit$var[[i]])
-      df.result$selec[cont] = paste(unlist(list_fit$selec[[i]]),collapse = ",")
-      df.result$method[cont] =  unlist(caret::getTrainPerf(dddd)[3])
-      df.result$rmse[cont] =  unlist(caret::getTrainPerf(dddd)[1])
-      df.result$r2[cont] =  unlist(caret::getTrainPerf(dddd)[2])
-      cont = cont + 1
+      dddd <- ddd[[j]]
+      df.result$variable[cont] <- unlist(list_fit$var[[i]])
+      df.result$selec[cont] <- paste(unlist(list_fit$selec[[i]]), collapse = ",")
+      df.result$method[cont] <- unlist(caret::getTrainPerf(dddd)[3])
+      df.result$rmse[cont] <- unlist(caret::getTrainPerf(dddd)[1])
+      df.result$r2[cont] <- unlist(caret::getTrainPerf(dddd)[2])
+      cont <- cont + 1
     }
   }
   return(df.result)
 }
-

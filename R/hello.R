@@ -13,18 +13,18 @@
 #   Check Package:             'Ctrl + Shift + E'
 #   Test Package:              'Ctrl + Shift + T'
 
-#hello <- function() {
+# hello <- function() {
 #  print("Hello, world!")
-#}
-#devtools::document()
+# }
+# devtools::document()
 
-#library(goodpractice)
+# library(goodpractice)
 
-#gp()
-#devtools::install_github("r-lib/boxes")
-#devtools::install_github("ropenscilabs/available")
-#library(available)
-#suggest(title = "functions to land use and soil mapping")
-#available("dsm")
-#roxygen2::roxygenise()
-#available_on_cran("runmodel")
+# gp()
+# devtools::install_github("r-lib/boxes")
+# devtools::install_github("ropenscilabs/available")
+# library(available)
+# suggest(title = "functions to land use and soil mapping")
+# available("dsm")
+# roxygen2::roxygenise()
+# available_on_cran("runmodel")

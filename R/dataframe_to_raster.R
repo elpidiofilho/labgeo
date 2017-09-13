@@ -15,4 +15,4 @@
 
 dataframe_to_raster <- function(df) {
   return(raster::rasterFromXYZ(df))
-  }
+}

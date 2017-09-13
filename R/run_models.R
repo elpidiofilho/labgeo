@@ -87,4 +87,3 @@ run_models <- function(df,
   print(paste("time elapsed", hms_span(inicio, Sys.time())))
   return(list.model)
 }
-

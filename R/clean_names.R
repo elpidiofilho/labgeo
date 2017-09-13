@@ -16,9 +16,10 @@
 
 clean_names <- function(df) {
   "." <- NULL
-  colnames(df) <- df %>% names %>%
-    str_to_lower %>%
-    iconv(., "utf-8", to='ASCII//TRANSLIT') %>%
+  colnames(df) <- df %>%
+    names() %>%
+    str_to_lower() %>%
+    iconv(., "utf-8", to = "ASCII//TRANSLIT") %>%
     str_replace_all("\\.", "_") %>%
     str_replace_all("\\,", "_") %>%
     str_replace_all(" ", "_") %>%

@@ -44,22 +44,22 @@ recursive_feature_elimination <- function(df,
                                           nfolds = 5,
                                           fun = rfFuncs,
                                           cpu_cores = 6,
-                                          metric = ifelse(is.factor(df[,1]),"Kappa", "Rsquared"),
+                                          metric = ifelse(is.factor(df[, 1]), "Kappa", "Rsquared"),
                                           seeds = NULL,
-                                          verbose = TRUE){
+                                          verbose = TRUE) {
   if (!is.data.frame(df)) stop("df is not a dataframe")
-  if (is.null(metric)){
+  if (is.null(metric)) {
     if (is.numeric(df[, 1])) {
       metric <- "Rsquared"
     } else {
       metric <- "Kappa"
     }
   }
-  if (nfolds == 0 ){
+  if (nfolds == 0) {
     method <- "none"
     tune_length <- NULL
   } else {
-    if (nfolds >= nrow(df)){
+    if (nfolds >= nrow(df)) {
       method <- "LOOCV"
     } else {
       method <- "CV"
@@ -67,12 +67,12 @@ recursive_feature_elimination <- function(df,
   }
 
   if (is.null(seeds)) {
-    seedsvec = NULL
+    seedsvec <- NULL
   } else {
-      set.seed(seeds)
-      seedsvec <- vector(mode = "list", length = nfolds + 1)
-      for (i in 1:nfolds) seedsvec[[i]] <- sample.int(n = 1000, 400)
-      seedsvec[[nfolds + 1]] <- sample.int(1000, 1)
+    set.seed(seeds)
+    seedsvec <- vector(mode = "list", length = nfolds + 1)
+    for (i in 1:nfolds) seedsvec[[i]] <- sample.int(n = 1000, 400)
+    seedsvec[[nfolds + 1]] <- sample.int(1000, 1)
   }
 
 
@@ -83,14 +83,21 @@ recursive_feature_elimination <- function(df,
     doParallel::registerDoParallel(cl)
   }
   if (is.null(index)) {
-    rfProfile <- caret::rfe(formula = formula, data = df,  sizes = sizes, metric = metric,
-                            rfeControl = rfeControl(method = "cv", functions = fun, number = nfolds,
-                                                    seeds = seedsvec))
+    rfProfile <- caret::rfe(
+      formula = formula, data = df, sizes = sizes, metric = metric,
+      rfeControl = rfeControl(
+        method = "cv", functions = fun, number = nfolds,
+        seeds = seedsvec
+      )
+    )
   } else {
-    rfProfile <- caret::rfe(formula = formula, data = df,  sizes = sizes, metric = metric,
-                            rfeControl = rfeControl(method = "cv", functions = fun, number = nfolds,
-                                                    seeds = seedsvec, index = index))
-
+    rfProfile <- caret::rfe(
+      formula = formula, data = df, sizes = sizes, metric = metric,
+      rfeControl = rfeControl(
+        method = "cv", functions = fun, number = nfolds,
+        seeds = seedsvec, index = index
+      )
+    )
   }
   if (!is.null(cl)) {
     parallel::stopCluster(cl)
@@ -99,8 +106,8 @@ recursive_feature_elimination <- function(df,
     print("=======================================================================")
     print("Recursive Feature Elimination")
     print(paste("outcome : ", names(df)[1], sep = ""))
-    print(paste('Selected vars :', paste(rfProfile$optVariables, collapse = ",")))
-    print(paste("time elapsed", hms_span(inicio,Sys.time())))
+    print(paste("Selected vars :", paste(rfProfile$optVariables, collapse = ",")))
+    print(paste("time elapsed", hms_span(inicio, Sys.time())))
   }
   return(rfProfile)
 }

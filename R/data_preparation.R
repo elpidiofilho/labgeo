@@ -26,9 +26,11 @@ data_preparation <- function(df, prune = 0.99, p = 0.75, seed = 313) {
   set.seed(seed)
   cp <- caret::createDataPartition(outcome, p = p, list = FALSE, group = 6)
   dtrainn <- df[cp, ]
-  dtestn <-  df[-cp, ]
-  treatmentsn <- vtreat::designTreatmentsN(dtrainn, colnames(dtrainn),
-                                   nome.out, verbose = FALSE)
+  dtestn <- df[-cp, ]
+  treatmentsn <- vtreat::designTreatmentsN(
+    dtrainn, colnames(dtrainn),
+    nome.out, verbose = FALSE
+  )
   treino <- vtreat::prepare(treatmentsn, dtrainn, pruneSig = prune) %>%
     dplyr::select(one_of(nome.out), everything())
   teste <- vtreat::prepare(treatmentsn, dtestn, pruneSig = prune) %>%

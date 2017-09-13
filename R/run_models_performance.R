@@ -29,22 +29,23 @@
 #' @importFrom stats var
 #' @examples
 #' \dontrun{
+#' library(labgeo)
 #' library(dplyr)
+#' data("c_stock")
 #' vf = labgeo::factor_detect(c_stock, 40)
-#' df = c_stock %>%  mutate_at(vf,funs(factor))
-#' dp = data_preparation(df = df, p = 0.10, prune = 0.99)
+#' df = c_stock %>%  mutate_at(vf,funs(factor)) %>% filter(stock_10 < 10)
+#' dp = data_preparation(df = df, p = 0.20, prune = 0.99)
 #' treino = dp$treino
 #' teste = dp$teste
 #' nm = names(treino)[1]
 #' vrf = recursive_feature_elimination(treino,sizes = c(5,10,15,20,25,30,40),
-#'                                     nfolds = 5,cpu_cores = 7, metric = "Rsquared")
-# 'vsel = c(nm,vrf$optVariables[1:30])
-# 'dfsel = treino %>% select(one_of(vsel))
-# 'models = c("ridge", "rf", "cubist","pls")
-# 'fit_models = run_models(df = dfsel, models = models,
+#' nfolds = 5,cpu_cores = 7, metric = "Rsquared")
+#' vsel = c(nm,vrf$optVariables)
+#' dfsel = treino %>% select(one_of(vsel))
+#' models = c("ridge", "rf", "cubist","pls")
+#' fit_models = run_models(df = dfsel, models = models,
 #'                         cpu_cores = 7, tune_length = 5, metric = "Rsquared")
-# 'dfresult = run_models_performance(fit_models, df_valida = teste, verbose = T)
-# 'head(dfresult)
+#' dfresult = run_models_performance(fit_models, df_valida = teste, verbose = T)
 #' }
 #' @export
 
@@ -84,7 +85,7 @@ rmp_regressao <- function(fit_run_model, df_valida, verbose = FALSE) {
   for (i in 1:length(fit_run_model)) {
     fit_md <- fit_run_model[[i]]
     v <- suppressMessages(predict(fit_md, df_valida))
-    ddd <- data_frame(observado = df_valida[, 1], predito = v, residuo = abs(v - df_valida[, 1]))
+    ddd <- data.frame(observado = df_valida[, 1], predito = v, residuo = abs(v - df_valida[, 1]))
     names(ddd)[1] <- "observado"
     names(ddd)[3] <- "residuo"
     summ_model$model[i] <- fit_md$method
@@ -191,9 +192,17 @@ pred_acc <- function(obs, pred) {
     sum((obs - mean(obs)) ^ 2)) * 100 ## variance explained by predictive models
 
   list(
-    mean_bias_error = mbe, relative_mean_bias_error = rme, mean_absolute_error = mae,
-    relative_mean_absolute_error = rmae, mean_square_error = mse, root_mean_square_error = rmse,
-    relative_rmse = rrmse, Nash_Sutcliffe_efficiency = nse, variance_explained_perc = vecv, rsquared = r2, t_test = list(t)
+    mean_bias_error = mbe,
+    relative_mean_bias_error = rme,
+    mean_absolute_error = mae,
+    relative_mean_absolute_error = rmae,
+    mean_square_error = mse,
+    root_mean_square_error = rmse,
+    relative_rmse = rrmse,
+    Nash_Sutcliffe_efficiency = nse,
+    variance_explained_perc = vecv,
+    rsquared = r2,
+    t_test = list(t)
   )
 }
 
@@ -210,7 +219,7 @@ rmp_classificacao <- function(fit_run_model, df_valida, verbose = FALSE) {
   for (i in 1:length(fit_run_model)) {
     fit_md <- fit_run_model[[i]]
     v <- suppressMessages(predict(fit_md, df_valida))
-    ddd <- data_frame(observado = df_valida[, 1], predito = v)
+    ddd <- data.frame(observado = df_valida[, 1], predito = v)
     summ_model$model[i] <- fit_md$method
     summ_model$fit[i] <- list(fit_md)
 
@@ -220,19 +229,20 @@ rmp_classificacao <- function(fit_run_model, df_valida, verbose = FALSE) {
     summ_model$Kappa[i] <- cf$overall[2]
     summ_model$byclass[i] <- list(cf$byClass)
     summ_model$cf[i] <- list(cf$table)
-    confusion <- data_frame(cf$table)
+    confusion <- data.frame(cf$table)
     freqcols <- prop_table(cf$table, 2) %>%
-      data_frame() %>%
+      data.frame() %>%
       dplyr::rename(freq_col = Freq)
     freqrows <- prop_table(cf$table, 1) %>%
-      data_frame() %>%
+      data.frame() %>%
       dplyr::rename(freq_row = Freq)
     ddd <- dplyr::left_join(freqcols, freqrows, by = c("Prediction", "Reference")) %>%
       tidyr::gather(key = var, value = valor, -Prediction, -Reference)
 
     g1 <- ggplot(confusion, mapping = aes(x = Reference, y = Prediction)) +
       geom_tile(colour = "white", fill = "lightyellow2") +
-      scale_x_discrete(name = "Actual Class") + scale_y_discrete(name = "Predicted Class") +
+      scale_x_discrete(name = "Actual Class") +
+      scale_y_discrete(name = "Predicted Class") +
       geom_tile(
         aes(x = Reference, y = Prediction),
         data = subset(confusion, as_character(Reference) == as_character(Prediction)),
@@ -261,7 +271,7 @@ rmp_classificacao <- function(fit_run_model, df_valida, verbose = FALSE) {
     }
   }
   if (verbose == TRUE) {
-    dfresult <- data_frame(model = summ_model$model, accuracy = summ_model$accuracy, kappa = summ_model$Kappa) %>%
+    dfresult <- data.frame(model = summ_model$model, accuracy = summ_model$accuracy, kappa = summ_model$Kappa) %>%
       print() %>%
       tidyr::gather(key = var, value = valor, -model)
     print(ggplot(dfresult, aes(x = model, y = valor, fill = model)) + geom_col() +

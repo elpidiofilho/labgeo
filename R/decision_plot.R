@@ -23,9 +23,9 @@
 
 decision_plot <- function(model, df, class = NULL, predict_type = "class",
                           resolution = 100, showgrid = TRUE, ...) {
-
   if (!is.null(class)) cl <- df[, class] else cl <- 1
-  df <- df %>% dplyr::select(-dplyr::one_of(class))
+  df <- df %>%
+    dplyr::select(-dplyr::one_of(class))
   k <- length(unique(cl))
 
   plot(df, col = as.integer(cl) + 1L, pch = as.integer(cl) + 1L, ...)
@@ -47,8 +47,10 @@ decision_plot <- function(model, df, class = NULL, predict_type = "class",
   if (showgrid) points(g, col = as.integer(p) + 1L, pch = ".")
 
   z <- matrix(as.integer(p), nrow = resolution, byrow = TRUE)
-  contour(xs, ys, z, add = TRUE, drawlabels = FALSE,
-          lwd = 2, levels = (1:(k - 1)) + .5)
+  contour(
+    xs, ys, z, add = TRUE, drawlabels = FALSE,
+    lwd = 2, levels = (1:(k - 1)) + .5
+  )
 
   invisible(z)
 }

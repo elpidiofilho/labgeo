@@ -23,11 +23,18 @@
 
 extract_data_point <- function(path_raster, raster_type = "*.asc",
                                path_point, name_point,
-                                 cpu_cores = 1, remove_NA = TRUE) {
-  if (dir.exists(path_raster) == FALSE) stop(paste(path_raster, "does not exists"))
-  if (dir.exists(path_point) == FALSE) stop(paste(path_point, "does not exists"))
+                               cpu_cores = 1, remove_NA = TRUE) {
+  if (dir.exists(path_raster) == FALSE) {
+    stop(paste(path_raster, "does not exists"))
+  }
+  if (dir.exists(path_point) == FALSE) {
+    stop(paste(path_point, "does not exists"))
+  }
   pat <- glob2rx(raster_type)
-  l <- list.files(path_raster, pattern = pat, include.dirs = TRUE, full.names = TRUE)
+  l <- list.files(
+    path_raster, pattern = pat,
+    include.dirs = TRUE, full.names = TRUE
+  )
   st <- raster::stack(l)
   p <- rgdal::readOGR(path_point, name_point)
   inicio <- Sys.time()

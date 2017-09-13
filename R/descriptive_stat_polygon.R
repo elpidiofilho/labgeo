@@ -4,7 +4,7 @@
 #' @title Descriptive statistics polygon
 #' @description This function calculates Descriptive statistics for samples collected in polygon
 #' @param df dataframe
-#' @param poligon_id name of column thats contains polygon id
+#' @param poligon name of column thats contains polygon id
 #' @param desc parameters os descritive statistics to be calculated.Choices are : c("min", "median", "mean", "max", "sd","skewness", "kurtosis", "p1", "p10", "p25","p33", "p66", "p75", "p90", "p99")
 #' @importFrom dplyr group_by
 #' @importFrom dplyr select
@@ -26,13 +26,17 @@
 
 
 
-descriptive_stat_polygon <- function(df, poligon_id, desc = c("min", "mean", "max", "sd")) {
-  #  c("min", "median", "mean", "max", "sd","skewness", "kurtosis", "p1", "p10", "p25","p33", "p66", "p75", "p90", "p99")
+descriptive_stat_polygon <- function(df, poligon,
+                                     desc = c("min", "mean", "max", "sd")) {
+  #  c("min", "median", "mean", "max", "sd","skewness", "kurtosis",
+  # "p1", "p10", "p25","p33", "p66", "p75", "p90", "p99")
   inicio <- Sys.time()
   vpc <- c("p1", "p10", "p25", "p33", "p66", "p75", "p90", "p99")
   pdesc <- desc[vpc %in% desc]
   dfselnum <- dff %>%
     dplyr::select_if(is.numeric)
+
+  poligon_id = quo(poligon)
   d1 <- multidplyr::partition(dfselnum, polig)
   multidplyr::cluster_copy(d1, p1)
   multidplyr::cluster_copy(d1, p10)
@@ -43,11 +47,12 @@ descriptive_stat_polygon <- function(df, poligon_id, desc = c("min", "mean", "ma
   multidplyr::cluster_copy(d1, p90)
   multidplyr::cluster_copy(d1, p99)
   multidplyr::cluster_copy(d1, px)
+  multidplyr::cluster_copy(d1, poligon_id)
   dnum <- d1 %>%
     dplyr::summarise_all(desc) %>%
     dplyr::collect()
   dcat <- df %>%
-    dplyr::group_by(!! poligon_id) %>%
+    dplyr::group_by(polig) %>%
     dplyr::select_if(is.factor) %>%
     dplyr::summarise_all(moda) %>%
     dplyr::mutate_if(is.character, as.factor)

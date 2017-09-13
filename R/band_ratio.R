@@ -10,13 +10,13 @@
 #' @examples
 #' \dontrun{
 #' br = band_ratio(df)
-#'}
+#' }
 #' @export
 
 band_ratio <- function(df) {
   nb <- ncol(df)
   cont <- 1
-  for (i in 1:(nb - 1)){
+  for (i in 1:(nb - 1)) {
     for (j in (i + 1):nb) {
       rb <- (df[, i] - df[j]) / (df[, i] + df[j])
       if (cont == 1) {

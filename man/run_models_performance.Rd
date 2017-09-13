@@ -23,15 +23,22 @@ details
 }
 \examples{
 \dontrun{
+library(labgeo)
 library(dplyr)
+data("c_stock")
 vf = labgeo::factor_detect(c_stock, 40)
-df = c_stock \%>\%  mutate_at(vf,funs(factor))
-dp = data_preparation(df = df, p = 0.10, prune = 0.99)
+df = c_stock \%>\%  mutate_at(vf,funs(factor)) \%>\% filter(stock_10 < 10)
+dp = data_preparation(df = df, p = 0.20, prune = 0.99)
 treino = dp$treino
 teste = dp$teste
 nm = names(treino)[1]
 vrf = recursive_feature_elimination(treino,sizes = c(5,10,15,20,25,30,40),
-                                    nfolds = 5,cpu_cores = 7, metric = "Rsquared")
+nfolds = 5,cpu_cores = 7, metric = "Rsquared")
+vsel = c(nm,vrf$optVariables)
+dfsel = treino \%>\% select(one_of(vsel))
+models = c("ridge", "rf", "cubist","pls")
+fit_models = run_models(df = dfsel, models = models,
                         cpu_cores = 7, tune_length = 5, metric = "Rsquared")
+dfresult = run_models_performance(fit_models, df_valida = teste, verbose = T)
 }
 }

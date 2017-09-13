@@ -17,13 +17,14 @@
 #' }
 #' @export
 
-halarick_descriptor <- function(band, ngrey = 16,  window = c(3, 3),
-                                shift=list(c(0 ,1), c(1, 1), c(1, 0), c(1, -1)),
-                                statistics = c("mean", "mean_ENVI", "variance",
-                                               "variance_ENVI", "homogeneity",
-                                               "contrast", "dissimilarity", "entropy",
-                                               "second_moment", "correlation")) {
-
+halarick_descriptor <- function(band, ngrey = 16, window = c(3, 3),
+                                shift=list(c(0, 1), c(1, 1), c(1, 0), c(1, -1)),
+                                statistics = c(
+                                  "mean", "mean_ENVI", "variance",
+                                  "variance_ENVI", "homogeneity",
+                                  "contrast", "dissimilarity", "entropy",
+                                  "second_moment", "correlation"
+                                )) {
   result <- glcm::glcm(band, window = window, shift = shift, statistics = statistics)
   return(result)
 }

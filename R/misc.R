@@ -22,7 +22,8 @@ zero_range <- function(x, tol = 1000 * .Machine$double.eps) {
   abs((x[1] - x[2]) / m) < tol
 }
 
-rescale <- function(x, to = c(0, 1), from = range(x, na.rm = TRUE, finite = TRUE)) {
+rescale <- function(x, to = c(0, 1),
+                    from = range(x, na.rm = TRUE, finite = TRUE)) {
   if (zero_range(from) || zero_range(to)) {
     return(ifelse(is.na(x), NA, mean(to)))
   }
@@ -57,33 +58,34 @@ kde2d <- function(x, y, h, n = 25, lims = c(range(x), range(y))) {
 
 ## code by Nathan Russell https://github.com/nathan-russell
 ## https://stackoverflow.com/questions/32100133/print-the-time-a-script-has-been-running-in-r
-
+#' @export
 hms_span <- function(start, end) {
   dsec <- as.numeric(difftime(end, start, unit = "secs"))
   hours <- floor(dsec / 3600)
   minutes <- floor((dsec - 3600 * hours) / 60)
-  seconds <- dsec - 3600*hours - 60*minutes
+  seconds <- dsec - 3600 * hours - 60 * minutes
   paste0(
     sapply(c(hours, minutes, seconds), function(x) {
       formatC(x, width = 2, format = "d", flag = "0")
-    }), collapse = ":")
+    }), collapse = ":"
+  )
 }
 
 
 #' @export
 to_table <- function(txt, n.col) {
-  n.col = 4
-  num.elem = length(txt)
-  divint = ceiling(num.elem / n.col) * n.col
-  dif = divint - ncol(dff)
+  n.col <- 4
+  num.elem <- length(txt)
+  divint <- ceiling(num.elem / n.col) * n.col
+  dif <- divint - num.elem
   if (dif > 0) {
-    complete = rep(" ", times = dif)
-    txt_complete = c(txt,complete)
+    complete <- rep(" ", times = dif)
+    txt_complete <- c(txt, complete)
   } else {
-    txt_complete = txt
+    txt_complete <- txt
   }
-  mx = matrix(txt_complete, ncol = n.col)
-  names(mx) = 1:n.col
-  dd = knitr::kable(mx, col.names = 1:n.col)
+  mx <- matrix(txt_complete, ncol = n.col)
+  names(mx) <- 1:n.col
+  dd <- knitr::kable(mx, col.names = 1:n.col)
   return(dd)
 }

@@ -15,7 +15,7 @@
 #' vt = treino_validacao_poligono(dfall, p = 0.80, seed = 123)
 #' treino = dfall[treino,]
 #' valida = dfall[-treino,]
-#'}
+#' }
 #' @export
 
 train_validation_poligon <- function(dfall, p = 0.75, seed = 313) {
@@ -40,4 +40,3 @@ train_validation_poligon <- function(dfall, p = 0.75, seed = 313) {
     dplyr::select(idam))[, 1]
   return(vtreino)
 }
-

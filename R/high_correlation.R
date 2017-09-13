@@ -20,12 +20,14 @@
 #' }
 #' @export
 
-high_correlation <- function(df, cutoff = 0.95, correl = "linear", verbose = FALSE) {
-  df <- df %>% dplyr::select_if(is.numeric)
+high_correlation <- function(df, cutoff = 0.95,
+                             correl = "linear", verbose = FALSE) {
+  df <- df %>%
+    dplyr::select_if(is.numeric)
   if (correl == "linear") {
     mcor <- cor(df)
   } else { ## rdc
-    mcor = as.matrix(non_linear_correl(df))
+    mcor <- as.matrix(non_linear_correl(df))
   }
   vc <- caret::findCorrelation(mcor, cutoff)
   if (length(vc) == 0) {
@@ -49,7 +51,7 @@ high_correlation <- function(df, cutoff = 0.95, correl = "linear", verbose = FAL
 vector2matrix <- function(vhc) {
   l1 <- length(vhc)
   l2 <- (ceiling(sqrt(length(vhc)))) ^ 2
-  ladd  <- l2 - l1
+  ladd <- l2 - l1
   ncol <- sqrt(l2)
   nrow <- ncol
   if (ladd > 0) {
@@ -60,3 +62,4 @@ vector2matrix <- function(vhc) {
   m <- matrix(v1, nrow, ncol)
   return(m)
 }
+

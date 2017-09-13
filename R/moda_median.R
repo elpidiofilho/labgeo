@@ -12,25 +12,22 @@
 #' }
 #' @export
 
-
-
-moda_median <- function(df){
-  Freq = NULL
+moda_median <- function(df) {
+  Freq <- NULL
   DF <- as.data.frame(df)
-  #x = DF[,2]
-  MODE2 <- function(x){
-    if (is.numeric(x) == FALSE){
+  # x = DF[,2]
+  MODE2 <- function(x) {
+    if (is.numeric(x) == FALSE) {
       df <- as.data.frame(table(x))
       df <- df[order(df$Freq), ]
       m <- max(df$Freq)
       MODE1 <- as.vector(as.character(subset(df, Freq == m)[, 1]))
-      if (sum(df$Freq) / length(df$Freq) == 1){
+      if (sum(df$Freq) / length(df$Freq) == 1) {
         warning("No Mode: Frequency of all values is 1", call. = FALSE)
-      }else{
+      } else {
         return(MODE1)
       }
-
-    }else{
+    } else {
       df <- median(x, na.rm = TRUE)
     }
   }
