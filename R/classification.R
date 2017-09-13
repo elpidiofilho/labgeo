@@ -37,12 +37,12 @@ classification <- function(df.train,
                            tune_length = 5,
                            metric = "Kappa",
                            seeds = NULL,
-                           verbose = FALSE){
-  if (nfolds == 0 ){
+                           verbose = FALSE) {
+  if (nfolds == 0) {
     method <- "none"
     tune_length <- 1
   }
-  if (nfolds == nrow(df.train)){
+  if (nfolds == nrow(df.train)) {
     method <- "LOOCV"
   } else {
     method <- "CV"
@@ -52,8 +52,10 @@ classification <- function(df.train,
   if (is.null(formula)) {
     formula <- as.formula(paste(names(df.train)[1], "~ ."))
   }
-  tc <- caret::trainControl(method = method, number = nfolds, index = index,
-                     savePredictions = TRUE, returnResamp = "all")
+  tc <- caret::trainControl(
+    method = method, number = nfolds, index = index,
+    savePredictions = TRUE, returnResamp = "all"
+  )
 
   if (cpu_cores > 0) {
     cl <- parallel::makePSOCKcluster(cpu_cores)
@@ -61,17 +63,19 @@ classification <- function(df.train,
   }
 
   set.seed(313)
-  fit <- suppressMessages(caret::train(formula, data = df.train, method = classifier,
-                      metric = metric,
-                      trControl = tc,
-                      tuneLength = tune_length,
-                      preProcess = preprocess))
+  fit <- suppressMessages(caret::train(
+    formula, data = df.train, method = classifier,
+    metric = metric,
+    trControl = tc,
+    tuneLength = tune_length,
+    preProcess = preprocess
+  ))
   if (!is.null(cl)) {
     parallel::stopCluster(cl)
   }
   if (verbose == TRUE) {
     print(paste("Classification variable ", names(df.train)[1]))
-    print(paste("time elapsed : ", hms_span(inicio,Sys.time())))
+    print(paste("time elapsed : ", hms_span(inicio, Sys.time())))
     print(caret::getTrainPerf(fit))
   }
   return(fit)

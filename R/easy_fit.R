@@ -39,85 +39,85 @@
 easy_fit <- function(dy, dx,
                      nfolds= 10,
                      repeats = 1,
-                     metric = ifelse(is.factor(dy[,1]),"Kappa", "Rsquared"),
+                     metric = ifelse(is.factor(dy[, 1]), "Kappa", "Rsquared"),
                      cpu_cores = 7,
                      tune_length = 5,
                      fun_RFE = rfFuncs,
                      repeats_RFE = 1,
-                     metric_RFE = ifelse(is.factor(dy[,1]),"Kappa", "Rsquared"),
+                     metric_RFE = ifelse(is.factor(dy[, 1]), "Kappa", "Rsquared"),
                      nfolds_RFE = 5,
                      sizes_RFE = c(2:10, 15),
                      tolerance_RFE = 0,
-                     models = c("ridge", "rf", "cubist",'pls','foba','gbm','glmboost'),
+                     models = c("ridge", "rf", "cubist", "pls", "foba", "gbm", "glmboost"),
                      preprocess = NULL,
                      seeds = NULL,
                      verbose = TRUE) {
-
-  ###-------------------------------------------------------------------------
-if (is.null(seeds)) {
-    seedsvec = NULL
-  } else {
-    set.seed(seeds)
-    seedsvec <- vector(mode = "list", length = nfolds + 1)
-    for (i in 1:nfolds) seedsvec[[i]] <- sample.int(n = 1000, 400)
-    seedsvec[[nfolds + 1]] <- sample.int(1000, 1)
-  }
-  ###-------------------------------------------------------------------------
-  ny = ncol(dy)
-  list.model = dplyr::tibble(var = character(ny), selec = character(ny),
-                             models = vector(mode = "list", length = (ny)))
-  vm = caret::dummyVars(~ ., data = dx)
-  dxm = predict(vm, dx) %>% data.frame
+  ny <- ncol(dy)
+  list.model <- dplyr::tibble(
+    var = character(ny), selec = character(ny),
+    models = vector(mode = "list", length = (ny))
+  )
+  vm <- caret::dummyVars(~ ., data = dx)
+  dxm <- predict(vm, dx) %>%
+    data.frame()
 
   for (i in 1:ny) {
-    maximize = TRUE
-    if (is.numeric(dy[,i])) {
-      if (is.null(metric) | metric == "Rsquared"){
-        maximize = TRUE
+    maximize <- TRUE
+    if (is.numeric(dy[, i])) {
+      if (is.null(metric) | metric == "Rsquared") {
+        maximize <- TRUE
       }
     } else {
-      if (is.null(metric) | metric == "Kappa"){
-        maximize = TRUE
+      if (is.null(metric) | metric == "Kappa") {
+        maximize <- TRUE
       }
-
     }
-    el = names(dy)[i]
-    y = dy[,i]
-    xy = data.frame(y,dxm)
-    xy = xy %>% na.omit() %>% data.frame()
-    names(xy)[1] = el
+    el <- names(dy)[i]
+    y <- dy[, i]
+    xy <- data.frame(y, dxm)
+    xy <- xy %>%
+      na.omit() %>%
+      data.frame()
+    names(xy)[1] <- el
     set.seed(313)
-    fit = recursive_feature_elimination(xy,
-                                        sizes = sizes_RFE,
-                                        fun = fun_RFE,
-                                        cpu_cores = cpu_cores,
-                                        nfolds = nfolds_RFE,
-                                        metric = metric_RFE,
-                                        seeds = seedsvec,
-                                        verbose = verbose)
+    fit <- recursive_feature_elimination(
+      xy,
+      sizes = sizes_RFE,
+      fun = fun_RFE,
+      cpu_cores = cpu_cores,
+      nfolds = nfolds_RFE,
+      metric = metric_RFE,
+      seeds = seeds,
+      verbose = verbose
+    )
     if (tolerance_RFE > 0) {
-      tol5 <- caret::pickSizeTolerance(fit$results, metric = "Rsquared",
-                                       tol = tolerance_RFE, maximize = maximize)
-      vs = c(el,fit$optVariables[1:tol5])
+      tol5 <- caret::pickSizeTolerance(
+        fit$results, metric = "Rsquared",
+        tol = tolerance_RFE, maximize = maximize
+      )
+      vs <- c(el, fit$optVariables[1:tol5])
     } else {
-      vs = c(el,fit$optVariables)
+      vs <- c(el, fit$optVariables)
     }
 
-    dsel = xy %>% dplyr::select(one_of(vs))
+    dsel <- xy %>%
+      dplyr::select(one_of(vs))
 
-    fit.reg = run_models(dsel,
-                         models = models,
-                         preprocess = preprocess,
-                         metric = metric,
-                         cpu_cores = cpu_cores,
-                         tune_length = tune_length,
-                         nfolds = nfolds,
-                         repeats = repeats,
-                         seeds = seedsvec)
+    fit.reg <- run_models(
+      dsel,
+      models = models,
+      preprocess = preprocess,
+      metric = metric,
+      cpu_cores = cpu_cores,
+      tune_length = tune_length,
+      nfolds = nfolds,
+      repeats = repeats,
+      seeds = seeds
+    )
 
-    list.model$var[i] = el
-    list.model$selec[i] = list(vs)
-    list.model$models[i] = list(fit.reg)
+    list.model$var[i] <- el
+    list.model$selec[i] <- list(vs)
+    list.model$models[i] <- list(fit.reg)
   }
   return(list.model)
 }

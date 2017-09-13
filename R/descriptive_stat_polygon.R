@@ -21,7 +21,7 @@
 #' @examples
 #' \dontrun{
 #' b = descriptive_stat_polygon(df,"id")
-#'}
+#' }
 #' @export
 
 
@@ -161,5 +161,3 @@ skewness <- function(x) {
   skew <- (n / ((n - 1) * (n - 2))) * summ
   return(skew)
 }
-
-

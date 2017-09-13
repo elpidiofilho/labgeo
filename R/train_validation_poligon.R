@@ -19,18 +19,25 @@
 #' @export
 
 train_validation_poligon <- function(dfall, p = 0.75, seed = 313) {
-  '.' <- poligono <- NULL
+  "." <- poligono <- NULL
   stopifnot(is.data.frame(dfall), p > 0, p < 1)
-  idam = NULL
-  dfuy <- dplyr::select(dfall,1:2) %>% dplyr::mutate(idam = seq_len(nrow(.)))
+  idam <- NULL
+  dfuy <- dplyr::select(dfall, 1:2) %>%
+    dplyr::mutate(idam = seq_len(nrow(.)))
   nv <- names(dfall)[1:2]
   dfuy$idam <- seq_len(nrow(dfuy))
   dots <- lapply(nv, as.symbol)
-  dfu <-  dfuy %>% dplyr::group_by_(.dots = dots) %>% dplyr::slice(1) %>% data.frame()
+  dfu <- dfuy %>%
+    dplyr::group_by_(.dots = dots) %>%
+    dplyr::slice(1) %>%
+    data.frame()
   set.seed(seed)
-  vc <- caret::createDataPartition(dfu[,1], p = p, list = FALSE)[, 1]
-  vp <- dfu[vc,2]
+  vc <- caret::createDataPartition(dfu[, 1], p = p, list = FALSE)[, 1]
+  vp <- dfu[vc, 2]
   names(dfuy)[2] <- c("poligono")
-  vtreino <- (dfuy %>% dplyr::filter(poligono %in% vp) %>% dplyr::select(idam))[, 1]
+  vtreino <- (dfuy %>%
+    dplyr::filter(poligono %in% vp) %>%
+    dplyr::select(idam))[, 1]
   return(vtreino)
 }
+

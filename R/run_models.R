@@ -30,59 +30,61 @@ run_models <- function(df,
                        repeats = 1,
                        tune_length = 5,
                        cpu_cores = 7,
-                       metric = ifelse(is.factor(df[,1]),"Kappa", "Rsquared"),
+                       metric = ifelse(is.factor(df[, 1]), "Kappa", "Rsquared"),
                        seeds = NULL) {
-
   if (class(df) != "data.frame") stop("df is not a data frame.")
   package.inicio <- search()[ifelse(unlist(gregexpr("package:", search())) == 1, TRUE, FALSE)]
-  inicio = Sys.time()
-  if(is.factor(df[,1]) == TRUE) {
-    mod = 1
+  inicio <- Sys.time()
+  if (is.factor(df[, 1]) == TRUE) {
+    mod <- 1
   } else {
-    mod = 0
+    mod <- 0
   }
   if (is.null(seeds)) {
-    seedsvec = NULL
+    seedsvec <- NULL
   } else {
-    if (class(seedsvec) != "list") {
-      set.seed(seeds)
-      seedsvec <- vector(mode = "list", length = nfolds + 1)
-      for (i in 1:nfolds) seedsvec[[i]] <- sample.int(n = 1000, 400)
-      seedsvec[[nfolds + 1]] <- sample.int(1000, 1)
-    }
+    set.seed(seeds)
+    seedsvec <- vector(mode = "list", length = nfolds + 1)
+    for (i in 1:nfolds) seedsvec[[i]] <- sample.int(n = 1000, 400)
+    seedsvec[[nfolds + 1]] <- sample.int(1000, 1)
   }
 
-  nr = length(models)
-  list.model = vector("list", length = nr)
+  nr <- length(models)
+  list.model <- vector("list", length = nr)
   for (j in 1:length(models)) {
     if (mod == 0) {
-      fit.reg = regression(df.train = df,
-                           regressor = models[j],
-                           preprocess = preprocess,
-                           nfolds = nfolds,
-                           cpu_cores = cpu_cores,
-                           repeats = repeats,
-                           metric = metric,
-                           tune_length = tune_length,
-                           seeds = seedsvec)
-      list.model[j] = list(fit.reg)
-    }  else {
-      fit.class = classification(df.train = df,
-                                 classifier = models[j],
-                                 preprocess = preprocess,
-                                 nfolds = nfolds,
-                                 cpu_cores = cpu_cores,
-                                 repeats = repeats,
-                                 metric = metric,
-                                 tune_length = tune_length,
-                                 seeds = seedsvec)
-      list.model[j] = list(fit.class)
+      fit.reg <- regression(
+        df.train = df,
+        regressor = models[j],
+        preprocess = preprocess,
+        nfolds = nfolds,
+        cpu_cores = cpu_cores,
+        repeats = repeats,
+        metric = metric,
+        tune_length = tune_length,
+        seeds = seedsvec
+      )
+      list.model[j] <- list(fit.reg)
+    } else {
+      fit.class <- classification(
+        df.train = df,
+        classifier = models[j],
+        preprocess = preprocess,
+        nfolds = nfolds,
+        cpu_cores = cpu_cores,
+        repeats = repeats,
+        metric = metric,
+        tune_length = tune_length,
+        seeds = seedsvec
+      )
+      list.model[j] <- list(fit.class)
     }
   }
-  package.fim =  search()[ifelse(unlist(gregexpr("package:",search())) == 1, TRUE, FALSE)]
+  package.fim <- search()[ifelse(unlist(gregexpr("package:", search())) == 1, TRUE, FALSE)]
   package.list <- setdiff(package.fim, package.inicio)
-  if (length(package.list) > 0)  for (package in package.list) detach(package, character.only = TRUE)
+  if (length(package.list) > 0) for (package in package.list) detach(package, character.only = TRUE)
 
-  print(paste("time elapsed", hms_span(inicio,Sys.time())))
+  print(paste("time elapsed", hms_span(inicio, Sys.time())))
   return(list.model)
 }
+

@@ -16,12 +16,12 @@
 #' }
 #' @export
 
-
-
 t_SNE_plot <- function(dx, y) {
-  V1 = V2 = Class = NULL
-  tsne <- Rtsne::Rtsne(as.matrix(dx), check_duplicates = FALSE, pca = TRUE,
-               perplexity = 30, theta = 0.5, dims = 5)
+  V1 <- V2 <- Class <- NULL
+  tsne <- Rtsne::Rtsne(
+    as.matrix(dx), check_duplicates = FALSE, pca = TRUE,
+    perplexity = 30, theta = 0.5, dims = 5
+  )
 
   embedding <- as.data.frame(tsne$Y)
   embedding$Class <- y
@@ -34,9 +34,10 @@ t_SNE_plot <- function(dx, y) {
     ggplot2::xlab("") + ggplot2::ylab("") +
     ggplot2::ggtitle("t-SNE 2D Embedding of 'Classe' Outcome") +
     ggplot2::theme_light(base_size = 20) +
-    ggplot2::theme(axis.text.x = ggplot2::element_blank(),
-          axis.text.y = ggplot2::element_blank())
+    ggplot2::theme(
+      axis.text.x = ggplot2::element_blank(),
+      axis.text.y = ggplot2::element_blank()
+    )
   print(g)
   return(tsne)
 }
-
