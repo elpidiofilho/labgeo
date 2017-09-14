@@ -15,6 +15,7 @@
 #' @importFrom dplyr collect
 #' @importFrom multidplyr cluster_copy partition
 #' @importFrom stats quantile
+#' @importFrom rlang quo
 #' @author Elpidio Filho, \email{elpidio@ufv.br}
 #' @keywords statics polygon
 #' @details calculates Descriptive statistics for samples collected in polygon
@@ -33,10 +34,10 @@ descriptive_stat_polygon <- function(df, poligon,
   inicio <- Sys.time()
   vpc <- c("p1", "p10", "p25", "p33", "p66", "p75", "p90", "p99")
   pdesc <- desc[vpc %in% desc]
-  dfselnum <- dff %>%
+  dfselnum <- df %>%
     dplyr::select_if(is.numeric)
 
-  poligon_id = quo(poligon)
+  poligon_id = rlang::quo(poligon)
   d1 <- multidplyr::partition(dfselnum, polig)
   multidplyr::cluster_copy(d1, p1)
   multidplyr::cluster_copy(d1, p10)
