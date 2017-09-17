@@ -14,6 +14,7 @@
 #' @param df   dataframe, with income variable in the first column
 #' @param index  Users cross validation folds. Default = NULL
 #' @param nfolds   Number of folds to be build in cross-validation. Default = 10
+#' @param repeats repeats
 #' @param sizes A numeric vector of integers corresponding to the number of features
 #'  that should be retained. Default = c(2:5,10)
 #' @param fun Default = rfFuncs , get importance values from Random Forest model.
@@ -42,6 +43,7 @@ recursive_feature_elimination <- function(df,
                                           sizes = c(2:5, 10),
                                           index = NULL,
                                           nfolds = 5,
+                                          repeats = 1,
                                           fun = rfFuncs,
                                           cpu_cores = 6,
                                           metric = ifelse(is.factor(df[, 1]), "Kappa", "Rsquared"),
@@ -64,8 +66,8 @@ recursive_feature_elimination <- function(df,
     } else {
       method <- "CV"
     }
+    if (repeats > 1) method <- "repeatedcv"
   }
-
   if (is.null(seeds)) {
     seedsvec <- NULL
   } else {

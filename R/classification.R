@@ -47,7 +47,7 @@ classification <- function(df.train,
   } else {
     method <- "CV"
   }
-
+  if (repeats > 1) method <- "repeatedcv"
   inicio <- Sys.time()
   if (is.null(formula)) {
     formula <- as.formula(paste(names(df.train)[1], "~ ."))

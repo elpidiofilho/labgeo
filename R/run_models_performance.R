@@ -173,8 +173,8 @@ kde2d <- function(x, y, h, n = 25, lims = c(range(x), range(y))) {
   list(x = gx, y = gy, z = z)
 }
 
-MASS::bandwidth.nrd
 
+#' @export
 pred_acc <- function(obs, pred) {
   mu <- mean(obs)
   mbe <- mean(obs - pred) ## mean bias error ()

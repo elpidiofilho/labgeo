@@ -5,7 +5,7 @@
 \title{Recursive Feature Elimination}
 \usage{
 recursive_feature_elimination(df, sizes = c(2:5, 10), index = NULL,
-  nfolds = 5, fun = rfFuncs, cpu_cores = 6,
+  nfolds = 5, repeats = 1, fun = rfFuncs, cpu_cores = 6,
   metric = ifelse(is.factor(df[, 1]), "Kappa", "Rsquared"), seeds = NULL,
   verbose = TRUE)
 }
@@ -18,6 +18,8 @@ that should be retained. Default = c(2:5,10)}
 \item{index}{Users cross validation folds. Default = NULL}
 
 \item{nfolds}{Number of folds to be build in cross-validation. Default = 10}
+
+\item{repeats}{repeats}
 
 \item{fun}{Default = rfFuncs , get importance values from Random Forest model.}
 
