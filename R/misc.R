@@ -90,78 +90,16 @@ to_table <- function(txt, n.col) {
   return(dd)
 }
 
-#' @export
-plot_predict_observed <- function(result) {
-  nr = nrow(result)
-  i = 1
-  for (i in 1:nr) {
-    ddd = result$dfpredobs[[i]]
-    ddd$model = result$model[i]
-    if (i == 1) {
-      dresult = ddd
-    } else {
-      dresult = rbind(dresult, ddd)
-    }
-  }
-  dresult  %>%
-    ggplot(aes( y= observado, x = predito)) +
-    geom_abline(slope = 1, intercept = 0) +
-    geom_point(aes(y = observado), shape = 1) +
-    geom_point(aes(color = abs(residuo))) +
-    scale_color_continuous(low = "green", high = "red") +
-    guides(color = FALSE) +
-    facet_wrap(~model, scales = 'free') +  theme_bw()
-}
-
-#' @export
-plot_predict_observed_residual <- function(result) {
-  nr = nrow(result)
-  i = 1
-  for (i in 1:nr) {
-    ddd = result$dfpredobs[[i]]
-    ddd$model = result$model[i]
-    if (i == 1) {
-      dresult = ddd
-    } else {
-      dresult = rbind(dresult, ddd)
-    }
-  }
-  dresult  %>%
-    ggplot(aes( y= observado, x = predito)) +
-    geom_segment(aes(y = predito,   yend = observado, x = predito, xend = predito))   +
-    geom_abline(slope = 1, intercept = 0) +
-    geom_point(aes(y = observado), shape = 1) +
-    geom_point(aes(color = abs(residuo))) +
-    scale_color_continuous(low = "green", high = "red") +
-    guides(color = FALSE) +
-    facet_wrap(~model, scales = 'free') +  theme_bw()
-}
 
 
 #' @export
-rfe_result <- function(rfe) {
-  ddd = rfe$results
-  mx = max(ddd$results$Kappa)
-  wm = which.max(ddd$Kappa)
-  ddd$tol = NA
-  for (i in 1:wm) {
-    ddd$tol[i] = abs(ddd$Kappa[i] - ddd$Kappa[wm])/  ddd$Kappa[wm] * 100
+save_gggraphics <- function(object, graphic_format = c("jpg", "png"),
+                         file_path, width = 15, height = 15,
+                         units = "cm", dpi = 100) {
+  nf = length(format)
+  for (i in 1:nf) {
+    ggplot2::ggsave(object, file = paste0(file_path, ".", graphic_format[i]),
+                    width = width, height = height, units = units, dpi = dpi)
   }
-
-  g1 = ddd %>% gather(key = var, value = Value, -Variables ) %>%
-    ggplot(aes(x = Variables, y = Value)) +
-    geom_line()  +
-    geom_point() +
-    geom_smooth() +
-    facet_wrap(~var, scales = 'free')
-
-  g2 = ggplot(ddd, aes(x = Variables, y = tol)) + geom_point() + geom_line() +
-    geom_label(label = round(ddd$tol,1), nudge_y = 0.5) +
-    xlim(min(ddd$Variables), ddd$Variables[wm])  +
-    ylab("tolerance (%)") + xlab('num of selected variables')
-  theme_bw()
-  print(g1)
-  print(g2)
-  knitr::kable(ddd[1:wm,], digits = 3, col.names = names(ddd))
-  return(ddd)
+  invisible(NULL)
 }

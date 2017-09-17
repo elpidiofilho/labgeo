@@ -307,3 +307,58 @@ rescale <- function(x, to = c(0, 1), from = range(x, na.rm = TRUE, finite = TRUE
   }
   (x - from[1]) / diff(from) * diff(to) + to[1]
 }
+
+
+
+#' Plot predict observed and residual
+#'
+#' @title Plot predict observed and residual
+#' @description This function plots predict,  observed values and residual
+#' @param result  return of function rum_model_performance
+#' @param residual logic value indicates if plot or not residuals
+#' @details details
+#' @importFrom dplyr tibble
+#' @importFrom ggplot2 ggplot  geom_segment geom_point geom_abline facet_wrap
+#' @importFrom ggplot2 ggtitle aes theme_bw scale_color_continuous guides
+#' @importFrom dplyr '%>%'
+#' @examples
+#' \dontrun{
+#' plot_predict_observed_residual(result, TRUE)
+#' }
+#' @export
+#'
+plot_predict_observed_residual <- function(result, residual = FALSE) {
+  nr <- nrow(result)
+  i <- 1
+  for (i in 1:nr) {
+    ddd <- result$dfpredobs[[i]]
+    ddd$model <- result$model[i]
+    if (i == 1) {
+      dresult <- ddd
+    } else {
+      dresult <- rbind(dresult, ddd)
+    }
+  }
+  if (residual == TRUE) {
+    g1 <- dresult  %>%
+      ggplot(aes( y= observado, x = predito)) +
+      geom_segment(aes(y = predito,   yend = observado, x = predito, xend = predito))   +
+      geom_abline(slope = 1, intercept = 0) +
+      geom_point(aes(y = observado), shape = 1) +
+      geom_point(aes(color = abs(residuo))) +
+      scale_color_continuous(low = "green", high = "red") +
+      guides(color = FALSE) +
+      facet_wrap(~model, scales = 'free') +  theme_bw()
+  } else {
+    g1 <- dresult  %>%
+      ggplot(aes( y= observado, x = predito)) +
+      geom_abline(slope = 1, intercept = 0) +
+      geom_point(aes(y = observado), shape = 1) +
+      geom_point(aes(color = abs(residuo))) +
+      scale_color_continuous(low = "green", high = "red") +
+      guides(color = FALSE) +
+      facet_wrap(~model, scales = 'free') +  theme_bw()
+  }
+  print(g1)
+  return(g1)
+}

@@ -113,3 +113,54 @@ recursive_feature_elimination <- function(df,
   }
   return(rfProfile)
 }
+
+
+
+
+#' Recursive Feature Elimination plot results
+#'
+#' This function plot results of Recursive Feature Elimination (RFE)
+#'
+#'
+#' @param fit.rfe Results from recursive_feature_elimination  function
+#' @keywords Recursive Feature Elimination results plot
+#' @details  details
+#' @importFrom ggplot2 ggplot aes geom_line geom_point geom_smooth facet_wrap
+#' @importFrom ggplot2 xlim xlab ylab theme_bw
+#' @importFrom tidyr gather
+#' @importFrom caret trainControl rfe rfeControl rfFuncs
+#' @importFrom knitr kable
+#' @author Elpidio Filho, \email{elpidio@ufv.br}
+#' @examples
+#' \dontrun{
+#' rfe_result(fi.rfe)
+#' }
+
+#' @export
+#'
+rfe_result <- function(fit.rfe) {
+  ddd = fit.rfe$results
+  mx = max(ddd$results$Kappa)
+  wm = which.max(ddd$Kappa)
+  ddd$tol = NA
+  for (i in 1:wm) {
+    ddd$tol[i] = abs(ddd$Kappa[i] - ddd$Kappa[wm])/  ddd$Kappa[wm] * 100
+  }
+
+  g1 = ddd %>% gather(key = var, value = Value, -Variables ) %>%
+    ggplot(aes(x = Variables, y = Value)) +
+    geom_line()  +
+    geom_point() +
+    geom_smooth() +
+    facet_wrap(~var, scales = 'free')
+
+  g2 = ggplot(ddd, aes(x = Variables, y = tol)) + geom_point() + geom_line() +
+    geom_label(label = round(ddd$tol,1), nudge_y = 0.5) +
+    xlim(min(ddd$Variables), ddd$Variables[wm])  +
+    ylab("tolerance (%)") + xlab('num of selected variables')
+  theme_bw()
+  print(g1)
+  print(g2)
+  knitr::kable(ddd[1:wm,], digits = 3, col.names = names(ddd))
+  return(ddd)
+}
