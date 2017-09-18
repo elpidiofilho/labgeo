@@ -9,21 +9,11 @@
 #' @details details
 #' @importFrom caret postResample
 #' @importFrom dplyr tibble
-#' @importFrom ggplot2 ggplot
-#' @importFrom ggplot2 geom_point
-#' @importFrom ggplot2 ggtitle
-#' @importFrom ggplot2 geom_abline
-#' @importFrom ggplot2 geom_tile
-#' @importFrom ggplot2 facet_wrap
-#' @importFrom ggplot2 geom_text
-#' @importFrom ggplot2 xlim
-#' @importFrom ggplot2 ylim
-#' @importFrom ggplot2 aes
-#' @importFrom ggplot2 scale_x_discrete
-#' @importFrom ggplot2 scale_y_discrete
+#' @importFrom ggplot2 ggplot geom_point ggtitle geom_abline
+#' @importFrom ggplot2 geom_tile facet_wrap geom_text
+#' @importFrom ggplot2 xlim  ylim aes labs geom_col
+#' @importFrom ggplot2 scale_x_discrete scale_y_discrete
 #' @importFrom ggplot2 scale_fill_gradientn
-#' @importFrom ggplot2 labs
-#' @importFrom ggplot2 geom_col
 #' @importFrom tidyr gather
 #' @importFrom viridis scale_color_viridis
 #' @importFrom stats var

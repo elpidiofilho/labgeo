@@ -139,26 +139,28 @@ recursive_feature_elimination <- function(df,
 #' @export
 #'
 rfe_result <- function(fit.rfe) {
-  ddd = fit.rfe$results
-  mx = max(ddd$results$Kappa)
-  wm = which.max(ddd$Kappa)
-  ddd$tol = NA
+  ddd <- fit.rfe$results
+  mx <- max(ddd$results[,3])
+  wm <- which.max(ddd[,3])
+  ddd$tol <- NA
   for (i in 1:wm) {
-    ddd$tol[i] = abs(ddd$Kappa[i] - ddd$Kappa[wm])/  ddd$Kappa[wm] * 100
+    ddd$tol[i] <- abs(ddd[i, 3] - ddd[wm, 3])/  ddd[wm, 3] * 100
   }
 
-  g1 = ddd %>% gather(key = var, value = Value, -Variables ) %>%
-    ggplot(aes(x = Variables, y = Value)) +
-    geom_line()  +
-    geom_point() +
-    geom_smooth() +
-    facet_wrap(~var, scales = 'free')
+  g1 <- ddd %>% tidyr::gather(key = var, value = Value, -Variables ) %>%
+    ggplot2::ggplot(aes(x = Variables, y = Value)) +
+    ggplot2::geom_line()  +
+    ggplot2::geom_point() +
+    ggplot2::geom_smooth() +
+    ggplot2::facet_wrap(~var, scales = 'free')
 
-  g2 = ggplot(ddd, aes(x = Variables, y = tol)) + geom_point() + geom_line() +
-    geom_label(label = round(ddd$tol,1), nudge_y = 0.5) +
-    xlim(min(ddd$Variables), ddd$Variables[wm])  +
-    ylab("tolerance (%)") + xlab('num of selected variables')
-  theme_bw()
+  g2 <- ggplot2::ggplot(ddd, aes(x = Variables, y = tol)) +
+    ggplot2::geom_point() +
+    ggplot2::geom_line() +
+    ggplot2::geom_label(label = round(ddd$tol, 1), nudge_y = 0.5) +
+    ggplot2::xlim(min(ddd$Variables), ddd$Variables[wm])  +
+    ggplot2::ylab("tolerance (%)") + xlab('num of selected variables')
+  ggplot2::theme_bw()
   print(g1)
   print(g2)
   knitr::kable(ddd[1:wm,], digits = 3, col.names = names(ddd))
