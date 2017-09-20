@@ -17,8 +17,10 @@ R package to classification and regression in easy way
       
       4 - Carry out the prediction of the best adjusted models using covariables
       in the form of rasters and satellite images. (Under construction)
+      
       The functions were written for automatic execution in parallel whenever possible,
       taking advantage of multi-core CPUs, aiming agility in more complex modeling.
+      
       The model settings are made using the Caret package written by Max Kuhn.
       The Caret package creates a standard interface for accessing a few hundred models,
       is a Swiss Army knife of data modeling.
