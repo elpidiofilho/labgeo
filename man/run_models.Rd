@@ -7,7 +7,7 @@
 run_models(df, models = c("svmPoly", "rf", "gbm", "C5.0"), formula = NULL,
   preprocess = NULL, nfolds = 10, repeats = 1, tune_length = 5,
   cpu_cores = 7, metric = ifelse(is.factor(df[, 1]), "Kappa", "Rsquared"),
-  seeds = NULL)
+  seeds = NULL, verbose = FALSE)
 }
 \arguments{
 \item{df}{Training dataframe}
@@ -29,6 +29,8 @@ run_models(df, models = c("svmPoly", "rf", "gbm", "C5.0"), formula = NULL,
 \item{metric}{metric used to evaluate model fit. For numeric outcome ("RMSE", "Rsquared)}
 
 \item{seeds}{seeds}
+
+\item{verbose}{prints results during the execution of the function}
 }
 \description{
 This function run many models using the same data

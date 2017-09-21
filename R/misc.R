@@ -73,7 +73,7 @@ hms_span <- function(start, end) {
 
 
 #' @export
-to_table <- function(txt, n.col) {
+to_table <- function(txt, n.col, num.digits = 3) {
   n.col <- 4
   num.elem <- length(txt)
   divint <- ceiling(num.elem / n.col) * n.col
@@ -86,7 +86,7 @@ to_table <- function(txt, n.col) {
   }
   mx <- matrix(txt_complete, ncol = n.col)
   names(mx) <- 1:n.col
-  dd <- knitr::kable(mx, col.names = 1:n.col)
+  dd <- knitr::kable(mx, col.names = 1:n.col, digits = num.digits)
   return(dd)
 }
 
