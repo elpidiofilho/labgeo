@@ -352,3 +352,17 @@ plot_predict_observed_residual <- function(result, residual = FALSE) {
   print(g1)
   return(g1)
 }
+
+
+
+#' Convert variables to factor
+#'
+#' @title  Convert variables to factor
+#' @description This function  Convert variables to factor
+#' @param df  dataframe
+#' @param vf vector with names of variables to be converted to factor
+#' @export
+to_factor <- function(df, vf) {
+  df.fac = df %>% mutate_at(vf, funs(factor))
+  return(df.fac)
+}
