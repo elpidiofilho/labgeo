@@ -24,10 +24,13 @@ Labgeo is a package of routines for fit classification and regression models. Th
 
 To install the last version of Labgeo package use : devtools::install_github("elpidiofilho/labgeo")
 
-To install package multidplyr use : devtools::install_github("hadley/multidplyr")
+To install package multidplyr use : 
+devtools::install_github("hadley/multidplyr")
 
-Warning : Caret Version 6.0.77 in CRAN has a bug. Use version 6.0.76 instead, until correction in CRAN. To install a prior version use the code bellow : devtools::install_version("caret", version = "6.0-76")
+Warning : Caret Version 6.0.77 in CRAN has a bug. Use version 6.0.76 instead, until correction in CRAN. To install a prior version use the code bellow : 
+devtools::install_version("caret", version = "6.0-76")
 
 It is also necessary to install via github the multidplyr package, which is not yet available in CRAN. The install multidplyr use :
+
 devtools::install_github("hadley/multidplyr")
  
