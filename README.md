@@ -23,7 +23,7 @@ Labgeo is a package of routines for fit classification and regression models. Th
   The Caret package creates a standard interface for accessing a few hundred models,
   is a Swiss Army knife of data modeling.
 
-##Installation 
+## Installation 
 
 To install the last version of Labgeo package use : 
 
