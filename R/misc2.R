@@ -1,5 +1,5 @@
 #' @export
-train_test = function(df, p = 0.75, seed = NULL){
+train_test = function(df, p = 0.75, groups = min(10,length(y)), seed = NULL){
   if (is.null(seed) == FALSE) {
     set.seed(seed)
   }

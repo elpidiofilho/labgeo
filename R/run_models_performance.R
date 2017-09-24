@@ -309,7 +309,7 @@ rescale <- function(x, to = c(0, 1), from = range(x, na.rm = TRUE, finite = TRUE
 #' @details details
 #' @importFrom dplyr tibble
 #' @importFrom ggplot2 ggplot  geom_segment geom_point geom_abline facet_wrap
-#' @importFrom ggplot2 ggtitle aes theme_bw scale_color_continuous guides
+#' @importFrom ggplot2 ggtitle aes theme_bw scale_color_continuous guides xlim ylim
 #' @importFrom dplyr '%>%'
 #' @examples
 #' \dontrun{
@@ -333,6 +333,8 @@ plot_predict_observed_residual <- function(result, residual = FALSE) {
     g1 <- dresult  %>%
       ggplot(aes( y= observado, x = predito)) +
       geom_segment(aes(y = predito,   yend = observado, x = predito, xend = predito))   +
+      xlim(range(c(ddd$predito, ddd$observado))) +
+      ylim(range(c(ddd$predito, ddd$observado))) +
       geom_abline(slope = 1, intercept = 0) +
       geom_point(aes(y = observado), shape = 1) +
       geom_point(aes(color = abs(residuo))) +
@@ -349,7 +351,7 @@ plot_predict_observed_residual <- function(result, residual = FALSE) {
       guides(color = FALSE) +
       facet_wrap(~model, scales = 'free') +  theme_bw()
   }
-  print(g1)
+  #print(g1)
   return(g1)
 }
 
