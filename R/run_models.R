@@ -13,6 +13,7 @@
 #' @param metric metric used to evaluate model fit. For numeric outcome ("RMSE", "Rsquared)
 #' @param seeds  seeds
 #' @param verbose  prints results during the execution of the function
+#' @importFrom progress progress_bar
 #' @keywords  models
 #' @author Elpidio Filho, \email{elpidio@ufv.br}
 #' @details details
@@ -23,12 +24,13 @@
 #' fit_models = run_models(df,models = models)
 #' }
 
-run_models <- function(df,
-                       models = c("svmPoly", "rf", "gbm", "C5.0"),
+run_models <- function(df, models = ifelse(is.factor(df[, 1]),
+                                           c("svmPoly","rf","gbm","C5.0"),
+                                           c("lm", "cubist", "gbm", "rf")),
                        formula = NULL,
                        preprocess = NULL,
                        nfolds = 10,
-                       repeats = 1,
+                       repeats = NA,
                        tune_length = 5,
                        cpu_cores = 7,
                        metric = ifelse(is.factor(df[, 1]), "Kappa", "Rsquared"),
@@ -45,16 +47,27 @@ run_models <- function(df,
     seedsvec <- NULL
   } else {
     set.seed(seeds)
-    seedsvec <- vector(mode = "list", length = nfolds + 1)
-    for (i in 1:nfolds) seedsvec[[i]] <- sample.int(n = 1000, 400)
-    seedsvec[[nfolds + 1]] <- sample.int(1000, 1)
+    if (is.na(repeats) == FALSE) {
+    nel = nfolds * repeats + 1
+    } else {
+      nel = nfolds + 1
+    }
+    seedsvec <- vector(mode = "list", length = nel)
+    for (i in 1:nel) seedsvec[[i]] <- sample.int(n = 5000, nel * 10)
+    seedsvec[[nel + 1]] <- sample.int(5000, 1)
   }
-
+  if (verbose == TRUE) {
+    pb <- progress_bar$new(total = length(models),
+                           format("Running [:bar] :percent elapsed: :elapsed eta: :eta"),
+                           clear = FALSE)
+    gg = pb$tick(0)
+  }
   nr <- length(models)
   list.model <- vector("list", length = nr)
   for (j in 1:length(models)) {
     if (verbose == TRUE) {
       print(paste("Begin execution model :",models[j]))
+      flush.console()
       inicio <- Sys.time()
     }
 
@@ -86,15 +99,12 @@ run_models <- function(df,
       list.model[j] <- list(fit.class)
     }
     if (verbose == TRUE) {
-      print(paste("End execution" ,models[j]))
-      print(paste("time elapsed :", hms_span(start = inicio, end = Sys.time())))
-
+      pb$tick()
     }
   }
   package.fim <- search()[ifelse(unlist(gregexpr("package:", search())) == 1, TRUE, FALSE)]
   package.list <- setdiff(package.fim, package.inicio)
   if (length(package.list) > 0) for (package in package.list) detach(package, character.only = TRUE)
 
-  print(paste("time elapsed", hms_span(inicio, Sys.time())))
   return(list.model)
 }

@@ -5,7 +5,7 @@
 \title{This function performs the training of the chosen regressor}
 \usage{
 regression(df.train, formula = NULL, preprocess = NULL, regressor = "rf",
-  nfolds = 10, repeats = 1, index = NULL, cpu_cores = 3,
+  nfolds = 10, repeats = NA, index = NULL, cpu_cores = 3,
   tune_length = 5, metric = "Rsquared", seeds = NULL, verbose = FALSE)
 }
 \arguments{

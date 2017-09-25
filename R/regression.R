@@ -33,7 +33,7 @@ regression <- function(df.train,
                        preprocess = NULL,
                        regressor = "rf",
                        nfolds = 10,
-                       repeats = 1,
+                       repeats =  NA,
                        index = NULL,
                        cpu_cores = 3,
                        tune_length = 5,
@@ -51,13 +51,16 @@ regression <- function(df.train,
   } else {
     method <- "CV"
   }
-  if (repeats > 1) method <- "repeatedcv"
+  if (is.na(repeats) == FALSE) {
+    if(repeats > 1) method <- "repeatedcv"
+  }
+  tune_length = ifelse(tune_length > (ncol(df.train) -2), (ncol(df.train) -2), tune_length)
 
   inicio <- Sys.time()
   if (is.null(formula)) {
     formula <- as.formula(paste(names(df.train)[1], "~ ."))
   }
-  tc <- caret::trainControl(
+  tc <- suppressMessages(caret::trainControl(
     method = method,
     number = nfolds,
     repeats = repeats,
@@ -65,20 +68,21 @@ regression <- function(df.train,
     savePredictions = "final",
     returnResamp = "final",
     seeds = seeds,
-    verbose = FALSE
-  )
+    verboseIter = FALSE
+  ))
 
   if (cpu_cores > 0) {
     cl <- parallel::makePSOCKcluster(cpu_cores)
     doParallel::registerDoParallel(cl)
   }
-  set.seed(313)
+
   fit <- suppressMessages(caret::train(
     formula,
     data = df.train,
     method = regressor,
     metric = metric,
     trControl = tc,
+    verbose = FALSE,
     tuneLength = tune_length,
     preProcess = preprocess
   ))
@@ -86,8 +90,8 @@ regression <- function(df.train,
     parallel::stopCluster(cl)
   }
   if (verbose == TRUE) {
-    print(paste("time elapsed : ", hms_span(inicio, Sys.time())))
-    print(caret::getTrainPerf(fit))
+#    print(paste("time elapsed : ", hms_span(inicio, Sys.time())))
+ #   print(caret::getTrainPerf(fit))
   }
   return(fit)
 }
