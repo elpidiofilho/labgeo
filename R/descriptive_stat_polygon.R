@@ -6,13 +6,8 @@
 #' @param df dataframe
 #' @param poligon name of column thats contains polygon id
 #' @param desc parameters os descritive statistics to be calculated.Choices are : c("min", "median", "mean", "max", "sd","skewness", "kurtosis", "p1", "p10", "p25","p33", "p66", "p75", "p90", "p99")
-#' @importFrom dplyr group_by
-#' @importFrom dplyr select
-#' @importFrom dplyr summarise_all
-#' @importFrom dplyr select_if
-#' @importFrom dplyr mutate_if
-#' @importFrom dplyr left_join
-#' @importFrom dplyr collect
+#' @importFrom dplyr group_by select select_if mutate_if
+#' @importFrom dplyr summarise_all left_join collect
 #' @importFrom multidplyr cluster_copy partition
 #' @importFrom stats quantile
 #' @importFrom rlang quo

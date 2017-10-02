@@ -12,13 +12,8 @@
 #' @keywords extract raster data
 #' @importFrom  rgdal readOGR
 #' @importFrom dplyr left_join
-#' @importFrom raster stack
-#' @importFrom raster raster
-#' @importFrom raster rasterToPoints
-#' @importFrom raster rasterize
-#' @importFrom raster res
-#' @importFrom raster extract
-#' @importFrom raster extent
+#' @importFrom raster stack raster rasterToPoints rasterize
+#' @importFrom raster res extract extent
 #' @importFrom sp SpatialPointsDataFrame
 #' @details  details
 #' @author Elpidio Filho, \email{elpidio@ufv.br}

@@ -41,7 +41,7 @@ details
 }
 \examples{
 \dontrun{
-regression(train,"rf",10,6)
+regression(df.train = df, regressor = "rf", metric = "Rsquared", seeds = 313)
 }
 }
 \author{

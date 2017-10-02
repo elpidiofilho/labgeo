@@ -24,7 +24,7 @@
 #' @export
 #' @examples
 #' \dontrun{
-#' regression(train,"rf",10,6)
+#' regression(df.train = df, regressor = "rf", metric = "Rsquared", seeds = 313)
 #' }
 
 
@@ -90,8 +90,8 @@ regression <- function(df.train,
     parallel::stopCluster(cl)
   }
   if (verbose == TRUE) {
-#    print(paste("time elapsed : ", hms_span(inicio, Sys.time())))
- #   print(caret::getTrainPerf(fit))
+  #  print(paste("time elapsed : ", hms_span(inicio, Sys.time())))
+  #   print(caret::getTrainPerf(fit))
   }
   return(fit)
 }

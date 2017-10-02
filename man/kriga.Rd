@@ -4,7 +4,7 @@
 \alias{kriga}
 \title{kriga - Automatric krige}
 \usage{
-kriga(df, target_var, nrep = 10, px, py, p = 0.75, seed = NULL)
+kriga(df, target_var, nrep = 10, name_px, name_py, p = 0.75, seed = NULL)
 }
 \arguments{
 \item{df}{dataframe with targer variable, coordinate x  and coordinate y}
@@ -13,9 +13,9 @@ kriga(df, target_var, nrep = 10, px, py, p = 0.75, seed = NULL)
 
 \item{nrep}{Number of repetitions}
 
-\item{px}{names of column with coordinate x}
+\item{name_px}{names of column with coordinate x}
 
-\item{py}{names of column with coordinate y}
+\item{name_py}{names of column with coordinate y}
 
 \item{p}{proportion between training and validation}
 
@@ -29,8 +29,8 @@ details
 }
 \examples{
 \dontrun{
-result.krig = kriga(df = d,target_var = "argila", px = 'point_x',
-                    py = 'point_y',nrep = 100, p = 0.75 , seed = 313)
+result.krig = kriga(df = d,target_var = "argila", name_px = 'point_x',
+                    name_py = 'point_y',nrep = 100, p = 0.75 , seed = 313)
 media = result.krig \%>\% select(-(model:repet))
         \%>\% summarise_all(funs(med = mean, desvpad = sd ))
 print(knitr::kable(media))

@@ -67,8 +67,8 @@ rmp_regressao <- function(fit_run_model, df_valida, verbose = FALSE) {
     model = character(nm), fit = list(nm), dfpredobs = list(nm),
     mbe = numeric(nm), mae = numeric(nm),
     r2 = numeric(nm), rmse = numeric(nm), nse = numeric(nm),
-    var_exp = numeric(nm),
-    grafic1 = list(nm), grafic2 = list(nm)
+    var_exp = numeric(nm)
+    #grafic1 = list(nm), grafic2 = list(nm)
   )
 
 
@@ -89,25 +89,25 @@ rmp_regressao <- function(fit_run_model, df_valida, verbose = FALSE) {
     summ_model$nse[i] <- acc$Nash_Sutcliffe_efficiency
     summ_model$var_exp[i] <- acc$variance_explained_perc
     maxvalue <- ceiling(max(max(df_valida[, 1]), v) / 5) * 5
-    summ_model$grafic1[i] <- list(ggplot2::ggplot(ddd, aes(x = predito, y = observado)) +
-      ggplot2::geom_point() +
-      ggplot2::ggtitle(paste(
-        fit_md$method, " R2 = ",
-        round(summ_model$r2[i], 3)
-      )) +
-      ggplot2::xlim(c(0, maxvalue)) + ggplot2::ylim(c(0, maxvalue)) +
-      ggplot2::geom_abline(slope = 1, intercept = 0, color = "red"))
+##    summ_model$grafic1[i] <- list(ggplot2::ggplot(ddd, aes(x = predito, y = observado)) +
+#      ggplot2::geom_point() +
+#      ggplot2::ggtitle(paste(
+#        fit_md$method, " R2 = ",
+#        round(summ_model$r2[i], 3)
+#      )) +
+#      ggplot2::xlim(c(0, maxvalue)) + ggplot2::ylim(c(0, maxvalue)) +
+#      ggplot2::geom_abline(slope = 1, intercept = 0, color = "red"))
 
     residuo <- ddd$residuo
-    density <- get_density(ddd$predito, ddd$observado)
+#    density <- get_density(ddd$predito, ddd$observado)
     maxresiduo <- max(residuo)
 
-    summ_model$grafic2[i] <- list(ggplot2::ggplot(ddd) +
-      ggplot2::geom_point(aes(predito, observado, color = density ^ 0.7), size = 0.1, shape = 20) +
-      viridis::scale_color_viridis() +
-      ggplot2::xlim(c(0, maxvalue)) + ggplot2::ylim(c(0, maxvalue)) +
-      ggplot2::geom_abline(slope = 1, intercept = 0, color = "red") +
-      ggplot2::ggtitle(fit_md$method))
+ #   summ_model$grafic2[i] <- list(ggplot2::ggplot(ddd) +
+#      ggplot2::geom_point(aes(predito, observado, color = density ^ 0.7), size = 0.1, shape = 20) +
+#      viridis::scale_color_viridis() +
+ #     ggplot2::xlim(c(0, maxvalue)) + ggplot2::ylim(c(0, maxvalue)) +
+#      ggplot2::geom_abline(slope = 1, intercept = 0, color = "red") +
+ #     ggplot2::ggtitle(fit_md$method))
   }
   if (verbose == TRUE) {
     dgr <- summ_model %>%
@@ -116,7 +116,8 @@ rmp_regressao <- function(fit_run_model, df_valida, verbose = FALSE) {
     print(ggplot2::ggplot(dgr, aes(x = model, y = valor, fill = model)) +
       ggplot2::geom_col() +
       ggplot2::geom_text(aes(label = round(valor, 3)), size = 3, vjust = 1.5) +
-      ggplot2::facet_wrap(~var, scales = "free"))
+      ggplot2::facet_wrap(~var, scales = "free")) +
+      ggplot2::ggtitle(model)
   }
 
   return(summ_model)
@@ -253,8 +254,8 @@ rmp_classificacao <- function(fit_run_model, df_valida, verbose = FALSE) {
       ggtitle(fit_md$method) +
       facet_wrap(~var)
 
-    summ_model$g1[i] <- list(g1)
-    summ_model$g2[i] <- list(g2)
+   # summ_model$g1[i] <- list(g1)
+   # summ_model$g2[i] <- list(g2)
     if (verbose == TRUE) {
       print(g1)
       print(g2)
@@ -367,4 +368,27 @@ plot_predict_observed_residual <- function(result, residual = FALSE) {
 to_factor <- function(df, vf) {
   df.fac = df %>% mutate_at(vf, funs(factor))
   return(df.fac)
+}
+
+
+plot_confusio_matrix <- function(obs,pred) {
+  confusionMatrix(pred, obs)$table %>%
+    prop.table(margin = 1) %>%
+    as.data.frame.matrix() %>%
+    rownames_to_column(var = 'actual') %>%
+    gather(key = 'prediction', value = 'freq',-actual) %>%
+    ggplot(aes(x = actual, y = prediction, fill = freq)) +
+    geom_tile() +
+    geom_text(aes(label = round(freq, 2)), size = 3, color = 'gray20') +
+    scale_fill_gradient(low = 'yellow', high = 'red', limits = c(0,1), name = 'Relative Frequency') +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+    ggtitle('Confusion Matrix - Random Forest (100 Trees)')
+
+  confusionMatrix(y_test, preds)$table %>%
+    as.data.frame.matrix() %>%
+    kable("html") %>%
+    kable_styling(bootstrap_options = c('striped'), font_size = 8) %>%
+    scroll_box(height = "400px")
+
+
 }
