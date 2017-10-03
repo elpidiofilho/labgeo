@@ -112,7 +112,8 @@ easy_fit <- function(dy, dx,
       tune_length = tune_length,
       nfolds = nfolds,
       repeats = repeats,
-      seeds = seeds
+      seeds = seeds,
+      verbose = verbose
     )
 
     list.model$var[i] <- el

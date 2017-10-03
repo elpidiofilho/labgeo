@@ -54,7 +54,7 @@ regression <- function(df.train,
   if (is.na(repeats) == FALSE) {
     if(repeats > 1) method <- "repeatedcv"
   }
-  tune_length = ifelse(tune_length > (ncol(df.train) -2), (ncol(df.train) -2), tune_length)
+  #tune_length = ifelse(tune_length > (ncol(df.train) -2), (ncol(df.train) -2), tune_length)
 
   inicio <- Sys.time()
   if (is.null(formula)) {
