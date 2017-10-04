@@ -15,3 +15,17 @@ create_dummy <- function(df) {
   dfr = predict(od, df) %>% data.frame()
   return(dfr)
 }
+
+#' @export
+remove_extra_spaces <- function(x) {
+  return(gsub("^ *|(?<= ) | *$", "", x, perl = TRUE))
+}
+
+#' @export
+comma_to_point <- function(x, tonumeric = TRUE) {
+  if (tonumeric) {
+    return(as.numeric(gsub(",", ".", x)))
+  } else {
+    return(gsub(",", ".", x))
+  }
+}
