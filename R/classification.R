@@ -63,17 +63,20 @@ classification <- function(df.train,
   }
 
   set.seed(313)
-  fit <- suppressMessages(caret::train(
+  fit = tryCatch({
+  suppressMessages(caret::train(
     formula, data = df.train, method = classifier,
     metric = metric,
     trControl = tc,
     tuneLength = tune_length,
     preProcess = preprocess
-  ))
+  ))},
+  error = function(e){NULL})
+
   if (!is.null(cl)) {
     parallel::stopCluster(cl)
   }
-  if (verbose == TRUE) {
+  if (verbose == TRUE & is.null(fit == FALSE)) {
     print(paste("Classification variable ", names(df.train)[1]))
     print(paste("time elapsed : ", hms_span(inicio, Sys.time())))
     print(caret::getTrainPerf(fit))
