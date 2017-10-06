@@ -52,3 +52,13 @@ roi <- function(extent, project) {
   proj4string(e) <- project
   return(e)
 }
+
+#' @export
+caret.models <- function(model.regression = TRUE) {
+  if (model.regression == TRUE) {
+    m <- unique(modelLookup()[modelLookup()$forClass,c(1)])
+  } else {
+    m <- unique(modelLookup()[modelLookup()$forReg,c(1)])
+  }
+  return(m)
+}
