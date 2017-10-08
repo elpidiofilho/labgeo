@@ -19,7 +19,7 @@ Labgeo is a package of routines for fit classification and regression models. Th
   taking advantage of multi-core CPUs, aiming agility in more complex modeling.
 
 
-  The model settings are made using the Caret package written by Max Kuhn.
+  The model settings are made using the Caret package written by Max Kuhn (https://github.com/topepo/caret).
   The Caret package creates a standard interface for accessing a few hundred models,
   is a Swiss Army knife of data modeling.
 
