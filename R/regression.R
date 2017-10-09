@@ -76,16 +76,18 @@ regression <- function(df.train,
     doParallel::registerDoParallel(cl)
   }
 
-  fit <- suppressMessages(caret::train(
-    formula,
-    data = df.train,
-    method = regressor,
-    metric = metric,
-    trControl = tc,
-    verbose = FALSE,
-    tuneLength = tune_length,
-    preProcess = preprocess
-  ))
+  fit <- fit = tryCatch({
+    suppressMessages(caret::train(
+      formula,
+      data = df.train,
+      method = regressor,
+      metric = metric,
+      trControl = tc,
+      verbose = FALSE,
+      tuneLength = tune_length,
+      preProcess = preprocess
+    ))},
+    error = function(e){NULL})
   if (!is.null(cl)) {
     parallel::stopCluster(cl)
   }

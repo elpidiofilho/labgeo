@@ -47,6 +47,8 @@ comma_to_point <- function(x, tonumeric = TRUE) {
 #' pol.roi = roio(ext, proj)
 #'}
 
+
+
 roi <- function(extent, project) {
   e = as(raster::extent(extent), "SpatialPolygons")
   proj4string(e) <- project
@@ -62,3 +64,62 @@ caret.models <- function(model.regression = TRUE) {
   }
   return(m)
 }
+
+#' @export
+numeric_to_factor <- function(vx, npercentil = 4) {
+ return(dplyr::ntile(vx, npercentil))
+}
+
+#' @export
+remove_acento <- function(vx) {
+  return(chartr("áàãâéêíóõôúÚçª", "aaaaeeiooouUca", vx))
+}
+
+#' @export
+spaceless <- function(x) {x <- gsub(" ", "_", x);x}
+
+
+#' @export
+eliminate_symbol <- function(vx, replace = " ") {
+  vxclean <- vx %>%
+    str_to_lower() %>%
+    chartr("áàãéêíóõúÚçª", "aaaeeioouUca", .) %>%
+    #  iconv(., "utf-8", to = "ASCII//TRANSLIT") %>%
+    str_replace_all("\\.", replace) %>%
+    str_replace_all("\\,", replace) %>%
+    str_replace_all(" ", replace) %>%
+    str_replace_all("-", replace) %>%
+    str_replace_all(" - ", replace) %>%
+    str_replace_all("\\+", replace) %>%
+    str_replace_all("\\*", replace) %>%
+    str_replace_all("\\/", replace) %>%
+    str_replace_all("\\(", replace) %>%
+    str_replace_all("\\)", replace) %>%
+    str_replace_all("\\'", replace) %>%
+    str_replace_all('\\"', replace) %>%
+    str_replace_all("___", replace) %>%
+    str_replace_all("__", replace)
+  return(vxclean)
+}
+
+#' @export
+remove_first_symbol <- function(vx) {
+  return(gsub("^\\P{L}*", "", vx, perl=T))
+}
+
+#' @export
+space_to_symbol <- function(vx, symbol){
+  return(vx %>% str_replace_all(" ", symbol))
+}
+
+#' @export
+point_to_camel <- function(x){
+  capit <- function(x) paste0(toupper(substring(x, 1, 1)), substring(x, 2, nchar(x)))
+  sapply(strsplit(x, "\\."), function(x) paste(capit(x), collapse=""))
+}
+
+#' @export
+abbrev <- function(df, maxlength) {
+  colnames(df) <- df %>%  names() %>% abbreviate()
+}
+
