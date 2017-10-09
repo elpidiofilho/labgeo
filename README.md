@@ -19,21 +19,28 @@ Labgeo is a package of routines for fit classification and regression models. Th
   taking advantage of multi-core CPUs, aiming agility in more complex modeling.
 
 
-  The model settings are made using the Caret package written by Max Kuhn.
+  The model settings are made using the Caret package written by Max Kuhn (https://github.com/topepo/caret).
   The Caret package creates a standard interface for accessing a few hundred models,
   is a Swiss Army knife of data modeling.
 
 ## Installation 
 
-To install the last version of Labgeo package use : 
+To install the last version of Labgeo package follow this steps : 
 
-devtools::install_github("elpidiofilho/labgeo")
-
-Warning : Caret Version 6.0.77 in CRAN has a bug. Use version 6.0.76 instead, until correction in CRAN. To install a prior version use the code bellow : 
-
-devtools::install_version("caret", version = "6.0-76")
-
-It is also necessary to install via github the multidplyr package, which is not yet available in CRAN. The install multidplyr use :
-
+1 - Install via github the multidplyr package, which is not yet available in CRAN. The install multidplyr use :
 devtools::install_github("hadley/multidplyr")
+
+2 - Install via github labgeo package devtools::install_github("elpidiofilho/labgeo")
+
+3 - Warning : Caret Version 6.0.77 in CRAN has a bug. Max Kuhn the caret pakcage manteiner write that a new CRAN version of caret with bug correctionm will be submitted around December. Use version 6.0.76 instead, until correction in CRAN.
+
+To install a prior version use the code bellow : 
+devtools::install_version("caret", version = "6.0-76") 
+
+*OR* 
+
+To install 6.0.77 with bug correction version from gitub :
+devtools::install_github('topepo/caret/pkg/caret')
+
+
  
