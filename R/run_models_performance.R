@@ -113,11 +113,12 @@ rmp_regressao <- function(fit_run_model, df_valida, verbose = FALSE) {
     dgr <- summ_model %>%
       select(model, mbe, mae, rmse, nse, r2, var_exp) %>%
       tidyr::gather(key = var, value = valor, -model)
-    print(ggplot2::ggplot(dgr, aes(x = model, y = valor, fill = model)) +
+      g1 = ggplot2::ggplot(dgr, aes(x = model, y = valor, fill = model)) +
       ggplot2::geom_col() +
       ggplot2::geom_text(aes(label = round(valor, 3)), size = 3, vjust = 1.5) +
-      ggplot2::facet_wrap(~var, scales = "free")) +
+      ggplot2::facet_wrap(~var, scales = "free") +
       ggplot2::ggtitle(model)
+     print(g1)
   }
 
   return(summ_model)

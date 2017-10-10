@@ -76,7 +76,7 @@ regression <- function(df.train,
     doParallel::registerDoParallel(cl)
   }
 
-  fit <- fit = tryCatch({
+  fit <- tryCatch({
     suppressMessages(caret::train(
       formula,
       data = df.train,

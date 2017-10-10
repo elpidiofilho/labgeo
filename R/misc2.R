@@ -96,6 +96,7 @@ eliminate_symbol <- function(vx, replace = " ") {
     str_replace_all("\\(", replace) %>%
     str_replace_all("\\)", replace) %>%
     str_replace_all("\\'", replace) %>%
+    str_replace_all("\\&", replace) %>%
     str_replace_all('\\"', replace) %>%
     str_replace_all("___", replace) %>%
     str_replace_all("__", replace)
