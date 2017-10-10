@@ -24,6 +24,9 @@
 #' fit_models = run_models(df,models = models)
 #' }
 
+
+
+
 run_models <- function(df, models = ifelse(is.factor(df[, 1]),
                                            c("svmPoly","rf","gbm","C5.0"),
                                            c("lm", "cubist", "gbm", "rf")),
@@ -43,19 +46,6 @@ run_models <- function(df, models = ifelse(is.factor(df[, 1]),
   } else {
     mod <- 0
   }
-  if (is.null(seeds)) {
-    seedsvec <- NULL
-  } else {
-    set.seed(seeds)
-    if (is.na(repeats) == FALSE) {
-    nel = nfolds * repeats + 1
-    } else {
-      nel = nfolds + 1
-    }
-    seedsvec <- vector(mode = "list", length = nel)
-    for (i in 1:nel) seedsvec[[i]] <- sample.int(n = 5000, nel * 10)
-    seedsvec[[nel + 1]] <- sample.int(5000, 1)
-  }
   if (verbose == TRUE) {
     pb <- progress_bar$new(total = length(models),
                            format("Running [:bar] :percent elapsed: :elapsed eta: :eta"),
@@ -63,7 +53,8 @@ run_models <- function(df, models = ifelse(is.factor(df[, 1]),
     gg = pb$tick(0)
   }
   nr <- length(models)
-  list.model <- vector("list", length = nr)
+  list.model <- vector("list")
+  cont = 1
   for (j in 1:length(models)) {
     if (verbose == TRUE) {
       print(paste("Begin execution model :",models[j]))
@@ -81,9 +72,12 @@ run_models <- function(df, models = ifelse(is.factor(df[, 1]),
         repeats = repeats,
         metric = metric,
         tune_length = tune_length,
-        seeds = seedsvec
+        seeds = vector_seeds(seeds, repeats, nfolds)
       )
-      list.model[j] <- list(fit.reg)
+      if (is.null(fit.reg) == FALSE ) {
+        list.model[cont] <- list(fit.reg)
+        cont = cont + 1
+      }
     } else {
       fit.class <- classification(
         df.train = df,
@@ -94,9 +88,12 @@ run_models <- function(df, models = ifelse(is.factor(df[, 1]),
         repeats = repeats,
         metric = metric,
         tune_length = tune_length,
-        seeds = seedsvec
+        seeds = vector_seeds(seeds, repeats, nfolds)
       )
-      list.model[j] <- list(fit.class)
+      if (is.null(fit.class) == FALSE ) {
+        list.model[cont] <- list(fit.class)
+        cont = cont + 1
+      }
     }
     if (verbose == TRUE) {
       pb$tick()
@@ -107,4 +104,23 @@ run_models <- function(df, models = ifelse(is.factor(df[, 1]),
   if (length(package.list) > 0) for (package in package.list) detach(package, character.only = TRUE)
 
   return(list.model)
+}
+
+
+
+vector_seeds <- function(seeds, repeats, nfolds){
+  if (is.null(seeds)) {
+    vseed <- NULL
+  } else {
+    set.seed(seeds)
+    if (is.na(repeats) == FALSE) {
+      nel = nfolds * repeats + 1
+    } else {
+      nel = nfolds + 1
+    }
+    vseed <- vector(mode = "list", length = nel)
+    for (i in 1:nel) vseed[[i]] <- sample.int(n = 5000, nel * 10)
+    vseed[[nel + 1]] <- sample.int(5000, 1)
+  }
+  return(vseed)
 }
