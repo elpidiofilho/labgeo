@@ -138,7 +138,7 @@ recursive_feature_elimination <- function(df,
 #' @keywords Recursive Feature Elimination results plot
 #' @details  details
 #' @importFrom ggplot2 ggplot aes geom_line geom_point geom_smooth facet_wrap
-#' @importFrom ggplot2 xlim xlab ylab theme_bw scale_x_continuous scale_y_continuous(
+#' @importFrom ggplot2 xlim xlab ylab theme_bw scale_x_continuous scale_y_continuous
 #' @importFrom tidyr gather
 #' @importFrom caret trainControl rfe rfeControl rfFuncs
 #' @importFrom knitr kable

@@ -1,11 +1,10 @@
 Package: labgeo
 Type: Package
 Title: Collection of functions to land use and soil mapping
-Version: 0.2.2.1
+Version: 0.3.0.0
 Author: Elpidio I. Fernandes Filho
 Maintainer: Elpidio Filho <elpidio@ufv.br>
-Description: More about what it does (maybe more than one line)
-    Use four spaces when indenting paragraphs within the Description.
+Description: Labgeo is a R package to fit classifications and regressions models in an easy way.
 License: GPL-2
 Encoding: UTF-8
 Depends: R (>= 3.3.0)
