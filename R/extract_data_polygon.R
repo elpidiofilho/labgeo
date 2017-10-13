@@ -55,6 +55,6 @@ extract_data_polygon <- function(path_raster, raster_type = ".asc",
     dp <- na.omit(dp)
   }
 
-  print(paste("time elapsed:", Sys.time() - inicio))
+  print(paste("time elapsed:",hms_span(inicio, Sys.time())))
   return(dp)
 }

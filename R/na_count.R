@@ -36,7 +36,8 @@ na_count <- function(df, verbose = TRUE) {
 
   if (verbose == TRUE) {
     nr <- nrow(df)
-    g1 <- ggplot2::ggplot(data = na_count, ggplot2::aes(
+    na_filter = na_count %>% filter(na_absolute  > 0)
+    g1 <- ggplot2::ggplot(data = na_filter, ggplot2::aes(
       x = stats::reorder(variav, na_relative),
       y = na_relative,
       fill = as.factor(classe_NA)
@@ -45,7 +46,7 @@ na_count <- function(df, verbose = TRUE) {
       ggplot2::xlab("Variables") + ggplot2::ylab("% NA") +
       ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90, hjust = 1))
 
-    g2 <- ggplot2::ggplot(data = na_count, ggplot2::aes(
+    g2 <- ggplot2::ggplot(data = na_filter, ggplot2::aes(
       x = stats::reorder(variav, nr - na_absolute),
       y = nr - na_absolute, fill = as.factor(classe_NA)
     )) +

@@ -24,6 +24,8 @@ remove_extra_spaces <- function(x) {
 
 #' Convert comma to point
 #'
+#' @param x vector
+#' @param tonumeric logical TRUE transform to numeric after change comma to point
 #' @export
 comma_to_point <- function(x, tonumeric = TRUE) {
   if (tonumeric) {
@@ -56,6 +58,7 @@ roi <- function(extent, project) {
 }
 
 #' @export
+#' @importFrom caret modelLookup
 caret.models <- function(model.regression = TRUE) {
   if (model.regression == TRUE) {
     m <- unique(modelLookup()[modelLookup()$forClass,c(1)])
@@ -81,7 +84,8 @@ spaceless <- function(x) {x <- gsub(" ", "_", x);x}
 
 #' @export
 eliminate_symbol <- function(vx, replace = " ") {
-  vxclean <- vx %>%
+"." <- NULL
+vxclean <- vx %>%
     str_to_lower() %>%
     chartr("áàãéêíóõúÚçª", "aaaeeioouUca", .) %>%
     #  iconv(., "utf-8", to = "ASCII//TRANSLIT") %>%
@@ -124,3 +128,10 @@ abbrev <- function(df, maxlength) {
   colnames(df) <- df %>%  names() %>% abbreviate()
 }
 
+#' @export
+balanced_sample <- function(df, target, n = 100) {
+  dfsample = df %>%
+    group_by(!!target) %>% sample_n(size = n, replace = T)  %>%
+    na.omit()  %>% data.frame()
+  return(dfsample)
+}

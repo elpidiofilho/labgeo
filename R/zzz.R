@@ -1,10 +1,10 @@
 
 .onLoad <- function(libname, pkgname) {
-  version  = packageDescription("labgeo")$Version
-  v = packageDescription("labgeo")$Built
+  version  = utils::packageDescription("labgeo")$Version
+  v = utils::packageDescription("labgeo")$Built
   data_compilacao = unlist(strsplit(as.character(v), ";"))
   #data_compilacao = unlist(base::strsplit(v, "[;]"))
   dc = data_compilacao[3]
-  packageStartupMessage(paste('library labgeo', ' - version ',version ))
-  packageStartupMessage(paste('Built:', dc))
+  base::packageStartupMessage(paste('library labgeo', ' - version ',version ))
+  base::packageStartupMessage(paste('Built:', dc))
 }

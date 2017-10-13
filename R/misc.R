@@ -129,22 +129,24 @@ getdist_rectangle <- function(px,py,nx,ny) {
 
 
 
+
 mclapply.hack <- function(...) {
 library(parallel)
+
     ## Create a cluster
   ## ... How many workers do you need?
   ## ... N.B. list(...)[[1]] returns the first
   ##          argument passed to the function. In
   ##          this case it is the list to iterate over
   size.of.list <- length(list(...)[[1]])
-  cl <- makeCluster( min(size.of.list, detectCores()) )
+  cl <- parallel::makeCluster( min(size.of.list, parallel::detectCores()) )
 
   ## Find out the names of the loaded packages
   loaded.package.names <- c(
     ## Base packages
-    sessionInfo()$basePkgs,
+    utils::sessionInfo()$basePkgs,
     ## Additional packages
-    names( sessionInfo()$otherPkgs ))
+    names( utils::sessionInfo()$otherPkgs ))
 
   ## N.B. tryCatch() allows us to properly shut down the
   ##      cluster if an error in our code halts execution
@@ -161,19 +163,19 @@ library(parallel)
     ##
     this.env <- environment()
     while( identical( this.env, globalenv() ) == FALSE ) {
-      clusterExport(cl,
+      parallel::clusterExport(cl,
                     ls(all.names=TRUE, env=this.env),
                     envir=this.env)
       this.env <- parent.env(environment())
     }
     ## repeat for the global environment
-    clusterExport(cl,
+    parallel::clusterExport(cl,
                   ls(all.names=TRUE, env=globalenv()),
                   envir=globalenv())
 
     ## Load the libraries on all the clusters
     ## N.B. length(cl) returns the number of clusters
-    parLapply( cl, 1:length(cl), function(xx){
+    parallel::parLapply( cl, 1:length(cl), function(xx){
       lapply(loaded.package.names, function(yy) {
         ## N.B. the character.only option of
         ##      require() allows you to give the
@@ -182,9 +184,9 @@ library(parallel)
     })
 
     ## Run the lapply in parallel
-    return( parLapply( cl, ...) )
+    return( parallel::parLapply( cl, ...) )
   }, finally = {
     ## Stop the cluster
-    stopCluster(cl)
+    parallel::stopCluster(cl)
   })
 }

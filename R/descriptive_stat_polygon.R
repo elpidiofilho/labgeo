@@ -26,6 +26,7 @@ descriptive_stat_polygon <- function(df, poligon,
                                      desc = c("min", "mean", "max", "sd")) {
   #  c("min", "median", "mean", "max", "sd","skewness", "kurtosis",
   # "p1", "p10", "p25","p33", "p66", "p75", "p90", "p99")
+  polig = NULL
   inicio <- Sys.time()
   vpc <- c("p1", "p10", "p25", "p33", "p66", "p75", "p90", "p99")
   pdesc <- desc[vpc %in% desc]
