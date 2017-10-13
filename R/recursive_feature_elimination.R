@@ -68,14 +68,27 @@ recursive_feature_elimination <- function(df,
     }
     if (repeats > 1) method <- "repeatedcv"
   }
-  if (is.null(seeds)) {
+
+
+  totalSize <- if(any(sizes == (ncol(df)) -1)) length(sizes) else length(sizes) + 1
+  if(is.null(seeds)){
     seedsvec <- NULL
   } else {
     set.seed(seeds)
-    seedsvec <- vector(mode = "list", length = nfolds + 1)
-    for (i in 1:nfolds) seedsvec[[i]] <- sample.int(n = 1000, 400)
-    seedsvec[[nfolds + 1]] <- sample.int(1000, 1)
+    vseeds <- vector(mode = "list", length = (nfolds * repeats) + 1)
+    vseeds <- lapply(vseeds, function(x) sample.int(n = 100000, size = totalSize))
+    vseeds[[nfolds * repeats + 1]] <- sample.int(n = 100000, size = 1)
+    seedsvec <- vseeds
   }
+
+#  if (is.null(seeds)) {
+#    seedsvec <- NULL
+#  } else {
+#    set.seed(seeds)
+#    seedsvec <- vector(mode = "list", length = nfolds + 1)
+#    for (i in 1:nfolds) seedsvec[[i]] <- sample.int(n = 1000, 400)
+#    seedsvec[[nfolds + 1]] <- sample.int(1000, 1)
+#  }
 
 
   inicio <- Sys.time()
@@ -146,20 +159,23 @@ rfe_result <- function(fit.rfe) {
   for (i in 1:wm) {
     ddd$tol[i] <- abs(ddd[i, 3] - ddd[wm, 3])/  ddd[wm, 3] * 100
   }
-
-  g1 <- ddd %>% tidyr::gather(key = var, value = Value, -Variables ) %>%
-    ggplot2::ggplot(aes(x = Variables, y = Value)) +
+  dddg = ddd %>% na.omit %>% tidyr::gather(key = var, value = Value, -Variables )
+  g1 <- ggplot2::ggplot(dddg, aes(x = Variables, y = Value)) +
     ggplot2::geom_line()  +
     ggplot2::geom_point() +
     ggplot2::geom_smooth() +
+    ggplot2::scale_x_continuous(breaks = dddg$Variables) +
     ggplot2::facet_wrap(~var, scales = 'free')
 
-  g2 <- ggplot2::ggplot(ddd, aes(x = Variables, y = tol)) +
+  ddd.na = ddd %>% na.omit
+  g2 <- ggplot2::ggplot(data = ddd.na , aes(x = Variables, y = tol)) +
     ggplot2::geom_point() +
     ggplot2::geom_line() +
-    ggplot2::geom_label(label = round(ddd$tol, 1), nudge_y = 0.5) +
-    ggplot2::xlim(min(ddd$Variables), ddd$Variables[wm])  +
-    ggplot2::ylab("tolerance (%)") + xlab('num of selected variables')
+    ggplot2::geom_label(label = round(ddd.na$tol, 1), nudge_y = 0.5) +
+   # ggplot2::xlim(min(ddd.na$Variables), ddd.na$Variables[wm])  +
+    ggplot2::scale_x_continuous(breaks = ddd.na$Variables) +
+    ggplot2::scale_y_continuous(breaks = c(0:round(max(ddd.na$tol)))) +
+    ggplot2::ylab("tolerance (%)") + xlab('number of selected variables')
   ggplot2::theme_bw()
   print(g1)
   print(g2)
