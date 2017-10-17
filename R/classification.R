@@ -38,6 +38,7 @@ classification <- function(df.train,
                            metric = "Kappa",
                            seeds = NULL,
                            verbose = FALSE) {
+  cl = NULL
   if (nfolds == 0) {
     method <- "none"
     tune_length <- 1
@@ -63,7 +64,7 @@ classification <- function(df.train,
   }
 
   set.seed(313)
-  fit = tryCatch({
+  fit <- tryCatch({
     suppressMessages(caret::train(
       formula, data = df.train, method = classifier,
       metric = metric,

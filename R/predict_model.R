@@ -31,9 +31,10 @@ predict_to_map <- function(model_list, path_raster, raster_type = ".asc",
   i = 1
   for (i in 1:nm) {
     inicio = Sys.time()
+    vsel = fit[[i]]$coefnames
     var_file_raster = paste0(path_raster,vsel,raster_type)
     st <- raster::stack(var_file_raster)
-    vachei = !(names(st) %in% fit[[i]]$coefnames)
+    vachei = !(names(st) %in% vsel)
     if (sum(vachei) > 0) {
       print(paste(names(st)[vachei]))
       stop("covariate no found")

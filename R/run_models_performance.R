@@ -58,114 +58,23 @@ run_models_performance <- function(fit_run_model, df_valida, verbose = FALSE) {
   }
 }
 
-getwd()
-
-rmp_regressao <- function(fit_run_model, df_valida, verbose = FALSE) {
-  predito <- observado <- model <- mbe <- mae <- rmse <- nse <- r2 <- var_exp <- var <- valor <- NULL
-  nm <- length(fit_run_model)
-  summ_model <- dplyr::tibble(
-    model = character(nm), fit = list(nm), dfpredobs = list(nm),
-    mbe = numeric(nm), mae = numeric(nm),
-    r2 = numeric(nm), rmse = numeric(nm), nse = numeric(nm),
-    var_exp = numeric(nm)
-    #grafic1 = list(nm), grafic2 = list(nm)
-  )
 
 
-  for (i in 1:length(fit_run_model)) {
-    fit_md <- fit_run_model[[i]]
-    v <- suppressMessages(predict(fit_md, df_valida))
-    ddd <- data.frame(observado = df_valida[, 1], predito = v, residuo = abs(v - df_valida[, 1]))
-    names(ddd)[1] <- "observado"
-    names(ddd)[3] <- "residuo"
-    summ_model$model[i] <- fit_md$method
-    summ_model$fit[i] <- list(fit_md)
-    summ_model$dfpredobs[i] <- list(ddd)
-    acc <- pred_acc(ddd$predito, ddd$observado)
-    summ_model$r2[i] <- acc$rsquared
-    summ_model$rmse[i] <- acc$root_mean_square_error
-    summ_model$mbe[i] <- acc$mean_bias_error
-    summ_model$mae[i] <- acc$mean_absolute_error
-    summ_model$nse[i] <- acc$Nash_Sutcliffe_efficiency
-    summ_model$var_exp[i] <- acc$variance_explained_perc
-    maxvalue <- ceiling(max(max(df_valida[, 1]), v) / 5) * 5
-##    summ_model$grafic1[i] <- list(ggplot2::ggplot(ddd, aes(x = predito, y = observado)) +
-#      ggplot2::geom_point() +
-#      ggplot2::ggtitle(paste(
-#        fit_md$method, " R2 = ",
-#        round(summ_model$r2[i], 3)
-#      )) +
-#      ggplot2::xlim(c(0, maxvalue)) + ggplot2::ylim(c(0, maxvalue)) +
-#      ggplot2::geom_abline(slope = 1, intercept = 0, color = "red"))
 
-    residuo <- ddd$residuo
-#    density <- get_density(ddd$predito, ddd$observado)
-    maxresiduo <- max(residuo)
-
- #   summ_model$grafic2[i] <- list(ggplot2::ggplot(ddd) +
-#      ggplot2::geom_point(aes(predito, observado, color = density ^ 0.7), size = 0.1, shape = 20) +
-#      viridis::scale_color_viridis() +
- #     ggplot2::xlim(c(0, maxvalue)) + ggplot2::ylim(c(0, maxvalue)) +
-#      ggplot2::geom_abline(slope = 1, intercept = 0, color = "red") +
- #     ggplot2::ggtitle(fit_md$method))
-  }
-  if (verbose == TRUE) {
-    dgr <- summ_model %>%
-      select(model, mbe, mae, rmse, nse, r2, var_exp) %>%
-      tidyr::gather(key = var, value = valor, -model)
-      g1 = ggplot2::ggplot(dgr, aes(x = model, y = valor, fill = model)) +
-      ggplot2::geom_col() +
-      ggplot2::geom_text(aes(label = round(valor, 3)), size = 3, vjust = 1.5) +
-      ggplot2::facet_wrap(~var, scales = "free") +
-      ggplot2::ggtitle(model)
-     print(g1)
-  }
-
-  return(summ_model)
-}
-
-get_density <- function(x, y, n = 100) {
-  dens <- kde2d(x = x, y = y, n = n)
-  ix <- findInterval(x, dens$x)
-  iy <- findInterval(y, dens$y)
-  ii <- cbind(ix, iy)
-  return(dens$z[ii])
-}
-
-
-bandwidth.nrd <- function(x) {
-  r <- quantile(x, c(0.25, 0.75))
-  h <- (r[2L] - r[1L]) / 1.34
-  4 * 1.06 * min(sqrt(var(x)), h) * length(x) ^ (-1 / 5)
-}
-
-
-## from library MASS
-## https://github.com/cran/MASS/blob/master/R/kde2d.R
-kde2d <- function(x, y, h, n = 25, lims = c(range(x), range(y))) {
-  dnorm <- NULL
-  nx <- length(x)
-  if (length(y) != nx)
-    stop("data vectors must be the same length")
-  if (any(!is.finite(x)) || any(!is.finite(y)))
-    stop("missing or infinite values in the data are not allowed")
-  if (any(!is.finite(lims)))
-    stop("only finite values are allowed in 'lims'")
-  n <- rep(n, length.out = 2L)
-  gx <- seq.int(lims[1L], lims[2L], length.out = n[1L])
-  gy <- seq.int(lims[3L], lims[4L], length.out = n[2L])
-  h <- if (missing(h)) c(bandwidth.nrd(x), bandwidth.nrd(y))
-    else rep(h, length.out = 2L)
-  if (any(h <= 0))
-    stop("bandwidths must be strictly positive")
-  h <- h / 4 # for S's bandwidth scale
-  ax <- outer(gx, x, "-") / h[1L]
-  ay <- outer(gy, y, "-") / h[2L]
-  z <- base::tcrossprod(matrix(dnorm(ax),, nx), matrix(dnorm(ay),, nx)) / (nx * h[1L] * h[2L])
-  list(x = gx, y = gy, z = z)
-}
-
-
+#' Calculate statiscs of accuracy to regression models
+#'
+#'
+#' @title Calculate statiscs of accuracy to regression models
+#' @description This function Calculate statiscs of accuracy to regression models
+#' @param obs vector with observated data
+#' @param pred vector with predicted value
+#' @details details
+#' @importFrom stats cor t.test
+#' @examples
+#' \dontrun{
+#' v.obs = c(0,25,75,100)
+#' v.pred = c(1.24,70,97)
+#' pred_acc(v.obs, v.pred)
 #' @export
 pred_acc <- function(obs, pred) {
   mu <- mean(obs)
@@ -208,7 +117,7 @@ rmp_classificacao <- function(fit_run_model, df_valida, verbose = FALSE) {
     accuracy = numeric(nm), Kappa = numeric(nm), byclass = list(nm), cf = list(nm),
     g1 = list(nm), g2 = list(nm)
   )
-  for (i in 1:length(fit_run_model)) {
+  for (i in seq_len(fit_run_model)) {
     fit_md <- fit_run_model[[i]]
     v <- suppressMessages(predict(fit_md, df_valida))
     ddd <- data.frame(observado = df_valida[, 1], predito = v)
@@ -320,7 +229,8 @@ rescale <- function(x, to = c(0, 1), from = range(x, na.rm = TRUE, finite = TRUE
 #' @export
 #'
 plot_predict_observed_residual <- function(result, residual = FALSE) {
-  nr <- nrow(result)
+observado <- predito <- residuo <- NULL
+    nr <- nrow(result)
   i <- 1
   for (i in 1:nr) {
     ddd <- result$dfpredobs[[i]]
@@ -359,26 +269,29 @@ plot_predict_observed_residual <- function(result, residual = FALSE) {
 
 
 
-#' Convert variables to factor
+
+#' Plot Confusion Matrix
 #'
-#' @title  Convert variables to factor
-#' @description This function  Convert variables to factor
-#' @param df  dataframe
-#' @param vf vector with names of variables to be converted to factor
+#' @title  Plot Confusion Matrix
+#' @description This function  Plot Confusion Matrix
+#' @param obs  observed values
+#' @param pred predicted values
+#' @importFrom ggplot2 ggplot geom_tile geom_text scale_fill_gradient theme
+#' @importFrom ggplot2 ggtitle  element_text
+#' @importFrom tidyr gather
+#' @importFrom caret confusionMatrix
+#' @importFrom tibble rownames_to_column
+#' @importFrom knitr kable
+#' @importFrom  kableExtra kable_styling scroll_box
 #' @export
-to_factor <- function(df, vf) {
-  df.fac = df %>% mutate_at(vf, funs(factor))
-  return(df.fac)
-}
-
-
-plot_confusio_matrix <- function(obs,pred) {
+plot_confusio_matrix <- function(obs, pred) {
+  actual  <- prediction <- freq <- y_test <- preds <- NULL
   confusionMatrix(pred, obs)$table %>%
     prop.table(margin = 1) %>%
     as.data.frame.matrix() %>%
     rownames_to_column(var = 'actual') %>%
-    gather(key = 'prediction', value = 'freq',-actual) %>%
-    ggplot(aes(x = actual, y = prediction, fill = freq)) +
+    tidyr::gather(key = 'prediction', value = 'freq',-actual) %>%
+    ggplot2::ggplot(aes(x = actual, y = prediction, fill = freq)) +
     geom_tile() +
     geom_text(aes(label = round(freq, 2)), size = 3, color = 'gray20') +
     scale_fill_gradient(low = 'yellow', high = 'red', limits = c(0,1), name = 'Relative Frequency') +
@@ -390,6 +303,54 @@ plot_confusio_matrix <- function(obs,pred) {
     kable("html") %>%
     kable_styling(bootstrap_options = c('striped'), font_size = 8) %>%
     scroll_box(height = "400px")
+}
 
 
+
+
+rmp_regressao <- function(fit_run_model, df_valida, verbose = FALSE) {
+  predito <- observado <- model <- mbe <- mae <- rmse <- nse <- r2 <- var_exp <- var <- valor <- NULL
+  nm <- length(fit_run_model)
+  summ_model <- dplyr::tibble(
+    model = character(nm), fit = list(nm), dfpredobs = list(nm),
+    mbe = numeric(nm), mae = numeric(nm),
+    r2 = numeric(nm), rmse = numeric(nm), nse = numeric(nm),
+    var_exp = numeric(nm)
+    #grafic1 = list(nm), grafic2 = list(nm)
+  )
+
+
+  for (i in seq_len(fit_run_model)) {
+    fit_md <- fit_run_model[[i]]
+    v <- suppressMessages(predict(fit_md, df_valida))
+    ddd <- data.frame(observado = df_valida[, 1], predito = v, residuo = abs(v - df_valida[, 1]))
+    names(ddd)[1] <- "observado"
+    names(ddd)[3] <- "residuo"
+    summ_model$model[i] <- fit_md$method
+    summ_model$fit[i] <- list(fit_md)
+    summ_model$dfpredobs[i] <- list(ddd)
+    acc <- pred_acc(ddd$predito, ddd$observado)
+    summ_model$r2[i] <- acc$rsquared
+    summ_model$rmse[i] <- acc$root_mean_square_error
+    summ_model$mbe[i] <- acc$mean_bias_error
+    summ_model$mae[i] <- acc$mean_absolute_error
+    summ_model$nse[i] <- acc$Nash_Sutcliffe_efficiency
+    summ_model$var_exp[i] <- acc$variance_explained_perc
+    maxvalue <- ceiling(max(max(df_valida[, 1]), v) / 5) * 5
+    residuo <- ddd$residuo
+    maxresiduo <- max(residuo)
+  }
+  if (verbose == TRUE) {
+    dgr <- summ_model %>%
+      select(model, mbe, mae, rmse, nse, r2, var_exp) %>%
+      tidyr::gather(key = var, value = valor, -model)
+    g1 <- ggplot2::ggplot(dgr, aes(x = model, y = valor, fill = model)) +
+      ggplot2::geom_col() +
+      ggplot2::geom_text(aes(label = round(valor, 3)), size = 3, vjust = 1.5) +
+      ggplot2::facet_wrap(~var, scales = "free") +
+      ggplot2::ggtitle(model)
+    print(g1)
+  }
+
+  return(summ_model)
 }

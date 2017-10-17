@@ -14,6 +14,7 @@
 #' @param seeds  seeds
 #' @param verbose  prints results during the execution of the function
 #' @importFrom progress progress_bar
+#' @importFrom utils flush.console
 #' @keywords  models
 #' @author Elpidio Filho, \email{elpidio@ufv.br}
 #' @details details
@@ -50,12 +51,12 @@ run_models <- function(df, models = ifelse(is.factor(df[, 1]),
     pb <- progress_bar$new(total = length(models),
                            format("Running [:bar] :percent elapsed: :elapsed eta: :eta"),
                            clear = FALSE)
-    gg = pb$tick(0)
+    gg <- pb$tick(0)
   }
   nr <- length(models)
   list.model <- vector("list")
-  cont = 1
-  for (j in 1:length(models)) {
+  cont <- 1
+  for (j in seq_len(models)) {
     if (verbose == TRUE) {
       print(paste("Begin execution model :",models[j]))
       flush.console()
@@ -76,7 +77,7 @@ run_models <- function(df, models = ifelse(is.factor(df[, 1]),
       )
       if (is.null(fit.reg) == FALSE ) {
         list.model[cont] <- list(fit.reg)
-        cont = cont + 1
+        cont <- cont + 1
       }
     } else {
       fit.class <- classification(
@@ -92,7 +93,7 @@ run_models <- function(df, models = ifelse(is.factor(df[, 1]),
       )
       if (is.null(fit.class) == FALSE ) {
         list.model[cont] <- list(fit.class)
-        cont = cont + 1
+        cont <- cont + 1
       }
     }
     if (verbose == TRUE) {
@@ -114,9 +115,9 @@ vector_seeds <- function(seeds, repeats, nfolds){
   } else {
     set.seed(seeds)
     if (is.na(repeats) == FALSE) {
-      nel = nfolds * repeats + 1
+      nel <- nfolds * repeats + 1
     } else {
-      nel = nfolds + 1
+      nel <- nfolds + 1
     }
     vseed <- vector(mode = "list", length = nel)
     for (i in 1:nel) vseed[[i]] <- sample.int(n = 5000, nel * 10)
