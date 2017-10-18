@@ -56,7 +56,7 @@ run_models <- function(df, models = ifelse(is.factor(df[, 1]),
   nr <- length(models)
   list.model <- vector("list")
   cont <- 1
-  for (j in seq_len(models)) {
+  for (j in 1:length(models)) {
     if (verbose == TRUE) {
       print(paste("Begin execution model :",models[j]))
       flush.console()

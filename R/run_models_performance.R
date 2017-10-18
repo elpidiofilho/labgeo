@@ -117,7 +117,7 @@ rmp_classificacao <- function(fit_run_model, df_valida, verbose = FALSE) {
     accuracy = numeric(nm), Kappa = numeric(nm), byclass = list(nm), cf = list(nm),
     g1 = list(nm), g2 = list(nm)
   )
-  for (i in seq_len(fit_run_model)) {
+  for (i in 1:length(fit_run_model)) {
     fit_md <- fit_run_model[[i]]
     v <- suppressMessages(predict(fit_md, df_valida))
     ddd <- data.frame(observado = df_valida[, 1], predito = v)
@@ -320,7 +320,7 @@ rmp_regressao <- function(fit_run_model, df_valida, verbose = FALSE) {
   )
 
 
-  for (i in seq_len(fit_run_model)) {
+  for (i in 1:length(fit_run_model)) {
     fit_md <- fit_run_model[[i]]
     v <- suppressMessages(predict(fit_md, df_valida))
     ddd <- data.frame(observado = df_valida[, 1], predito = v, residuo = abs(v - df_valida[, 1]))
