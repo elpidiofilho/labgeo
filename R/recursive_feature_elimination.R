@@ -46,11 +46,12 @@ recursive_feature_elimination <- function(df,
                                           repeats = 1,
                                           fun = rfFuncs,
                                           cpu_cores = 6,
-                                          metric = ifelse(is.factor(df[, 1]), "Kappa", "Rsquared"),
+                                          metric = ifelse(is.factor(df[, 1]),
+                                                          "Kappa", "Rsquared"),
                                           seeds = NULL,
                                           verbose = TRUE) {
 
-  cl = NULL
+  cl <- NULL
   if (!is.data.frame(df)) stop("df is not a dataframe")
   if (is.null(metric)) {
     if (is.numeric(df[, 1])) {
@@ -73,26 +74,17 @@ recursive_feature_elimination <- function(df,
   }
 
 
-  totalSize <- if(any(sizes == (ncol(df)) -1)) length(sizes) else length(sizes) + 1
-  if(is.null(seeds)){
+  totalsize <- if (any(sizes == (ncol(df)) - 1)) length(sizes)
+  else length(sizes) + 1
+  if (is.null(seeds)){
     seedsvec <- NULL
   } else {
     set.seed(seeds)
     vseeds <- vector(mode = "list", length = (nfolds * repeats) + 1)
-    vseeds <- lapply(vseeds, function(x) sample.int(n = 100000, size = totalSize))
+    vseeds <- lapply(vseeds, function(x) sample.int(n = 100000, size = totalsize))
     vseeds[[nfolds * repeats + 1]] <- sample.int(n = 100000, size = 1)
     seedsvec <- vseeds
   }
-
-#  if (is.null(seeds)) {
-#    seedsvec <- NULL
-#  } else {
-#    set.seed(seeds)
-#    seedsvec <- vector(mode = "list", length = nfolds + 1)
-#    for (i in 1:nfolds) seedsvec[[i]] <- sample.int(n = 1000, 400)
-#    seedsvec[[nfolds + 1]] <- sample.int(1000, 1)
-#  }
-
 
   inicio <- Sys.time()
   formula <- as.formula(paste(names(df)[1], "~ .", sep = ""))
@@ -101,7 +93,7 @@ recursive_feature_elimination <- function(df,
     doParallel::registerDoParallel(cl)
   }
   if (is.null(index)) {
-    rfProfile <- caret::rfe(
+    fit.rfe <- caret::rfe(
       formula = formula, data = df, sizes = sizes, metric = metric,
       rfeControl = rfeControl(
         method = "cv", functions = fun, number = nfolds,
@@ -109,7 +101,7 @@ recursive_feature_elimination <- function(df,
       )
     )
   } else {
-    rfProfile <- caret::rfe(
+    fit.rfe <- caret::rfe(
       formula = formula, data = df, sizes = sizes, metric = metric,
       rfeControl = rfeControl(
         method = "cv", functions = fun, number = nfolds,
@@ -121,13 +113,13 @@ recursive_feature_elimination <- function(df,
     parallel::stopCluster(cl)
   }
   if (verbose == TRUE) {
-    print("=======================================================================")
+    print("==================================================================")
     print("Recursive Feature Elimination")
     print(paste("outcome : ", names(df)[1], sep = ""))
-    print(paste("Selected vars :", paste(rfProfile$optVariables, collapse = ",")))
+    print(paste("Selected vars :", paste(fit.rfe$optVariables, collapse = ",")))
     print(paste("time elapsed", hms_span(inicio, Sys.time())))
   }
-  return(rfProfile)
+  return(fit.rfe)
 }
 
 
@@ -158,32 +150,33 @@ recursive_feature_elimination <- function(df,
 rfe_result <- function(fit.rfe) {
   value <- variables <- tol <- Value <- Variables <- NULL
   ddd <- fit.rfe$results
-  mx <- max(ddd$results[,3])
-  wm <- which.max(ddd[,3])
+  mx <- max(ddd$results[, 3])
+  wm <- which.max(ddd[, 3])
   ddd$tol <- NA
   for (i in 1:wm) {
-    ddd$tol[i] <- abs(ddd[i, 3] - ddd[wm, 3])/  ddd[wm, 3] * 100
+    ddd$tol[i] <- abs(ddd[i, 3] - ddd[wm, 3]) / ddd[wm, 3] * 100
   }
-  dddg <- ddd %>% na.omit %>% tidyr::gather(key = var, value = Value, -Variables )
+  dddg <- ddd %>% na.omit %>% tidyr::gather(key = var,
+                                            value = Value, -Variables )
   g1 <- ggplot2::ggplot(dddg, aes(x = Variables, y = Value)) +
     ggplot2::geom_line()  +
     ggplot2::geom_point() +
     ggplot2::geom_smooth() +
     ggplot2::scale_x_continuous(breaks = dddg$Variables) +
-    ggplot2::facet_wrap(~var, scales = 'free')
+    ggplot2::facet_wrap(~var, scales = "free")
 
   ddd.na <- ddd %>% na.omit
-  g2 <- ggplot2::ggplot(data = ddd.na , aes(x = Variables, y = tol)) +
+  g2 <- ggplot2::ggplot(data = ddd.na, aes(x = Variables, y = tol)) +
     ggplot2::geom_point() +
     ggplot2::geom_line() +
     ggplot2::geom_label(label = round(ddd.na$tol, 1), nudge_y = 0.5) +
     # ggplot2::xlim(min(ddd.na$Variables), ddd.na$Variables[wm])  +
     ggplot2::scale_x_continuous(breaks = ddd.na$Variables) +
     ggplot2::scale_y_continuous(breaks = c(0:round(max(ddd.na$tol)))) +
-    ggplot2::ylab("tolerance (%)") + xlab('number of selected variables')
+    ggplot2::ylab("tolerance (%)") + xlab("number of selected variables")
   ggplot2::theme_bw()
   print(g1)
   print(g2)
-  knitr::kable(ddd[1:wm,], digits = 3, col.names = names(ddd))
+  knitr::kable(ddd[1:wm, ], digits = 3, col.names = names(ddd))
   return(ddd)
 }

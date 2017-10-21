@@ -19,7 +19,7 @@ zero_range <- function(x, tol = 1000 * .Machine$double.eps) {
   m <- min(abs(x))
   if (m == 0)
     return(FALSE)
-  abs((x[1] - x[2]) / m) < tol
+  abs( (x[1] - x[2]) / m) < tol
 }
 
 rescale <- function(x, to = c(0, 1),
@@ -52,7 +52,8 @@ kde2d <- function(x, y, h, n = 25, lims = c(range(x), range(y))) {
   h <- h / 4 # for S's bandwidth scale
   ax <- outer(gx, x, "-") / h[1L]
   ay <- outer(gy, y, "-") / h[2L]
-  z <- tcrossprod(matrix(dnorm(ax),, nx), matrix(dnorm(ay),, nx)) / (nx * h[1L] * h[2L])
+  z <- tcrossprod(matrix(dnorm(ax),, nx),
+                  matrix(dnorm(ay),, nx)) / (nx * h[1L] * h[2L])
   list(x = gx, y = gy, z = z)
 }
 
@@ -62,13 +63,13 @@ kde2d <- function(x, y, h, n = 25, lims = c(range(x), range(y))) {
 hms_span <- function(start, end) {
   dsec <- as.numeric(difftime(end, start, unit = "secs"))
   hours <- floor(dsec / 3600)
-  minutes <- floor((dsec - 3600 * hours) / 60)
+  minutes <- floor( (dsec - 3600 * hours) / 60)
   seconds <- dsec - 3600 * hours - 60 * minutes
   paste0(
     sapply(c(hours, minutes, seconds), function(x) {
       formatC(x, width = 2, format = "d", flag = "0")
-    }), collapse = ":"
-  )
+    }),
+    collapse = ":")
 }
 
 
@@ -96,7 +97,7 @@ to_table <- function(txt, n.col, num.digits = 3) {
 save_gggraphics <- function(object, graphic_format = c("jpg", "png"),
                          file_path, width = 15, height = 15,
                          units = "cm", dpi = 100) {
-  nf = length(format)
+  nf <- length(format)
   for (i in 1:nf) {
     ggplot2::ggsave(object, file = paste0(file_path, ".", graphic_format[i]),
                     width = width, height = height, units = units, dpi = dpi)
@@ -105,7 +106,7 @@ save_gggraphics <- function(object, graphic_format = c("jpg", "png"),
 }
 
 #' @export
-getdist_rectangle <- function(px,py,nx,ny) {
+getdist_rectangle <- function(px, py, nx, ny) {
   maxy <- max(py)
   maxx <- max(px)
   miny <- min(py)
@@ -118,8 +119,8 @@ getdist_rectangle <- function(px,py,nx,ny) {
   df1 <- matrix(nrow = l, ncol = c)
   cont <- 1
   for (i in 1:c) {
-    df1[,cont] <- sqrt((gr$y[i] - py) ^ 2 + (gr$x[i] - px) ^ 2)
-    names(df1)[i] <- paste("dist_",i,sep="")
+    df1[, cont] <- sqrt( (gr$y[i] - py) ^ 2 + (gr$x[i] - px) ^ 2)
+    names(df1)[i] <- paste("dist_", i, sep = "")
     cont <- cont + 1
   }
   df1 <- data.frame(df1)
@@ -132,61 +133,31 @@ getdist_rectangle <- function(px,py,nx,ny) {
 
 mclapply.hack <- function(...) {
 library(parallel)
-
-    ## Create a cluster
-  ## ... How many workers do you need?
-  ## ... N.B. list(...)[[1]] returns the first
-  ##          argument passed to the function. In
-  ##          this case it is the list to iterate over
-  size.of.list <- length(list(...)[[1]])
-  cl <- parallel::makeCluster( min(size.of.list, parallel::detectCores()) )
-
-  ## Find out the names of the loaded packages
-  loaded.package.names <- c(
-    ## Base packages
+  size_of_list <- length(list(...)[[1]])
+  cl <- parallel::makeCluster( min(size_of_list, parallel::detectCores()) )
+  loaded_package_names <- c(
     utils::sessionInfo()$basePkgs,
-    ## Additional packages
     names( utils::sessionInfo()$otherPkgs ))
-
-  ## N.B. tryCatch() allows us to properly shut down the
-  ##      cluster if an error in our code halts execution
-  ##      of the function. For details see: help(tryCatch)
   tryCatch( {
-
-    ## Copy over all of the objects within scope to
-    ## all clusters.
-    ##
-    ## The approach is as follows: Beginning with the
-    ## current environment, copy over all objects within
-    ## the environment to all clusters, and then repeat
-    ## the process with the parent environment.
-    ##
-    this.env <- environment()
-    while( identical( this.env, globalenv() ) == FALSE ) {
+    this_env <- environment()
+    while (identical( this_env, globalenv() ) == FALSE ) {
       parallel::clusterExport(cl,
-                    ls(all.names=TRUE, env=this.env),
-                    envir=this.env)
-      this.env <- parent.env(environment())
+                    ls(all_names = TRUE, env = this_env),
+                    envir = this_env)
+      this_env <- parent.env(environment())
     }
-    ## repeat for the global environment
     parallel::clusterExport(cl,
-                  ls(all.names=TRUE, env=globalenv()),
-                  envir=globalenv())
+                  ls(all.names = TRUE, env = globalenv()),
+                  envir = globalenv())
 
-    ## Load the libraries on all the clusters
-    ## N.B. length(cl) returns the number of clusters
     parallel::parLapply( cl, 1:length(cl), function(xx){
-      lapply(loaded.package.names, function(yy) {
-        ## N.B. the character.only option of
-        ##      require() allows you to give the
-        ##      name of a package as a string.
-        require(yy , character.only=TRUE)})
+      lapply(loaded_package_names, function(yy) {
+        require(yy, character.only = TRUE)
+        })
     })
-
-    ## Run the lapply in parallel
     return( parallel::parLapply( cl, ...) )
-  }, finally = {
-    ## Stop the cluster
+  },
+  finally = {
     parallel::stopCluster(cl)
   })
 }

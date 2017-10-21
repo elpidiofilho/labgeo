@@ -25,6 +25,7 @@ halarick_descriptor <- function(band, ngrey = 16, window = c(3, 3),
                                   "contrast", "dissimilarity", "entropy",
                                   "second_moment", "correlation"
                                 )) {
-  result <- glcm::glcm(band, window = window, shift = shift, statistics = statistics)
+  result <- glcm::glcm(band, window = window,
+                       shift = shift, statistics = statistics)
   return(result)
 }

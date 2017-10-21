@@ -26,14 +26,14 @@ descriptive_stat_polygon <- function(df, poligon,
                                      desc = c("min", "mean", "max", "sd")) {
   #  c("min", "median", "mean", "max", "sd","skewness", "kurtosis",
   # "p1", "p10", "p25","p33", "p66", "p75", "p90", "p99")
-  polig = NULL
+  polig <- NULL
   inicio <- Sys.time()
   vpc <- c("p1", "p10", "p25", "p33", "p66", "p75", "p90", "p99")
-  pdesc <- desc[vpc %in% desc]
+  #pdesc <- desc[vpc %in% desc]
   dfselnum <- df %>%
     dplyr::select_if(is.numeric)
 
-  poligon_id = rlang::quo(poligon)
+  poligon_id <- rlang::quo(poligon)
   d1 <- multidplyr::partition(dfselnum, polig)
   multidplyr::cluster_copy(d1, p1)
   multidplyr::cluster_copy(d1, p10)
@@ -59,7 +59,7 @@ descriptive_stat_polygon <- function(df, poligon,
 }
 
 px <- function(x, q) {
-  n <- length(x)
+  #n <- length(x)
   vs <- sort(x, method = "shell")
   np <- round(q * length(x), 0)
   if (np > 1) {
@@ -138,7 +138,7 @@ moda <- function(x) {
 
 
 sums <- function(x, pot) {
-  return(sum((x - mean(x)) ^ pot))
+  return( sum((x - mean(x)) ^ pot))
 }
 
 kurtosis <- function(x) {

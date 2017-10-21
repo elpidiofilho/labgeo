@@ -1,18 +1,28 @@
+#' @title train test split
+#' @importFrom caret createDataPartition
+#' @param df dataframe
+#' @param p proportion between  train and test sets
+#' @param groups numbre of groups to be used in stratified sample
+
 #' @export
-train_test = function(df, p = 0.75, groups = min(10,length(y)), seed = NULL){
+train_test <- function(df, p = 0.75, groups = min(10, length(y)), seed = NULL){
   if (is.null(seed) == FALSE) {
     set.seed(seed)
   }
-  vcdp <- caret::createDataPartition(df[,1], p = p, list = FALSE)
-  train = df[vcdp, ]
-  test = df[-vcdp, ]
+  vcdp <- caret::createDataPartition(df[, 1], p = p, list = FALSE, groups = groups)
+  train <- df[vcdp, ]
+  test <- df[-vcdp, ]
   return(list(train = train, test = test))
 }
-
+#' convert factor to dummy variables
+#' @title convert factor to dummy variables
+#' @importFrom caret dummyVars
+#' @importFrom dplyr '%>%'
+#' @param df dataframe
 #' @export
-create_dummy <- function(df) {
-  od = caret::dummyVars(~ ., data = df)
-  dfr = predict(od, df) %>% data.frame()
+factor_to_dummy <- function(df) {
+  od <- caret::dummyVars(~ ., data = df)
+  dfr <- predict(od, df) %>% data.frame()
   return(dfr)
 }
 
@@ -39,7 +49,8 @@ comma_to_point <- function(x, tonumeric = TRUE) {
 #' code by Jeffrey Evans
 #' @importFrom raster extent
 #' @importFrom sp proj4string
-#' @param extent extent of region of interest
+#' @importFrom sp proj4string
+#' @importFrom raster extent
 #' @param extent projection of region of  interest
 #' @export
 #' @examples
@@ -49,25 +60,26 @@ comma_to_point <- function(x, tonumeric = TRUE) {
 #' pol.roi = roio(ext, proj)
 #'}
 
-
-
 roi <- function(extent, project) {
-  e = as(raster::extent(extent), "SpatialPolygons")
-  proj4string(e) <- project
+  e <- as(raster::extent(extent), "SpatialPolygons")
+  sp::proj4string(e) <- project
   return(e)
 }
 
+#' @param model.regression TRUE or FALSE
 #' @export
 #' @importFrom caret modelLookup
 caret.models <- function(model.regression = TRUE) {
   if (model.regression == TRUE) {
-    m <- unique(modelLookup()[modelLookup()$forClass,c(1)])
+    m <- unique(modelLookup()[modelLookup()$forClass, c(1)])
   } else {
-    m <- unique(modelLookup()[modelLookup()$forReg,c(1)])
+    m <- unique(modelLookup()[modelLookup()$forReg, c(1)])
   }
   return(m)
 }
-
+# convert numeric data to factor
+#' @title Numeric to Factor
+#' @importFrom dplyr ntile
 #' @export
 numeric_to_factor <- function(vx, npercentil = 4) {
  return(dplyr::ntile(vx, npercentil))
@@ -109,7 +121,7 @@ vxclean <- vx %>%
 
 #' @export
 remove_first_symbol <- function(vx) {
-  return(gsub("^\\P{L}*", "", vx, perl=T))
+  return(gsub("^\\P{L}*", "", vx, perl = T))
 }
 
 #' @export
@@ -119,8 +131,9 @@ space_to_symbol <- function(vx, symbol){
 
 #' @export
 point_to_camel <- function(x){
-  capit <- function(x) paste0(toupper(substring(x, 1, 1)), substring(x, 2, nchar(x)))
-  sapply(strsplit(x, "\\."), function(x) paste(capit(x), collapse=""))
+  capit <- function(x) paste0(toupper(substring(x, 1, 1)),
+                              substring(x, 2, nchar(x)))
+  sapply(strsplit(x, "\\."), function(x) paste(capit(x), collapse = ""))
 }
 
 #' @export
@@ -128,9 +141,11 @@ abbrev <- function(df, maxlength) {
   colnames(df) <- df %>%  names() %>% abbreviate()
 }
 
+
+#' @importFrom dplyr group_by sample_n
 #' @export
 balanced_sample <- function(df, target, n = 100) {
-  dfsample = df %>%
+  dfsample <- df %>%
     group_by(!!target) %>% sample_n(size = n, replace = T)  %>%
     na.omit()  %>% data.frame()
   return(dfsample)

@@ -26,7 +26,8 @@ high_correlation <- function(df, cutoff = 0.95,
     dplyr::select_if(is.numeric)
   if (correl == "linear") {
     mcor <- cor(df)
-  } else { ## rdc
+  } else {
+    ## rdc
     mcor <- as.matrix(non_linear_correl(df))
   }
   vc <- caret::findCorrelation(mcor, cutoff)
@@ -62,4 +63,3 @@ vector2matrix <- function(vhc) {
   m <- matrix(v1, nrow, ncol)
   return(m)
 }
-

@@ -19,3 +19,10 @@ Calculate statiscs of accuracy to regression models
 
 details
 }
+\examples{
+\dontrun{
+v.obs = c(0,25,75,100)
+v.pred = c(1.24,70,97)
+pred_acc(v.obs, v.pred)
+}
+}

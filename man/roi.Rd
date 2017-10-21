@@ -7,8 +7,6 @@
 roi(extent, project)
 }
 \arguments{
-\item{extent}{extent of region of interest}
-
 \item{extent}{projection of region of  interest}
 }
 \description{

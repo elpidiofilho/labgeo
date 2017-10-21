@@ -7,9 +7,9 @@
 separability_measures(Vector_1, Vector_2)
 }
 \arguments{
-\item{Vector.1}{data of class 1}
+\item{Vector_1}{data of class 1}
 
-\item{Vector.2}{data of class 2}
+\item{Vector_2}{data of class 2}
 }
 \description{
 This function calculates Jeffries-Matusita distance, Bhattacharya distance and the transformed divergence.
@@ -23,7 +23,7 @@ sample.1 <- c (1362, 1411, 1457, 1735, 1621, 1621, 1791, 1863, 1863, 1838)
 sample.2 <- c (1362, 1411, 1457, 10030, 1621, 1621, 1791, 1863, 1863, 1838)
 
 #separability between these two samples
-separability.measures ( sample.1 , sample.2 )
+separability.measures( sample_1 , sample_2 )
 }
 }
 \references{

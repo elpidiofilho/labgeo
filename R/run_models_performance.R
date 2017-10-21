@@ -41,19 +41,25 @@
 
 
 
-run_models_performance <- function(fit_run_model, df_valida, verbose = FALSE) {
-  package_inicio <- search()[ifelse(unlist(gregexpr("package:", search())) == 1, TRUE, FALSE)]
+run_models_performance <- function(fit_run_model,
+                                   df_valida, verbose = FALSE) {
+  package_inicio <- search()[ifelse(
+    unlist(gregexpr("package:", search())) == 1, TRUE, FALSE)]
   if (fit_run_model[[1]]$modelType == "Classification") {
     result <- rmp_classificacao(fit_run_model, df_valida, verbose)
-    package_fim <- search()[ifelse(unlist(gregexpr("package:", search())) == 1, TRUE, FALSE)]
+    package_fim <- search()[ifelse(
+      unlist(gregexpr("package:", search())) == 1, TRUE, FALSE)]
     package_list <- setdiff(package_fim, package_inicio)
-    if (length(package_list) > 0) for (package in package_list) detach(package, character.only = TRUE)
+    if (length(package_list) > 0) for (package in package_list)
+      detach(package, character.only = TRUE)
     return(result)
   } else {
     result <- rmp_regressao(fit_run_model, df_valida, verbose)
-    package_fim <- search()[ifelse(unlist(gregexpr("package:", search())) == 1, TRUE, FALSE)]
+    package_fim <- search()[ifelse(unlist(
+      gregexpr("package:", search())) == 1, TRUE, FALSE)]
     package_list <- setdiff(package_fim, package_inicio)
-    if (length(package_list) > 0) for (package in package_list) detach(package, character.only = TRUE)
+    if (length(package_list) > 0) for (package in package_list)
+      detach(package, character.only = TRUE)
     return(result)
   }
 }
@@ -75,22 +81,23 @@ run_models_performance <- function(fit_run_model, df_valida, verbose = FALSE) {
 #' v.obs = c(0,25,75,100)
 #' v.pred = c(1.24,70,97)
 #' pred_acc(v.obs, v.pred)
+#' }
 #' @export
 pred_acc <- function(obs, pred) {
   mu <- mean(obs)
   mbe <- mean(obs - pred) ## mean bias error ()
   mae <- mean(abs(obs - pred)) ## mean absolute error
-  mse <- mean((obs - pred) ^ 2) ## mean square error
+  mse <- mean( (obs - pred) ^ 2) ## mean square error
   rme <- mbe / mu * 100 ## relative mean error
   rmae <- mae / mu * 100 ## relative mean absolute error
   rmse <- sqrt(mse) ## root mean square error
   rrmse <- rmse / mu * 100 ## relative root mean square error
-  mo <- mean((obs - mu) ^ 2)
+  mo <- mean( (obs - mu) ^ 2)
   nse <- 1 - (mse / mo) ## Nash-Sutcliffe efficiency
   r2 <- stats::cor(obs, pred) ^ 2
   t <- stats::t.test(obs, pred, paired = TRUE)
-  vecv <- (1 - sum((obs - pred) ^ 2) /
-    sum((obs - mean(obs)) ^ 2)) * 100 ## variance explained by predictive models
+  vecv <- (1 - sum( (obs - pred) ^ 2) /
+    sum( (obs - mean(obs)) ^ 2)) * 100 ## variance explained by models
 
   list(
     mean_bias_error = mbe,
@@ -109,12 +116,15 @@ pred_acc <- function(obs, pred) {
 
 
 
-rmp_classificacao <- function(fit_run_model, df_valida, verbose = FALSE) {
-  Freq <- var <- valor <- Prediction <- Reference <- model <- NULL
+rmp_classificacao <- function(fit_run_model,
+                              df_valida, verbose = FALSE) {
+  Freq <- var <- valor <- Prediction <-
+    Reference <- model <- NULL
   nm <- length(fit_run_model)
   summ_model <- dplyr::tibble(
     model = character(nm), fit = list(nm), dfpredobs = list(nm),
-    accuracy = numeric(nm), Kappa = numeric(nm), byclass = list(nm), cf = list(nm),
+    accuracy = numeric(nm), Kappa = numeric(nm),
+    byclass = list(nm), cf = list(nm),
     g1 = list(nm), g2 = list(nm)
   )
   for (i in 1:length(fit_run_model)) {
@@ -125,7 +135,8 @@ rmp_classificacao <- function(fit_run_model, df_valida, verbose = FALSE) {
     summ_model$fit[i] <- list(fit_md)
 
     summ_model$dfpredobs[i] <- list(ddd)
-    cf <- caret::confusionMatrix(ddd$predito, ddd$observado, mode = "everything")
+    cf <- caret::confusionMatrix(ddd$predito,
+                                 ddd$observado, mode = "everything")
     summ_model$accuracy[i] <- cf$overall[1]
     summ_model$Kappa[i] <- cf$overall[2]
     summ_model$byclass[i] <- list(cf$byClass)
@@ -137,7 +148,8 @@ rmp_classificacao <- function(fit_run_model, df_valida, verbose = FALSE) {
     freqrows <- prop.table(cf$table, 1) %>%
       data.frame() %>%
       dplyr::rename(freq_row = Freq)
-    ddd <- dplyr::left_join(freqcols, freqrows, by = c("Prediction", "Reference")) %>%
+    ddd <- dplyr::left_join(freqcols, freqrows,
+                            by = c("Prediction", "Reference")) %>%
       tidyr::gather(key = var, value = valor, -Prediction, -Reference)
 
     g1 <- ggplot(confusion, mapping = aes(x = Reference, y = Prediction)) +
@@ -146,7 +158,8 @@ rmp_classificacao <- function(fit_run_model, df_valida, verbose = FALSE) {
       scale_y_discrete(name = "Predicted Class") +
       geom_tile(
         aes(x = Reference, y = Prediction),
-        data = subset(confusion, as.character(Reference) == as.character(Prediction)),
+        data = subset(confusion, as.character(Reference) ==
+                        as.character(Prediction)),
         color = "black", size = 1, fill = "red", alpha = 0.2
       ) +
       geom_text(aes(label = confusion$Freq), vjust = 1) +
@@ -158,7 +171,8 @@ rmp_classificacao <- function(fit_run_model, df_valida, verbose = FALSE) {
         colours = c("lightyellow2", "white", "palegreen"),
         values = rescale(c(0, 50, 100))
       ) +
-      scale_x_discrete(name = "Actual Class") + scale_y_discrete(name = "Predicted Class") +
+      scale_x_discrete(name = "Actual Class") +
+      scale_y_discrete(name = "Predicted Class") +
       labs(fill = "Normalized\nFrequency") +
       geom_text(aes(label = round(ddd$valor, 2)), vjust = 1) +
       ggtitle(fit_md$method) +
@@ -172,10 +186,13 @@ rmp_classificacao <- function(fit_run_model, df_valida, verbose = FALSE) {
     }
   }
   if (verbose == TRUE) {
-    dfresult <- data.frame(model = summ_model$model, accuracy = summ_model$accuracy, kappa = summ_model$Kappa) %>%
+    dfresult <- data.frame(model = summ_model$model,
+                           accuracy = summ_model$accuracy,
+                           kappa = summ_model$Kappa) %>%
       print() %>%
       tidyr::gather(key = var, value = valor, -model)
-    print(ggplot(dfresult, aes(x = model, y = valor, fill = model)) + geom_col() +
+    print(ggplot(dfresult, aes(x = model, y = valor, fill = model)) +
+            geom_col() +
       geom_text(aes(label = round(valor, 3)), vjust = 1.5) + facet_wrap(~ var))
   }
   return(summ_model)
@@ -199,10 +216,11 @@ zero_range <- function(x, tol = 1000 * .Machine$double.eps) {
   m <- min(abs(x))
   if (m == 0)
     return(FALSE)
-  abs((x[1] - x[2]) / m) < tol
+  abs( (x[1] - x[2]) / m) < tol
 }
 
-rescale <- function(x, to = c(0, 1), from = range(x, na.rm = TRUE, finite = TRUE)) {
+rescale <- function(x, to = c(0, 1),
+                    from = range(x, na.rm = TRUE, finite = TRUE)) {
   if (zero_range(from) || zero_range(to)) {
     return(ifelse(is.na(x), NA, mean(to)))
   }
@@ -243,8 +261,9 @@ observado <- predito <- residuo <- NULL
   }
   if (residual == TRUE) {
     g1 <- dresult  %>%
-      ggplot(aes( y= observado, x = predito)) +
-      geom_segment(aes(y = predito,   yend = observado, x = predito, xend = predito))   +
+      ggplot(aes( y = observado, x = predito)) +
+      geom_segment(aes(y = predito,   yend = observado,
+                       x = predito, xend = predito))   +
       xlim(range(c(ddd$predito, ddd$observado))) +
       ylim(range(c(ddd$predito, ddd$observado))) +
       geom_abline(slope = 1, intercept = 0) +
@@ -252,16 +271,16 @@ observado <- predito <- residuo <- NULL
       geom_point(aes(color = abs(residuo))) +
       scale_color_continuous(low = "green", high = "red") +
       guides(color = FALSE) +
-      facet_wrap(~model, scales = 'free') +  theme_bw()
+      facet_wrap(~model, scales = "free") +  theme_bw()
   } else {
     g1 <- dresult  %>%
-      ggplot(aes( y= observado, x = predito)) +
+      ggplot(aes( y = observado, x = predito)) +
       geom_abline(slope = 1, intercept = 0) +
       geom_point(aes(y = observado), shape = 1) +
       geom_point(aes(color = abs(residuo))) +
       scale_color_continuous(low = "green", high = "red") +
       guides(color = FALSE) +
-      facet_wrap(~model, scales = 'free') +  theme_bw()
+      facet_wrap(~model, scales = "free") +  theme_bw()
   }
   #print(g1)
   return(g1)
@@ -286,22 +305,23 @@ observado <- predito <- residuo <- NULL
 #' @export
 plot_confusio_matrix <- function(obs, pred) {
   actual  <- prediction <- freq <- y_test <- preds <- NULL
-  confusionMatrix(pred, obs)$table %>%
+  caret::confusionMatrix(pred, obs)$table %>%
     prop.table(margin = 1) %>%
     as.data.frame.matrix() %>%
-    rownames_to_column(var = 'actual') %>%
-    tidyr::gather(key = 'prediction', value = 'freq',-actual) %>%
+    rownames_to_column(var = "actual") %>%
+    tidyr::gather(key = "prediction", value = "freq", -actual) %>%
     ggplot2::ggplot(aes(x = actual, y = prediction, fill = freq)) +
     geom_tile() +
-    geom_text(aes(label = round(freq, 2)), size = 3, color = 'gray20') +
-    scale_fill_gradient(low = 'yellow', high = 'red', limits = c(0,1), name = 'Relative Frequency') +
+    geom_text(aes(label = round(freq, 2)), size = 3, color = "gray20") +
+    scale_fill_gradient(low = "yellow", high = "red", limits = c(0, 1),
+                        name = "Relative Frequency") +
     theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
-    ggtitle('Confusion Matrix - Random Forest (100 Trees)')
+    ggtitle("Confusion Matrix - Random Forest (100 Trees)")
 
-  confusionMatrix(y_test, preds)$table %>%
+  caret::confusionMatrix(y_test, preds)$table %>%
     as.data.frame.matrix() %>%
     kable("html") %>%
-    kable_styling(bootstrap_options = c('striped'), font_size = 8) %>%
+    kable_styling(bootstrap_options = c("striped"), font_size = 8) %>%
     scroll_box(height = "400px")
 }
 
@@ -309,7 +329,8 @@ plot_confusio_matrix <- function(obs, pred) {
 
 
 rmp_regressao <- function(fit_run_model, df_valida, verbose = FALSE) {
-  predito <- observado <- model <- mbe <- mae <- rmse <- nse <- r2 <- var_exp <- var <- valor <- NULL
+  predito <- observado <- model <- mbe <- mae <- rmse <- nse <-
+    r2 <- var_exp <- var <- valor <- NULL
   nm <- length(fit_run_model)
   summ_model <- dplyr::tibble(
     model = character(nm), fit = list(nm), dfpredobs = list(nm),
@@ -323,7 +344,8 @@ rmp_regressao <- function(fit_run_model, df_valida, verbose = FALSE) {
   for (i in 1:length(fit_run_model)) {
     fit_md <- fit_run_model[[i]]
     v <- suppressMessages(predict(fit_md, df_valida))
-    ddd <- data.frame(observado = df_valida[, 1], predito = v, residuo = abs(v - df_valida[, 1]))
+    ddd <- data.frame(observado = df_valida[, 1], predito = v,
+                      residuo = abs(v - df_valida[, 1]))
     names(ddd)[1] <- "observado"
     names(ddd)[3] <- "residuo"
     summ_model$model[i] <- fit_md$method
@@ -336,9 +358,6 @@ rmp_regressao <- function(fit_run_model, df_valida, verbose = FALSE) {
     summ_model$mae[i] <- acc$mean_absolute_error
     summ_model$nse[i] <- acc$Nash_Sutcliffe_efficiency
     summ_model$var_exp[i] <- acc$variance_explained_perc
-    maxvalue <- ceiling(max(max(df_valida[, 1]), v) / 5) * 5
-    residuo <- ddd$residuo
-    maxresiduo <- max(residuo)
   }
   if (verbose == TRUE) {
     dgr <- summ_model %>%

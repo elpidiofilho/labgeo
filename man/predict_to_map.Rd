@@ -10,6 +10,8 @@ predict_to_map(model_list, path_raster, raster_type = ".asc", path_result,
 \arguments{
 \item{model_list}{list of fit models by function run_models}
 
+\item{path_raster}{path of rasters with co-variates}
+
 \item{raster_type}{extension of raster files with co-variates}
 
 \item{path_result}{path to store maps with results of prediction}
@@ -17,8 +19,6 @@ predict_to_map(model_list, path_raster, raster_type = ".asc", path_result,
 \item{namefile}{sufix of name of file with results of prediction}
 
 \item{result_type}{type of file (extension) to be saved after prediction}
-
-\item{path_rastesr}{path of rasters with co-variates}
 }
 \description{
 This function predict a model fit and save result as a map raster file

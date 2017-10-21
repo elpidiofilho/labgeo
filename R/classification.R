@@ -38,7 +38,7 @@ classification <- function(df.train,
                            metric = "Kappa",
                            seeds = NULL,
                            verbose = FALSE) {
-  cl = NULL
+  cl <- NULL
   if (nfolds == 0) {
     method <- "none"
     tune_length <- 1
@@ -72,7 +72,7 @@ classification <- function(df.train,
       tuneLength = tune_length,
       preProcess = preprocess
     ))},
-    error = function(e){NULL})
+    error = function(e) NULL)
 
   if (!is.null(cl)) {
     parallel::stopCluster(cl)
