@@ -5,7 +5,7 @@
 #' @param groups numbre of groups to be used in stratified sample
 
 #' @export
-train_test <- function(df, p = 0.75, groups = min(10, length(y)), seed = NULL){
+train_test <- function(df, p = 0.75, groups = 10, seed = NULL){
   if (is.null(seed) == FALSE) {
     set.seed(seed)
   }
