@@ -42,7 +42,7 @@ predict_to_map <- function(model_list, path_raster, raster_type = ".asc",
     filename <- gsub(" ", "_", paste0(path_result, namefile,
                                       name_model, result_type))
     print(paste("model : ", name_model, "file name", filename))
-    raster::predict(object = st, model = model_list[[i]],
+    raster::predict(object = st, model = model_list$fit[[i]],
                     filename = filename, overwrite = TRUE)
     print(paste( "time prediction", hms_span(inicio, Sys.time())))
   }
