@@ -30,7 +30,7 @@ predict_to_map <- function(model_list, path_raster, raster_type = ".asc",
   nm <- length(model_list)
   for (i in 1:nm) {
     inicio <- Sys.time()
-    vsel <- model_list[[i]]$coefnames
+    vsel <- model_list$fit[[i]]$coefnames
     var_file_raster <- paste0(path_raster, vsel, raster_type)
     st <- raster::stack(var_file_raster)
     vachei <- !(names(st) %in% vsel)
