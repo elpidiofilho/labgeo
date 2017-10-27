@@ -38,7 +38,7 @@ predict_to_map <- function(model_list, path_raster, raster_type = ".asc",
       print(paste(names(st)[vachei]))
       stop("covariate no found")
     }
-    name_model <- model_list[[i]]$modelInfo$label
+    name_model <- model_list$model[i]
     filename <- gsub(" ", "_", paste0(path_result, namefile,
                                       name_model, result_type))
     print(paste("model : ", name_model, "file name", filename))
