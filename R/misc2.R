@@ -137,12 +137,19 @@ point_to_camel <- function(x){
 }
 
 #' @export
-abbrev <- function(df, maxlength) {
+abbrev_colnames <- function(df, maxlength) {
   colnames(df) <- df %>%  names() %>% abbreviate()
+  return(df)
 }
 
-
-#' @importFrom dplyr group_by sample_n
+#' Balanced Sample
+#' @name  balanced_sample
+#' @param df dataframe
+#' @param target name of outcome variable
+#' @param n number of samples
+#' @importFrom dplyr group_by sample_n %>%
+#' @return dataframe with balanced sample by outcome
+#' @author Elpidio Filho, \email{elpidio@ufv.br}
 #' @export
 balanced_sample <- function(df, target, n = 100) {
   dfsample <- df %>%
