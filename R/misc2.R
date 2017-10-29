@@ -27,8 +27,8 @@ factor_to_dummy <- function(df) {
 }
 
 #' @export
-remove_extra_spaces <- function(x) {
-  return(gsub("^ *|(?<= ) | *$", "", x, perl = TRUE))
+remove_extra_spaces <- function(vx) {
+  return(gsub("^ *|(?<= ) | *$", "", vx, perl = TRUE))
 }
 
 
@@ -77,16 +77,23 @@ caret.models <- function(model.regression = TRUE) {
   }
   return(m)
 }
-# convert numeric data to factor
+#' convert numeric data to factor
 #' @title Numeric to Factor
+#' @param vx vector of numeric
+#' @param percentil numeric the number of percintil to be splited the vector vx
+#' @return vector of factors
 #' @importFrom dplyr ntile
 #' @export
 numeric_to_factor <- function(vx, npercentil = 4) {
  return(dplyr::ntile(vx, npercentil))
 }
 
+
+#' Remove acentuation
+#' @param vx character vector
+#' @return vector of character whitout acentuation
 #' @export
-remove_acento <- function(vx) {
+remove_accentuation <- function(vx) {
   return(chartr("áàãâéêíóõôúÚçª", "aaaaeeiooouUca", vx))
 }
 
@@ -119,24 +126,43 @@ vxclean <- vx %>%
   return(vxclean)
 }
 
+#' Remove first symbol
+#' Remove symbol when it is the first character of a string
+#' @param vx vector of character
+#' @return vector of character with first symbol removed
 #' @export
 remove_first_symbol <- function(vx) {
   return(gsub("^\\P{L}*", "", vx, perl = T))
 }
 
+
+#' Convert string space to any symbol
+#' @param vx character vector
+#' @param symbol symbol the will replace space character
 #' @export
 space_to_symbol <- function(vx, symbol){
   return(vx %>% str_replace_all(" ", symbol))
 }
 
+#' Convert points to uppercase letter in a string
+#' @param vx character vector
+#' @return vector with points replaced by uppercase character
 #' @export
-point_to_camel <- function(x){
-  capit <- function(x) paste0(toupper(substring(x, 1, 1)),
-                              substring(x, 2, nchar(x)))
-  sapply(strsplit(x, "\\."), function(x) paste(capit(x), collapse = ""))
+point_to_camel <- function(vx){
+  capit <- function(vx) paste0(toupper(substring(vx, 1, 1)),
+                              substring(vx, 2, nchar(vx)))
+  s1 = sapply(strsplit(vx, "\\."), function(vx) paste(capit(vx), collapse = ""))
+  return(s1)
 }
 
+#' Abbreviate column names
+#'
+#' @param df dataframe
+#' @param maxlength max length of column names after abbreviation
+#' @importFrom dplyr %>%
+#' @return dataframe with names os columns abbreviated
 #' @export
+
 abbrev_colnames <- function(df, maxlength) {
   colnames(df) <- df %>%  names() %>% abbreviate()
   return(df)

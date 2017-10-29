@@ -6,3 +6,14 @@
 \usage{
 numeric_to_factor(vx, npercentil = 4)
 }
+\arguments{
+\item{vx}{vector of numeric}
+
+\item{percentil}{numeric the number of percintil to be splited the vector vx}
+}
+\value{
+vector of factors
+}
+\description{
+convert numeric data to factor
+}
