@@ -3,7 +3,6 @@
 #' @param df dataframe
 #' @param p proportion between  train and test sets
 #' @param groups numbre of groups to be used in stratified sample
-
 #' @export
 train_test <- function(df, p = 0.75, groups = 10, seed = NULL){
   if (is.null(seed) == FALSE) {
@@ -14,6 +13,7 @@ train_test <- function(df, p = 0.75, groups = 10, seed = NULL){
   test <- df[-vcdp, ]
   return(list(train = train, test = test))
 }
+
 #' convert factor to dummy variables
 #' @title convert factor to dummy variables
 #' @importFrom caret dummyVars
@@ -26,6 +26,8 @@ factor_to_dummy <- function(df) {
   return(dfr)
 }
 
+#' remove extra spaces
+#' @param vx character vector
 #' @export
 remove_extra_spaces <- function(vx) {
   return(gsub("^ *|(?<= ) | *$", "", vx, perl = TRUE))
@@ -77,6 +79,7 @@ caret.models <- function(model.regression = TRUE) {
   }
   return(m)
 }
+
 #' convert numeric data to factor
 #' @title Numeric to Factor
 #' @param vx vector of numeric
@@ -97,10 +100,16 @@ remove_accentuation <- function(vx) {
   return(chartr("áàãâéêíóõôúÚçª", "aaaaeeiooouUca", vx))
 }
 
+
+#' remove spaces from a character vector
+#' @param vx character vector
+#' @param symbol symbol or character to replace space
 #' @export
-spaceless <- function(x) {x <- gsub(" ", "_", x);x}
+spaceless <- function(vx, symbol = '-') {x <- gsub(" ", symbol, vx); vx}
 
-
+#' Eliminate symbol
+#' @param vx character vector
+#' @param replace symbol the will replace eliminated symbol character
 #' @export
 eliminate_symbol <- function(vx, replace = " ") {
 "." <- NULL
