@@ -11,7 +11,8 @@
 #' @param format graphics format of result file
 #' @param tiles number of  divisions in x and y to create tiles
 #' @param cpu_cores numeber of cpu cores
-#'
+#' @param verbose verbose
+#' @importFrom progress progress_bar
 #' @return
 #' @export
 #'
@@ -20,15 +21,16 @@
 #'                    path_file ='./mosaic/', format = "GTiff",  s
 #'                    uffix = 'etp_', tiles = 3, cpu_cores = 7 )
 
-predict_big_raster <- function(model, st, path_file, suffix = 'etp_2000_',
-                               format = "GTiff", tiles = 5, cpu_cores = 7) {
+predict_big_raster <- function(model, st, path_file, suffix = 'pred_',
+                               format = "GTiff", tiles = 5, cpu_cores = 7, verbose = TRUE) {
   td = NULL
   td = create_temp_dir()
   tile_stack(st = st, dir = td, num_tiles = tiles)
   i = 1
+
   for (i in 1:length(model)) {
     nm = model[[i]]$modelInfo$label
-    tile_predict(model = model[[i]], dir = td, cpu_cores = cpu_cores)
+    tile_predict(model = model[[i]], dir = td, cpu_cores = cpu_cores, verbose = verbose)
     mosaic_tiles(dir = td,  name_mosaic = paste0(path_file, suffix, nm, '.tif'), format = "GTiff")
   }
   if (dir.exists(td)) {
@@ -70,7 +72,7 @@ tile_stack <- function(st, dir, num_tiles) {
 }
 
 #model = modelo_calibra; dir = td; cpu_cores = 5
-tile_predict <- function(model, dir, cpu_cores =  4) {
+tile_predict <- function(model, dir, cpu_cores =  4, verbose = TRUE) {
   dir_tile <- paste0(dir,"/tiles/")
   dir_predict <- paste0(dir,"/predict/")
   rasters0 <- list.files(dir_tile, pattern = "*.grd", full.names = F, recursive = TRUE)
@@ -78,6 +80,13 @@ tile_predict <- function(model, dir, cpu_cores =  4) {
   print("predict tiles")
   nr <- length(rasters0)
   inicio <- Sys.time()
+  if (verbose == TRUE) {
+    pb <- progress_bar$new(total = length(model) * num_tiles,
+                           format("Running [:bar] :percent elapsed: :elapsed eta: :eta"),
+                           clear = FALSE)
+
+  }
+
   for (i in 1:nr){
     nf <- rasters0[i]
     s1 <- unlist(stringr::str_split(nf, '[.]'))[1]
@@ -94,6 +103,10 @@ tile_predict <- function(model, dir, cpu_cores =  4) {
                        progress = T, overwrite = T)
       endCluster()
     }
+    if (verbose == TRUE) {
+      pb$tick()
+    }
+
   }
   print(paste("predict ", hms_span(inicio,Sys.time())))
 }

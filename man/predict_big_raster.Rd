@@ -4,8 +4,8 @@
 \alias{predict_big_raster}
 \title{Title Predict big raster}
 \usage{
-predict_big_raster(model, st, path_file, suffix = "etp_2000_",
-  format = "GTiff", tiles = 5, cpu_cores = 7)
+predict_big_raster(model, st, path_file, suffix = "pred_", format = "GTiff",
+  tiles = 5, cpu_cores = 7, verbose = TRUE)
 }
 \arguments{
 \item{model}{model to be predicted}
@@ -21,6 +21,8 @@ predict_big_raster(model, st, path_file, suffix = "etp_2000_",
 \item{tiles}{number of  divisions in x and y to create tiles}
 
 \item{cpu_cores}{numeber of cpu cores}
+
+\item{verbose}{verbose}
 }
 \description{
 Title Predict big raster
