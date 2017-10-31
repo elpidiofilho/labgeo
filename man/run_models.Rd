@@ -4,11 +4,11 @@
 \alias{run_models}
 \title{This function run many models using the same data}
 \usage{
-run_models(df, models = ifelse(is.factor(df[, 1]), c("svmPoly", "rf", "gbm",
+run_models(df, models = ifelse(is.factor(df[, 1]), c("qda", "rf", "gbm",
   "C5.0"), c("lm", "cubist", "gbm", "rf")), formula = NULL,
-  preprocess = NULL, nfolds = 10, repeats = NA, tune_length = 5,
-  cpu_cores = 7, metric = ifelse(is.factor(df[, 1]), "Kappa", "Rsquared"),
-  seeds = NULL, verbose = FALSE)
+  preprocess = NULL, index = NULL, nfolds = 10, repeats = NA,
+  tune_length = 5, cpu_cores = 7, metric = ifelse(is.factor(df[, 1]),
+  "Kappa", "Rsquared"), seeds = NULL, verbose = FALSE)
 }
 \arguments{
 \item{df}{Training dataframe}
@@ -18,6 +18,8 @@ run_models(df, models = ifelse(is.factor(df[, 1]), c("svmPoly", "rf", "gbm",
 \item{formula}{A formula of the form y ~ x1 + x2 + ... If users don't inform formula, the first column will be used as Y values and the others columns with x1,x2....xn}
 
 \item{preprocess}{pre process}
+
+\item{index}{Users cross validation folds. Default = NULL}
 
 \item{nfolds}{Number of folds to be build in crossvalidation}
 

@@ -39,8 +39,6 @@
 #' }
 #' @export
 
-
-
 run_models_performance <- function(fit_run_model,
                                    df_valida, verbose = FALSE) {
   package_inicio <- search()[ifelse(

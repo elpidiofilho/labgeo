@@ -5,6 +5,7 @@
 #' @param df   Training dataframe
 #' @param formula   A formula of the form y ~ x1 + x2 + ... If users don't inform formula, the first column will be used as Y values and the others columns with x1,x2....xn
 #' @param preprocess pre process
+#' @param index  Users cross validation folds. Default = NULL
 #' @param models chosen models to be used to train model. Uses  algortims names from Caret package.
 #' @param nfolds   Number of folds to be build in crossvalidation
 #' @param repeats repeats
@@ -29,10 +30,11 @@
 
 
 run_models <- function(df, models = ifelse(is.factor(df[, 1]),
-                                           c("svmPoly","rf","gbm","C5.0"),
+                                           c("qda","rf","gbm","C5.0"),
                                            c("lm", "cubist", "gbm", "rf")),
                        formula = NULL,
                        preprocess = NULL,
+                       index = NULL,
                        nfolds = 10,
                        repeats = NA,
                        tune_length = 5,
@@ -66,6 +68,7 @@ run_models <- function(df, models = ifelse(is.factor(df[, 1]),
     if (mod == 0) {
       fit.reg <- regression(
         df.train = df,
+        index = index,
         regressor = models[j],
         preprocess = preprocess,
         nfolds = nfolds,
@@ -82,6 +85,7 @@ run_models <- function(df, models = ifelse(is.factor(df[, 1]),
     } else {
       fit.class <- classification(
         df.train = df,
+        index = index,
         classifier = models[j],
         preprocess = preprocess,
         nfolds = nfolds,
