@@ -136,7 +136,6 @@ mosaic_tiles <- function(dir, name_mosaic, format = "GTiff" ) {
   }
   rast.list$fun <- mean
   rast.mosaic <- do.call(raster::mosaic, rast.list)
-  plot(rast.mosaic)
-  writeRaster(rast.mosaic, filename = name_mosaic, format = format, overwrite = TRUE   )
+  raster::writeRaster(rast.mosaic, filename = name_mosaic, format = format, overwrite = TRUE   )
   print("end")
 }

@@ -60,7 +60,7 @@ regression <- function(df.train,
   if (is.null(formula)) {
     formula <- as.formula(paste(names(df.train)[1], "~ ."))
   }
-  tc <- suppressMessages(caret::trainControl(
+  tc <- caret::trainControl(
     method = method,
     number = nfolds,
     repeats = repeats,
@@ -69,7 +69,7 @@ regression <- function(df.train,
     returnResamp = "final",
     seeds = seeds,
     verboseIter = FALSE
-  ))
+  )
 
   if (cpu_cores > 0) {
     cl <- parallel::makePSOCKcluster(cpu_cores)
@@ -77,7 +77,7 @@ regression <- function(df.train,
   }
 
   fit <- tryCatch({
-    suppressMessages(caret::train(
+    caret::train(
       formula,
       data = df.train,
       method = regressor,
@@ -86,7 +86,7 @@ regression <- function(df.train,
       verbose = FALSE,
       tuneLength = tune_length,
       preProcess = preprocess
-    ))},
+    )},
     error = function(e){NULL})
   if (!is.null(cl)) {
     parallel::stopCluster(cl)
