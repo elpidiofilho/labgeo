@@ -80,6 +80,7 @@ run_models <- function(df, models = ifelse(is.factor(df[, 1]),
       )
       if (is.null(fit.reg) == FALSE ) {
         list.model[cont] <- list(fit.reg)
+        names(list.model)[cont] = models[j]
         cont <- cont + 1
       }
     } else {
@@ -97,6 +98,7 @@ run_models <- function(df, models = ifelse(is.factor(df[, 1]),
       )
       if (is.null(fit.class) == FALSE ) {
         list.model[cont] <- list(fit.class)
+        names(list.model)[cont] = models[j]
         cont <- cont + 1
       }
     }
@@ -107,7 +109,7 @@ run_models <- function(df, models = ifelse(is.factor(df[, 1]),
   package.fim <- search()[ifelse(unlist(gregexpr("package:", search())) == 1, TRUE, FALSE)]
   package.list <- setdiff(package.fim, package.inicio)
   if (length(package.list) > 0) for (package in package.list) detach(package, character.only = TRUE)
-
+  list.model <- list.model[!sapply(list.model, is.null)]
   return(list.model)
 }
 

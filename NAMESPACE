@@ -3,7 +3,7 @@
 export(abbrev_colnames)
 export(balanced_sample)
 export(band_ratio)
-export(caret.models)
+export(caret_models)
 export(classification)
 export(clean_names)
 export(comma_to_point)

@@ -68,11 +68,12 @@ roi <- function(extent, project) {
   return(e)
 }
 
+
 #' @param model.regression TRUE or FALSE
 #' @export
 #' @importFrom caret modelLookup
-caret.models <- function(model.regression = TRUE) {
-  if (model.regression == TRUE) {
+caret_models <- function(regression = TRUE) {
+  if (regression == FALSE) {
     m <- unique(modelLookup()[modelLookup()$forClass, c(1)])
   } else {
     m <- unique(modelLookup()[modelLookup()$forReg, c(1)])
