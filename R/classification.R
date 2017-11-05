@@ -54,8 +54,11 @@ classification <- function(df.train,
     formula <- as.formula(paste(names(df.train)[1], "~ ."))
   }
   tc <- caret::trainControl(
-    method = method, number = nfolds, index = index,
-    savePredictions = TRUE, returnResamp = "all"
+    method = method,
+    number = nfolds,
+    index = index
+    #savePredictions = TRUE,
+    #returnResamp = "all"
   )
 
   if (cpu_cores > 0) {

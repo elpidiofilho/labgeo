@@ -16,6 +16,7 @@
 #' @param verbose  prints results during the execution of the function
 #' @importFrom progress progress_bar
 #' @importFrom utils flush.console
+#' @importFrom caret getModelInfo
 #' @keywords  models
 #' @author Elpidio Filho, \email{elpidio@ufv.br}
 #' @details details
@@ -43,6 +44,13 @@ run_models <- function(df, models = ifelse(is.factor(df[, 1]),
                        seeds = NULL,
                        verbose = FALSE) {
   if (class(df) != "data.frame") stop("df is not a data frame.")
+
+  for (i in 1:length(models)) {
+    md <- getModelInfo(models[i], regex = FALSE)[[1]]
+    if (length(md) == 0)
+      stop(paste("Model", models[i], "is not in caret's built-in library"), call. = FALSE)
+  }
+
   package.inicio <- search()[ifelse(unlist(gregexpr("package:", search())) == 1, TRUE, FALSE)]
   if (is.factor(df[, 1]) == TRUE) {
     mod <- 1
@@ -66,36 +74,39 @@ run_models <- function(df, models = ifelse(is.factor(df[, 1]),
     }
 
     if (mod == 0) {
-      fit.reg <- regression(
-        df.train = df,
-        index = index,
-        regressor = models[j],
-        preprocess = preprocess,
-        nfolds = nfolds,
-        cpu_cores = cpu_cores,
-        repeats = repeats,
-        metric = metric,
-        tune_length = tune_length,
-        seeds = vector_seeds(seeds, repeats, nfolds)
-      )
+      fit.reg <- tryCatch({
+        regression(
+          df.train = df,
+          index = index,
+          regressor = models[j],
+          preprocess = preprocess,
+          nfolds = nfolds,
+          cpu_cores = cpu_cores,
+          repeats = repeats,
+          metric = metric,
+          tune_length = tune_length,
+          seeds = vector_seeds(seeds, repeats, nfolds))},
+        error = function(e){NULL})
+
       if (is.null(fit.reg) == FALSE ) {
         list.model[cont] <- list(fit.reg)
         names(list.model)[cont] = models[j]
         cont <- cont + 1
       }
     } else {
-      fit.class <- classification(
-        df.train = df,
-        index = index,
-        classifier = models[j],
-        preprocess = preprocess,
-        nfolds = nfolds,
-        cpu_cores = cpu_cores,
-        repeats = repeats,
-        metric = metric,
-        tune_length = tune_length,
-        seeds = vector_seeds(seeds, repeats, nfolds)
-      )
+      fit.class <- tryCatch({
+        classification(
+          df.train = df,
+          index = index,
+          classifier = models[j],
+          preprocess = preprocess,
+          nfolds = nfolds,
+          cpu_cores = cpu_cores,
+          repeats = repeats,
+          metric = metric,
+          tune_length = tune_length,
+          seeds = vector_seeds(seeds, repeats, nfolds))},
+        error = function(e){NULL})
       if (is.null(fit.class) == FALSE ) {
         list.model[cont] <- list(fit.class)
         names(list.model)[cont] = models[j]

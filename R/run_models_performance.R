@@ -119,79 +119,86 @@ rmp_classificacao <- function(fit_run_model, df_valida, verbose = FALSE) {
   nm <- length(fit_run_model)
   summ_model <- dplyr::tibble(
     model = character(nm), fit = list(nm), dfpredobs = list(nm),
-    accuracy = numeric(nm), Kappa = numeric(nm),
+    accuracy = numeric(nm), Kappa = numeric(nm), time_run = numeric(nm),
     byclass = list(nm), cf = list(nm),
     g1 = list(nm), g2 = list(nm)
   )
   cont = 1
   for (i in 1:length(fit_run_model)) {
     fit_md <- fit_run_model[[i]]
-    v <- tryCatch({ predict(fit_md, df_valida)},
-                  error = function(e){NULL})
-    if (is.null(v)==FALSE) {
-      ddd <- data.frame(observado = df_valida[, 1], predito = v)
-      summ_model$model[i] <- fit_md$method
-      summ_model$fit[i] <- list(fit_md)
+    if (is.null(fit_md) == FALSE) {
+      v <- tryCatch({ predict(fit_md, df_valida)},
+                    error = function(e){NULL})
+      if (is.null(v) == FALSE) {
+        ddd <- data.frame(observado = df_valida[, 1], predito = v)
+        summ_model$model[i] <- fit_md$method
+        summ_model$fit[i] <- list(fit_md)
 
-      summ_model$dfpredobs[i] <- list(ddd)
-      cf <- caret::confusionMatrix(ddd$predito,
-                                   ddd$observado, mode = "everything")
-      summ_model$accuracy[i] <- cf$overall[1]
-      summ_model$Kappa[i] <- cf$overall[2]
-      summ_model$byclass[i] <- list(cf$byClass)
-      summ_model$cf[i] <- list(cf$table)
-      cont = cont + 1
-    }
-    if (verbose == TRUE) {
-      confusion <- data.frame(cf$table)
-      freqcols <- prop.table(cf$table, 2) %>%
-        data.frame() %>%  dplyr::rename(freq_col = Freq)
-      freqrows <- prop.table(cf$table, 1) %>%
-        data.frame() %>%  dplyr::rename(freq_row = Freq)
-      ddd <- dplyr::left_join(freqcols, freqrows,
-                              by = c("Prediction", "Reference")) %>%
-        tidyr::gather(key = var, value = valor, -Prediction, -Reference)
+        summ_model$dfpredobs[i] <- list(ddd)
+        cf <- caret::confusionMatrix(ddd$predito,
+                                     ddd$observado, mode = "everything")
+        summ_model$accuracy[i] <- cf$overall[1]
+        summ_model$Kappa[i] <- cf$overall[2]
+        summ_model$byclass[i] <- list(cf$byClass)
+        summ_model$time_run[i] = fit_md$times$everything[3]
+        summ_model$cf[i] <- list(cf$table)
+        cont = cont + 1
+      }
+      if (verbose == TRUE) {
+        confusion <- data.frame(cf$table)
+        freqcols <- prop.table(cf$table, 2) %>%
+          data.frame() %>%  dplyr::rename(freq_col = Freq)
+        freqrows <- prop.table(cf$table, 1) %>%
+          data.frame() %>%  dplyr::rename(freq_row = Freq)
+        ddd <- dplyr::left_join(freqcols, freqrows,
+                                by = c("Prediction", "Reference")) %>%
+          tidyr::gather(key = var, value = valor, -Prediction, -Reference)
 
-      g1 <- ggplot(confusion, mapping = aes(x = Reference, y = Prediction)) +
-        geom_tile(colour = "white", fill = "lightyellow2") +
-        scale_x_discrete(name = "Actual Class") +
-        scale_y_discrete(name = "Predicted Class") +
-        geom_tile(
-          aes(x = Reference, y = Prediction),
-          data = subset(confusion, as.character(Reference) ==
-                          as.character(Prediction)),
-          color = "black", size = 1, fill = "red", alpha = 0.2
-        ) +
-        geom_text(aes(label = confusion$Freq), vjust = 1) +
-        ggtitle(fit_md$method)
+        g1 <- ggplot(confusion, mapping = aes(x = Reference, y = Prediction)) +
+          geom_tile(colour = "white", fill = "lightyellow2") +
+          scale_x_discrete(name = "Actual Class") +
+          scale_y_discrete(name = "Predicted Class") +
+          geom_tile(
+            aes(x = Reference, y = Prediction),
+            data = subset(confusion, as.character(Reference) ==
+                            as.character(Prediction)),
+            color = "black", size = 1, fill = "red", alpha = 0.2
+          ) +
+          geom_text(aes(label = confusion$Freq), vjust = 1) +
+          ggtitle(fit_md$method)
 
-      g2 <- ggplot(ddd, mapping = aes(x = Reference, y = Prediction)) +
-        geom_tile(aes(fill = valor), colour = "white") +
-        scale_fill_gradientn(
-          colours = c("lightyellow2", "white", "palegreen"),
-          values = rescale(c(0, 50, 100))
-        ) +
-        scale_x_discrete(name = "Actual Class") +
-        scale_y_discrete(name = "Predicted Class") +
-        labs(fill = "Normalized\nFrequency") +
-        geom_text(aes(label = round(ddd$valor, 2)), vjust = 1) +
-        ggtitle(fit_md$method) +
-        facet_wrap(~var)
-    }
-    if (verbose == TRUE) {
-      print(g1)
-      print(g2)
+        g2 <- ggplot(ddd, mapping = aes(x = Reference, y = Prediction)) +
+          geom_tile(aes(fill = valor), colour = "white") +
+          scale_fill_gradientn(
+            colours = c("lightyellow2", "white", "palegreen"),
+            values = rescale(c(0, 50, 100))
+          ) +
+          scale_x_discrete(name = "Actual Class") +
+          scale_y_discrete(name = "Predicted Class") +
+          labs(fill = "Normalized\nFrequency") +
+          geom_text(aes(label = round(ddd$valor, 2)), vjust = 1) +
+          ggtitle(fit_md$method) +
+          facet_wrap(~var)
+      }
+      if (verbose == TRUE) {
+        print(g1)
+        print(g2)
+      }
     }
   }
   summ_model = summ_model[1:(cont-1), ]
   if (verbose == TRUE) {
     dfresult <- data.frame(model = summ_model$model,
                            accuracy = summ_model$accuracy,
-                           kappa = summ_model$Kappa) %>%
-      print() %>% tidyr::gather(key = var, value = valor, -model)
-    print(ggplot(dfresult, aes(x = model, y = valor, fill = model)) +
-            geom_col() + geom_text(aes(label = round(valor, 3)), vjust = 1.5) +
-            facet_wrap(~ var))
+                           kappa = summ_model$Kappa,
+                           time = summ_model$time_run) %>%
+      print() %>% tidyr::gather(key = var, value = valor, -model, -time)
+    g1 = ggplot(dfresult, aes(x = model, y = valor, fill = model)) +
+      geom_col() +
+      geom_text(aes(label = round(valor, 3)), size = 2.5, vjust = 1.5) +
+      theme(axis.text.x = element_text(angle = 45, hjust = 1), legend.position="none") +
+      facet_wrap(~ var, scales = 'free')
+    print(g1)
   }
   return(summ_model)
 }
@@ -342,26 +349,28 @@ rmp_regressao <- function(fit_run_model, df_valida, verbose = FALSE) {
   for (i in 1:length(fit_run_model)) {
 
     fit_md <- fit_run_model[[i]]
-    v <- tryCatch({ predict(fit_md, df_valida)},
-                  error = function(e){NULL})
-    if (is.null(v)==FALSE) {
-      nr = nrow(df_valida)
-      ddd <- data.frame(model = rep(fit_md$method, nr), observado = df_valida[, 1], predito = v,
-                        residuo = abs(v - df_valida[, 1]), stringsAsFactors = FALSE) %>% na.omit()
-      names(ddd)[2] <- "observado"
-      names(ddd)[4] <- "residuo"
-      summ_model$model[cont] <- fit_md$method
-      summ_model$fit[cont] <- list(fit_md)
-      summ_model$dfpredobs[cont] <- list(ddd)
-      acc <- pred_acc(ddd$predito, ddd$observado)
-      summ_model$r2[cont] <- acc$rsquared
-      summ_model$rmse[cont] <- acc$root_mean_square_error
-      summ_model$mbe[cont] <- acc$mean_bias_error
-      summ_model$mae[cont] <- acc$mean_absolute_error
-      summ_model$nse[cont] <- acc$Nash_Sutcliffe_efficiency
-      summ_model$var_exp[cont] <- acc$variance_explained_perc
-      summ_model$time <- fit_md$times$everything[3]
-      cont = cont + 1
+    if (is.null(fit_md) == FALSE) {
+      v <- tryCatch({ predict(fit_md, df_valida)},
+                    error = function(e){NULL})
+      if (is.null(v)==FALSE) {
+        nr = nrow(df_valida)
+        ddd <- data.frame(model = rep(fit_md$method, nr), observado = df_valida[, 1], predito = v,
+                          residuo = abs(v - df_valida[, 1]), stringsAsFactors = FALSE) %>% na.omit()
+        names(ddd)[2] <- "observado"
+        names(ddd)[4] <- "residuo"
+        summ_model$model[cont] <- fit_md$method
+        summ_model$fit[cont] <- list(fit_md)
+        summ_model$dfpredobs[cont] <- list(ddd)
+        acc <- pred_acc(ddd$predito, ddd$observado)
+        summ_model$r2[cont] <- acc$rsquared
+        summ_model$rmse[cont] <- acc$root_mean_square_error
+        summ_model$mbe[cont] <- acc$mean_bias_error
+        summ_model$mae[cont] <- acc$mean_absolute_error
+        summ_model$nse[cont] <- acc$Nash_Sutcliffe_efficiency
+        summ_model$var_exp[cont] <- acc$variance_explained_perc
+        summ_model$time[cont] <- fit_md$times$everything[3]
+        cont = cont + 1
+      }
     }
   }
   summ_model = summ_model[1:(cont-1), ]
