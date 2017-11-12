@@ -6,9 +6,10 @@
 \usage{
 run_models(df, models = ifelse(is.factor(df[, 1]), c("qda", "rf", "gbm",
   "C5.0"), c("lm", "cubist", "gbm", "rf")), formula = NULL,
-  preprocess = NULL, index = NULL, nfolds = 10, repeats = NA,
-  tune_length = 5, cpu_cores = 7, metric = ifelse(is.factor(df[, 1]),
-  "Kappa", "Rsquared"), seeds = NULL, verbose = FALSE)
+  preprocess = NULL, index = NULL, resample = "cv", nfolds = 10,
+  repeats = NA, tune_length = 5, cpu_cores = 0,
+  metric = ifelse(is.factor(df[, 1]), "Kappa", "Rsquared"), seeds = NULL,
+  verbose = FALSE)
 }
 \arguments{
 \item{df}{Training dataframe}

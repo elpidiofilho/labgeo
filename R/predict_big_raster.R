@@ -15,12 +15,13 @@
 #' @importFrom progress progress_bar
 #' @importFrom raster stack beginCluster endCluster clusterR writeRaster crop res mosaic raster
 #' @return
-#' @export
-#'
 #' @examples
+#' \dontrun{
 #' predict_big_raster(model = modelo_calibra, st = stcovar,
-#'                    path_file ='./mosaic/', format = "GTiff",  s
-#'                    uffix = 'etp_', tiles = 3, cpu_cores = 7 )
+#'                    path_file ='./mosaic/', format = "GTiff",
+#'                    suffix = 'etp_', tiles = 3, cpu_cores = 7 )
+#' }
+#' @export
 
 predict_big_raster <- function(model, st, path_file, suffix = 'pred_',
                                format = "GTiff", tiles = 5, cpu_cores = 7, verbose = TRUE) {
@@ -85,6 +86,7 @@ tile_stack <- function(st, dir, num_tiles, verbose = TRUE) {
 
 #model = modelo_calibra; dir = td; cpu_cores = 5
 tile_predict <- function(model, dir, cpu_cores =  4, verbose = TRUE) {
+  res <- NULL
   dir_tile <- paste0(dir,"/tiles/")
   dir_predict <- paste0(dir,"/predict/")
   rasters0 <- list.files(dir_tile, pattern = "*.grd", full.names = F, recursive = TRUE)
@@ -110,7 +112,7 @@ tile_predict <- function(model, dir, cpu_cores =  4, verbose = TRUE) {
       writeRaster(rna, filename = paste0(dir_predict, s1, '.tif'), format = "GTiff", overwrite = T )
     } else {
       beginCluster(cpu_cores)
-      pred <- clusterR(rt,  raster::predict, args = list(modelo_calibra),
+      pred <- clusterR(rt,  raster::predict, args = list(model),
                        filename = paste0(dir_predict, s1, '.tif'), format = "GTiff",
                        progress = T, overwrite = T)
       endCluster()

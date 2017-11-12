@@ -28,7 +28,9 @@ predict_big_raster(model, st, path_file, suffix = "pred_", format = "GTiff",
 Title Predict big raster
 }
 \examples{
+\dontrun{
 predict_big_raster(model = modelo_calibra, st = stcovar,
-                   path_file ='./mosaic/', format = "GTiff",  s
-                   uffix = 'etp_', tiles = 3, cpu_cores = 7 )
+                   path_file ='./mosaic/', format = "GTiff",
+                   suffix = 'etp_', tiles = 3, cpu_cores = 7 )
+}
 }

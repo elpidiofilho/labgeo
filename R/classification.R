@@ -50,36 +50,43 @@ classification <- function(df.train,
   }
   #if (repeats > 1) method <- "repeatedcv"
   inicio <- Sys.time()
-  if (is.null(formula)) {
-    formula <- as.formula(paste(names(df.train)[1], "~ ."))
-  }
-  tc <- caret::trainControl(
-    method = method,
-    number = nfolds,
-    index = index
-    #savePredictions = TRUE,
-    #returnResamp = "all"
-  )
+  tc <- caret::trainControl(method = method,number = nfolds,
+                            index = index,  seeds = seeds )
 
   if (cpu_cores > 0) {
     cl <- parallel::makePSOCKcluster(cpu_cores)
     doParallel::registerDoParallel(cl)
+    on.exit(stopCluster(cl))
   }
 
-  set.seed(313)
-  fit <- tryCatch({
-    suppressMessages(caret::train(
-      formula, data = df.train, method = classifier,
-      metric = metric,
-      trControl = tc,
-      tuneLength = tune_length,
-      preProcess = preprocess
-    ))},
-    error = function(e) NULL)
+  #set.seed(313)
+  if (is.null(formula == FALSE)) {
+    fit <- tryCatch({
+      suppressMessages(caret::train(
+        formula, data = df.train, method = classifier,
+        metric = metric,
+        trControl = tc,
+        tuneLength = tune_length,
+        preProcess = preprocess
+      ))},
+      error = function(e) NULL)
+  } else {
+    fit <- tryCatch({
+      suppressMessages(caret::train(
+        x = df.train[, -1],
+        y = df.train[, 1],
+        method = classifier,
+        metric = metric,
+        trControl = tc,
+        tuneLength = tune_length,
+        preProcess = preprocess
+      ))},
+      error = function(e) NULL)
 
-  if (!is.null(cl)) {
-    parallel::stopCluster(cl)
   }
+  #if (!is.null(cl)) {
+  #  parallel::stopCluster(cl)
+  #}
   if (verbose == TRUE & is.null(fit) == FALSE) {
     print(paste("Classification variable ", names(df.train)[1]))
     print(paste("time elapsed : ", hms_span(inicio, Sys.time())))

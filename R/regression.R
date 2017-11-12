@@ -19,6 +19,7 @@
 #' @importFrom doParallel registerDoParallel
 #' @importFrom caret trainControl train getTrainPerf
 #' @importFrom stats as.formula
+#' @importFrom foreach registerDoSEQ
 #' @author Elpidio Filho, \email{elpidio@ufv.br}
 #' @details details
 #' @export
@@ -28,86 +29,58 @@
 #' }
 
 
-regression <- function(df.train,
-                       formula = NULL,
-                       preprocess = NULL,
-                       regressor = "rf",
-                       nfolds = 10,
-                       repeats =  NA,
-                       index = NULL,
-                       cpu_cores = 3,
-                       tune_length = 5,
-                       metric = "Rsquared",
-                       seeds = NULL,
-                       verbose = FALSE) {
-  # library(doParallel)
-  # library(caret)
-  if (nfolds == 0) {
-    method <- "none"
-    tune_length <- NULL
+regression <- function(df.train, formula = NULL, preprocess = NULL,
+                       regressor = "rf", resample = 'cv', nfolds = 10,
+                       repeats =  NA,  index = NULL, cpu_cores = 0,
+                       tune_length = 5, metric = "Rsquared",
+                       seeds = NULL, verbose = FALSE) {
+  resample_methods = c('boot', 'boot632', 'optimism_boot', 'boot_all', 'cv',
+                       'repeatedcv', 'LOOCV', 'LGOCV','none', 'oob',
+                       'timeslice', 'adaptive_cv', 'adaptive_boot', 'adaptive_LGOCV')
+
+  if  (!any(resample %in% resample_methods)) stop(paste("resample method",resample, "does not exist"))
+  lb = caret::getModelInfo(regressor, regex = FALSE)[[1]]$library
+  if (is.null(lb) == FALSE){
+    print(paste("loading library", lb))
+    suppressPackageStartupMessages(library(lb, character.only = TRUE))
   }
-  if (nfolds >= nrow(df.train)) {
-    method <- "LOOCV"
-  } else {
-    method <- "cv"
-  }
-  if (is.na(repeats) == FALSE) {
-    if(repeats > 1) method <- "repeatedcv"
-  }
-  #tune_length = ifelse(tune_length > (ncol(df.train) -2), (ncol(df.train) -2), tune_length)
 
   inicio <- Sys.time()
-  # if (is.null(formula)) {
-  #    formula <- as.formula(paste(names(df.train)[1], "~ ."))
-  #  }
-  tc <- caret::trainControl(
-    method = method,
-    number = nfolds,
-    repeats = repeats,
-    index = index,
-#    savePredictions = "final",
-#    returnResamp = "final",
-    seeds = seeds
- #   verboseIter = FALSE
-  )
+  print(resample)
+  tc <- caret::trainControl( method = resample, number = nfolds,
+                             repeats = repeats,  index = index,
+                             seeds = seeds)
 
-  if (cpu_cores > 0) {
+
+    if (cpu_cores > 0) {
     cl <- parallel::makePSOCKcluster(cpu_cores)
     doParallel::registerDoParallel(cl)
     on.exit(stopCluster(cl))
+  } else {
+    cl = NULL
   }
 
   if (is.null(formula)) {
     fit <- tryCatch({
-      caret::train(
-        x = df.train[,-1],
-        y = df.train[,1],
-        method = regressor,
-        metric = metric,
-        trControl = tc,
-#        verbose = FALSE,
-        tuneLength = tune_length,
-        preProcess = preprocess
+      caret::train(x = df.train[, -1], y = df.train[, 1],
+                   method = regressor, metric = metric,
+                   trControl = tc, tuneLength = tune_length,
+                   preProcess = preprocess
       )},
       error = function(e){NULL})
   } else {
     fit <- tryCatch({
-      caret::train(
-        formula,
-        data = df.train,
-        method = regressor,
-        metric = metric,
-        trControl = tc,
- #       verbose = FALSE,
-        tuneLength = tune_length,
-        preProcess = preprocess
+      caret::train(formula, data = df.train, method = regressor,
+                   metric = metric,trControl = tc, tuneLength = tune_length,
+                   preProcess = preprocess
       )},
       error = function(e){NULL})
   }
 
-#  if (!is.null(cl)) {
-#    parallel::stopCluster(cl)
-#  }
+  if (!is.null(cl)) {
+    parallel::stopCluster(cl)
+    foreach::registerDoSEQ()
+  }
   if (verbose == TRUE) {
     #  print(paste("time elapsed : ", hms_span(inicio, Sys.time())))
     #   print(caret::getTrainPerf(fit))
