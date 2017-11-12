@@ -6,7 +6,8 @@
 #' @param formula   A formula of the form y ~ x1 + x2 + ... If users don't inform formula, the first column will be used as Y values and the others columns with x1,x2....xn
 #' @param preprocess pre process
 #' @param regressor Choice of regressor to be used to train model. Uses  algortims names from Caret package.
-#' @param nfolds     Number of folds to be build in crossvalidation
+#' @param resample ressample method 'boot', 'boot632', 'optimism_boot', 'boot_all', 'cv', 'repeatedcv', 'LOOCV', 'LGOCV','none', 'oob', 'timeslice', 'adaptive_cv', 'adaptive_boot', 'adaptive_LGOCV'
+#' @param nfolds Number of folds to be build in crossvalidation
 #' @param repeats repeats
 #' @param index index
 #' @param cpu_cores  Number of CPU cores to be used in parallel processing
@@ -39,11 +40,11 @@ regression <- function(df.train, formula = NULL, preprocess = NULL,
                        'timeslice', 'adaptive_cv', 'adaptive_boot', 'adaptive_LGOCV')
 
   if  (!any(resample %in% resample_methods)) stop(paste("resample method",resample, "does not exist"))
-  lb = caret::getModelInfo(regressor, regex = FALSE)[[1]]$library
-  if (is.null(lb) == FALSE){
-    print(paste("loading library", lb))
-    suppressPackageStartupMessages(library(lb, character.only = TRUE))
-  }
+  #lb = caret::getModelInfo(regressor, regex = FALSE)[[1]]$library
+#  if (is.null(lb) == FALSE){
+#    print(paste("loading library", lb))
+#    suppressPackageStartupMessages(library(lb, character.only = TRUE))
+#  }
 
   inicio <- Sys.time()
   print(resample)
@@ -78,7 +79,7 @@ regression <- function(df.train, formula = NULL, preprocess = NULL,
   }
 
   if (!is.null(cl)) {
-    parallel::stopCluster(cl)
+    #parallel::stopCluster(cl)
     foreach::registerDoSEQ()
   }
   if (verbose == TRUE) {

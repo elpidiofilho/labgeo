@@ -18,6 +18,8 @@ regression(df.train, formula = NULL, preprocess = NULL, regressor = "rf",
 
 \item{regressor}{Choice of regressor to be used to train model. Uses  algortims names from Caret package.}
 
+\item{resample}{ressample method 'boot', 'boot632', 'optimism_boot', 'boot_all', 'cv', 'repeatedcv', 'LOOCV', 'LGOCV','none', 'oob', 'timeslice', 'adaptive_cv', 'adaptive_boot', 'adaptive_LGOCV'}
+
 \item{nfolds}{Number of folds to be build in crossvalidation}
 
 \item{repeats}{repeats}

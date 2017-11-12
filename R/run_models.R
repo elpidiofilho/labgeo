@@ -7,6 +7,7 @@
 #' @param preprocess pre process
 #' @param index  Users cross validation folds. Default = NULL
 #' @param models chosen models to be used to train model. Uses  algortims names from Caret package.
+#' @param resample ressample method 'boot', 'boot632', 'optimism_boot', 'boot_all', 'cv', 'repeatedcv', 'LOOCV', 'LGOCV','none', 'oob', 'timeslice', 'adaptive_cv', 'adaptive_boot', 'adaptive_LGOCV'
 #' @param nfolds   Number of folds to be build in crossvalidation
 #' @param repeats repeats
 #' @param cpu_cores  Number of CPU cores to be used in parallel processing
