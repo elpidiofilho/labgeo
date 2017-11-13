@@ -350,13 +350,17 @@ rmp_regressao <- function(fit_run_model, df_valida, verbose = FALSE) {
 
     fit_md <- fit_run_model[[i]]
     if (is.null(fit_md) == FALSE) {
-      v <- tryCatch({ predict(fit_md, df_valida)},
-                    error = function(e){NULL})
+      v <- tryCatch({ predict(fit_md, df_valida[ ,-1])},
+                    error = function(e){
+                      print(paste( "Error:", conditionMessage(e)))
+                      return(NULL)})
       if (is.null(v)==FALSE) {
+        v = unlist(v)
         nr = nrow(df_valida)
         ddd <- data.frame(model = rep(fit_md$method, nr), observado = df_valida[, 1], predito = v,
                           residuo = abs(v - df_valida[, 1]), stringsAsFactors = FALSE) %>% na.omit()
         names(ddd)[2] <- "observado"
+        names(ddd)[3] <- "predito"
         names(ddd)[4] <- "residuo"
         summ_model$model[cont] <- fit_md$method
         summ_model$fit[cont] <- list(fit_md)
