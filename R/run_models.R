@@ -37,7 +37,7 @@ run_models <- function(df, models = ifelse(is.factor(df[, 1]),
                        formula = NULL,
                        preprocess = NULL,
                        index = NULL,
-                       resample = 'cv',
+                       resample_ = 'cv',
                        nfolds = 10,
                        repeats = NA,
                        tune_length = 5,
@@ -46,19 +46,28 @@ run_models <- function(df, models = ifelse(is.factor(df[, 1]),
                        seeds = NULL,
                        verbose = FALSE) {
   if (class(df) != "data.frame") stop("df is not a data frame.")
-
-  for (i in 1:length(models)) {
-    md <- getModelInfo(models[i], regex = FALSE)[[1]]
-    if (length(md) == 0)
-      stop(paste("Model", models[i], "is not in caret's built-in library"), call. = FALSE)
-  }
-
-  package.inicio <- search()[ifelse(unlist(gregexpr("package:", search())) == 1, TRUE, FALSE)]
   if (is.factor(df[, 1]) == TRUE) {
     mod <- 1
   } else {
     mod <- 0
   }
+
+  for (i in 1:length(models)) {
+    md <- getModelInfo(models[i], regex = FALSE)[[1]]
+    if (length(md) == 0) {
+      stop(paste("Model", models[i], "is not in caret's built-in library"), call. = FALSE)
+    } else {
+      if (mod == 0 ) {
+        if (!('Regression' %in% md$type)) stop(paste("Model", models[i], "is not in a regression model"), call. = FALSE)
+      } else {
+        if (!('Classification' %in% md$type)) stop(paste("Model", models[i], "is not in a regression model"), call. = FALSE)
+      }
+    }
+  }
+
+  package.inicio <- search()[ifelse(unlist(gregexpr("package:", search())) == 1, TRUE, FALSE)]
+
+
   if (verbose == TRUE) {
     pb <- progress_bar$new(total = length(models),
                            format("Running [:bar] :percent elapsed: :elapsed eta: :eta"),
@@ -68,6 +77,7 @@ run_models <- function(df, models = ifelse(is.factor(df[, 1]),
   nr <- length(models)
   list.model <- vector("list")
   cont <- 1
+  failed = character()
   for (j in 1:length(models)) {
     if (verbose == TRUE) {
       print(paste("Begin execution model :",models[j]))
@@ -80,7 +90,7 @@ run_models <- function(df, models = ifelse(is.factor(df[, 1]),
         regression(
           df.train = df,
           index = index,
-          resample = resample,
+          resample_ = resample_,
           regressor = models[j],
           preprocess = preprocess,
           nfolds = nfolds,
@@ -89,18 +99,24 @@ run_models <- function(df, models = ifelse(is.factor(df[, 1]),
           metric = metric,
           tune_length = tune_length,
           seeds = vector_seeds(seeds, repeats, nfolds))},
-        error = function(e){NULL})
+        error = function(e){
+          print(paste( "Error:", conditionMessage(e)))
+          return(NULL)
+          })
 
       if (is.null(fit.reg) == FALSE ) {
         list.model[cont] <- list(fit.reg)
         names(list.model)[cont] = models[j]
         cont <- cont + 1
+      } else {
+        failed = c(failed,models[j] )
       }
     } else {
       fit.class <- tryCatch({
         classification(
           df.train = df,
           index = index,
+          resample_ = resample_,
           classifier = models[j],
           preprocess = preprocess,
           nfolds = nfolds,
@@ -124,6 +140,12 @@ run_models <- function(df, models = ifelse(is.factor(df[, 1]),
   package.list <- setdiff(package.fim, package.inicio)
   if (length(package.list) > 0) for (package in package.list) detach(package, character.only = TRUE)
   list.model <- list.model[!sapply(list.model, is.null)]
+  if (verbose == TRUE) {
+    if (length(failed) > 0) {
+      print('failed models')
+      print(failed)
+    }
+  }
   return(list.model)
 }
 

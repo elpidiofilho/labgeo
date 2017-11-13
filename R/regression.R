@@ -6,7 +6,7 @@
 #' @param formula   A formula of the form y ~ x1 + x2 + ... If users don't inform formula, the first column will be used as Y values and the others columns with x1,x2....xn
 #' @param preprocess pre process
 #' @param regressor Choice of regressor to be used to train model. Uses  algortims names from Caret package.
-#' @param resample ressample method 'boot', 'boot632', 'optimism_boot', 'boot_all', 'cv', 'repeatedcv', 'LOOCV', 'LGOCV','none', 'oob', 'timeslice', 'adaptive_cv', 'adaptive_boot', 'adaptive_LGOCV'
+#' @param resample_ ressample method 'boot', 'boot632', 'optimism_boot', 'boot_all', 'cv', 'repeatedcv', 'LOOCV', 'LGOCV','none', 'oob', 'timeslice', 'adaptive_cv', 'adaptive_boot', 'adaptive_LGOCV'
 #' @param nfolds Number of folds to be build in crossvalidation
 #' @param repeats repeats
 #' @param index index
@@ -31,7 +31,7 @@
 
 
 regression <- function(df.train, formula = NULL, preprocess = NULL,
-                       regressor = "rf", resample = 'cv', nfolds = 10,
+                       regressor = "rf", resample_ = 'cv', nfolds = 10,
                        repeats =  NA,  index = NULL, cpu_cores = 0,
                        tune_length = 5, metric = "Rsquared",
                        seeds = NULL, verbose = FALSE) {
@@ -39,7 +39,7 @@ regression <- function(df.train, formula = NULL, preprocess = NULL,
                        'repeatedcv', 'LOOCV', 'LGOCV','none', 'oob',
                        'timeslice', 'adaptive_cv', 'adaptive_boot', 'adaptive_LGOCV')
 
-  if  (!any(resample %in% resample_methods)) stop(paste("resample method",resample, "does not exist"))
+  if  (!any(resample_ %in% resample_methods)) stop(paste("resample method",resample, "does not exist"))
   #lb = caret::getModelInfo(regressor, regex = FALSE)[[1]]$library
 #  if (is.null(lb) == FALSE){
 #    print(paste("loading library", lb))
@@ -47,8 +47,7 @@ regression <- function(df.train, formula = NULL, preprocess = NULL,
 #  }
 
   inicio <- Sys.time()
-  print(resample)
-  tc <- caret::trainControl( method = resample, number = nfolds,
+  tc <- caret::trainControl( method = resample_, number = nfolds,
                              repeats = repeats,  index = index,
                              seeds = seeds)
 

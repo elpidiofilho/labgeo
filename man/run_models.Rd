@@ -6,7 +6,7 @@
 \usage{
 run_models(df, models = ifelse(is.factor(df[, 1]), c("qda", "rf", "gbm",
   "C5.0"), c("lm", "cubist", "gbm", "rf")), formula = NULL,
-  preprocess = NULL, index = NULL, resample = "cv", nfolds = 10,
+  preprocess = NULL, index = NULL, resample_ = "cv", nfolds = 10,
   repeats = NA, tune_length = 5, cpu_cores = 0,
   metric = ifelse(is.factor(df[, 1]), "Kappa", "Rsquared"), seeds = NULL,
   verbose = FALSE)
@@ -22,8 +22,6 @@ run_models(df, models = ifelse(is.factor(df[, 1]), c("qda", "rf", "gbm",
 
 \item{index}{Users cross validation folds. Default = NULL}
 
-\item{resample}{ressample method 'boot', 'boot632', 'optimism_boot', 'boot_all', 'cv', 'repeatedcv', 'LOOCV', 'LGOCV','none', 'oob', 'timeslice', 'adaptive_cv', 'adaptive_boot', 'adaptive_LGOCV'}
-
 \item{nfolds}{Number of folds to be build in crossvalidation}
 
 \item{repeats}{repeats}
@@ -37,6 +35,8 @@ run_models(df, models = ifelse(is.factor(df[, 1]), c("qda", "rf", "gbm",
 \item{seeds}{seeds}
 
 \item{verbose}{prints results during the execution of the function}
+
+\item{resample}{ressample method 'boot', 'boot632', 'optimism_boot', 'boot_all', 'cv', 'repeatedcv', 'LOOCV', 'LGOCV','none', 'oob', 'timeslice', 'adaptive_cv', 'adaptive_boot', 'adaptive_LGOCV'}
 }
 \description{
 This function run many models using the same data
