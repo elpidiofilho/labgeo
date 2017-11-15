@@ -7,7 +7,7 @@
 #' @param preprocess pre process
 #' @param index  Users cross validation folds. Default = NULL
 #' @param models chosen models to be used to train model. Uses  algortims names from Caret package.
-#' @param resample ressample method 'boot', 'boot632', 'optimism_boot', 'boot_all', 'cv', 'repeatedcv', 'LOOCV', 'LGOCV','none', 'oob', 'timeslice', 'adaptive_cv', 'adaptive_boot', 'adaptive_LGOCV'
+#' @param resample_ resample method 'boot', 'boot632', 'optimism_boot', 'boot_all', 'cv', 'repeatedcv', 'LOOCV', 'LGOCV','none', 'oob', 'timeslice', 'adaptive_cv', 'adaptive_boot', 'adaptive_LGOCV'
 #' @param nfolds   Number of folds to be build in crossvalidation
 #' @param repeats repeats
 #' @param cpu_cores  Number of CPU cores to be used in parallel processing
@@ -58,9 +58,11 @@ run_models <- function(df, models = ifelse(is.factor(df[, 1]),
       stop(paste("Model", models[i], "is not in caret's built-in library"), call. = FALSE)
     } else {
       if (mod == 0 ) {
-        if (!('Regression' %in% md$type)) stop(paste("Model", models[i], "is not in a regression model"), call. = FALSE)
+        if (!('Regression' %in% md$type))
+          stop(paste("Model", models[i], "is not in a regression model"), call. = FALSE)
       } else {
-        if (!('Classification' %in% md$type)) stop(paste("Model", models[i], "is not in a regression model"), call. = FALSE)
+        if (!('Classification' %in% md$type))
+          stop(paste("Model", models[i], "is not in a regression model"), call. = FALSE)
       }
     }
   }
