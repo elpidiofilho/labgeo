@@ -157,7 +157,6 @@ run_models <- function(df, models = ifelse(is.factor(df[, 1]),
       s2 = paste0(rep('.', (nm - j) / nm * width), collapse = '')
       cat("\r",label1,s1,s2, tdif, tdif_total)
       if (j == nm) cat("\n")
-      #pb$tick()
     }
   }
   package.fim <- search()[ifelse(unlist(gregexpr("package:", search())) == 1, TRUE, FALSE)]
