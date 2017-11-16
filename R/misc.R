@@ -74,6 +74,21 @@ hms_span <- function(start, end) {
 
 
 #' @export
+until_now <- function(start) {
+  end = Sys.time()
+  dsec <- as.numeric(difftime(end, start, unit = "secs"))
+  hours <- floor(dsec / 3600)
+  minutes <- floor( (dsec - 3600 * hours) / 60)
+  seconds <- dsec - 3600 * hours - 60 * minutes
+  paste0(
+    sapply(c(hours, minutes, seconds), function(x) {
+      formatC(x, width = 2, format = "d", flag = "0")
+    }),
+    collapse = ":")
+}
+
+
+#' @export
 to_table <- function(txt, n.col, num.digits = 3) {
   n.col <- 4
   num.elem <- length(txt)

@@ -55,6 +55,8 @@ easy_fit <- function(dy, dx,
                      preprocess = NULL,
                      seeds = NULL,
                      verbose = TRUE) {
+
+
   dy = data.frame(dy)
   ny <- ncol(dy)
 
