@@ -30,7 +30,7 @@ classification(df.train, formula = NULL, preprocess = NULL,
 
 \item{metric}{metric used to evaluate model fit. For numeric outcome ("RMSE", "Rsquared)}
 
-\item{seeds}{seeds}
+\item{seeds}{seeds seeds}
 
 \item{verbose}{verbose}
 }
