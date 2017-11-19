@@ -44,7 +44,7 @@ run_models <- function(df, models = ifelse(is.factor(df[, 1]),
                        cpu_cores = 0,
                        metric = ifelse(is.factor(df[, 1]), "Kappa", "Rsquared"),
                        seeds = NULL,
-                       verbose = FALSE) {
+                       verbose = TRUE) {
   if (class(df) != "data.frame") stop("df is not a data frame.")
   if (is.factor(df[, 1]) == TRUE) {
     mod <- 1

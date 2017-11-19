@@ -78,11 +78,13 @@ predict_stack_to_map <- function(model_list, stack_var,
   nm <- length(model_list)
   for (i in 1:nm) {
     inicio <- Sys.time()
-    vsel <- model_list[[i]]$coefnames
+    df_entrada = model_list[[i]]$trainingData %>% select(-.outcome)
+    #vsel <- model_list[[i]]$coefnames
+    vsel = names(df_entrada)
     vachei <- !((names(stack_var)) %in% vsel)
     if (sum(vachei) > 0) {
       print(paste(names(stack_var)[vachei]))
-      stop("covariate no found")
+      stop("covariate not found")
     }
     name_model <- model_list[[i]]$modelInfo$label
     filename <- gsub(" ", "_", paste0(path_result, namefile,

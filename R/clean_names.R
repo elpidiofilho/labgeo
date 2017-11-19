@@ -22,7 +22,8 @@ clean_names <- function(df) {
 #    chartr("áàãéêíóõúÚçª",
 #           "aaaeeioouUca", .) %>%
   #  iconv(., "utf-8", to = "ASCII//TRANSLIT") %>%
-  #  str_replace_all("\\.", "_") %>%
+    str_replace_all("\\.", "_") %>%
+    str_replace_all("\\..", "_") %>%
     str_replace_all("\\,", "_") %>%
     str_replace_all(" ", "_") %>%
     str_replace_all("-", "_") %>%

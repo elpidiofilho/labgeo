@@ -9,7 +9,7 @@ run_models(df, models = ifelse(is.factor(df[, 1]), c("qda", "rf", "gbm",
   preprocess = NULL, index = NULL, resample_ = "cv", nfolds = 10,
   repeats = NA, tune_length = 5, cpu_cores = 0,
   metric = ifelse(is.factor(df[, 1]), "Kappa", "Rsquared"), seeds = NULL,
-  verbose = FALSE)
+  verbose = TRUE)
 }
 \arguments{
 \item{df}{Training dataframe}
