@@ -393,3 +393,21 @@ rmp_regressao <- function(fit_run_model, df_valida, verbose = FALSE) {
   }
   return(summ_model)
 }
+
+
+#' @title  fit null model
+#' @description calculate RMSE of null model
+#' @param train_y vector with train outcome variable
+#' @param test_y  vector with test outcome variable
+#' @importFrom caret postResample
+#' @examples
+#' \dontrun{
+#' null_model(train_y = train$Ozone, test_y = test$Ozone)
+#' }
+#' @export
+null_model <- function(train_y, test_y) {
+  media = mean(train_y)
+  vr = postResample(rep(media, length(test_y)), test_y)
+  return(RMSE = vr[1])
+}
+
