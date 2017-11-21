@@ -81,11 +81,6 @@ run_models <- function(df, models = ifelse(is.factor(df[, 1]),
 
   if (verbose == TRUE) {
     label1 = models[i]
-   # pb <- progress_bar$new(total = length(models),
-  #                         format("Running [:bar] :percent elapsed: :elapsed eta: :eta"),
-  #                         clear = FALSE, width= 60)
-  #  gg <- pb$tick(0)
-
   }
   nr <- length(models)
   list.model <- vector("list")
@@ -98,6 +93,11 @@ run_models <- function(df, models = ifelse(is.factor(df[, 1]),
       #print(paste("Begin execution model :",models[j]))
       #flush.console()
       inicio <- Sys.time()
+      if(j == 1) {
+      nm = length(models)
+      width = 40
+      label1 = stringr::str_pad(models[j], 15, 'right')
+      cat("\r",label1) }
     }
 
     if (mod == 0) {
@@ -140,7 +140,7 @@ run_models <- function(df, models = ifelse(is.factor(df[, 1]),
           metric = metric,
           tune_length = tune_length,
           seeds = vector_seeds(seeds, repeats, nfolds))},
-        error = function(e){NULL})
+        error = function(e){print(e);NULL})
       if (is.null(fit.class) == FALSE ) {
         list.model[cont] <- list(fit.class)
         names(list.model)[cont] = models[j]
@@ -185,8 +185,8 @@ vector_seeds <- function(seeds, repeats, nfolds){
       nel <- nfolds + 1
     }
     vseed <- vector(mode = "list", length = nel)
-    for (i in 1:nel) vseed[[i]] <- sample.int(n = 5000, nel * 10)
-    vseed[[nel + 1]] <- sample.int(5000, 1)
+    for (i in 1:nel) vseed[[i]] <- sample.int(n = nel * 100, nel * 10)
+    vseed[[nel + 1]] <- sample.int(nel * 100, 1)
   }
   return(vseed)
 }

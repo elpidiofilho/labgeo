@@ -39,20 +39,27 @@ regression <- function(df.train, formula = NULL, preprocess = NULL,
                        'repeatedcv', 'LOOCV', 'LGOCV','none', 'oob',
                        'timeslice', 'adaptive_cv', 'adaptive_boot', 'adaptive_LGOCV')
 
-  if  (!any(resample_ %in% resample_methods)) stop(paste("resample method",resample, "does not exist"))
+  if  (!any(resample_ %in% resample_methods)) stop(paste("resample method", resample, "does not exist"))
   #lb = caret::getModelInfo(regressor, regex = FALSE)[[1]]$library
 #  if (is.null(lb) == FALSE){
 #    print(paste("loading library", lb))
 #    suppressPackageStartupMessages(library(lb, character.only = TRUE))
 #  }
 
+  tc = caret::trainControl( method = resample_, number = nfolds,index = index, seeds = seeds)
+  switch(resample_,
+         'cv' = {tc = caret::trainControl( method = resample_, number = nfolds,index = index, seeds = seeds)},
+         'repeatedcv' = { tc <- caret::trainControl( method = resample_, number = nfolds, repeats = repeats,  index = index,  seeds = seeds)},
+         'none' = {tc <- caret::trainControl( method = resample_)})
+
+
   inicio <- Sys.time()
-  tc <- caret::trainControl( method = resample_, number = nfolds,
-                             repeats = repeats,  index = index,
-                             seeds = seeds)
+#  if (resample_ == 'cv') {
+#    tc <- caret::trainControl( method = resample_, number = nfolds,
+#                               index = index, seeds = seeds)}
 
 
-    if (cpu_cores > 0) {
+  if (cpu_cores > 0) {
     cl <- parallel::makePSOCKcluster(cpu_cores)
     doParallel::registerDoParallel(cl)
     on.exit(stopCluster(cl))
@@ -67,7 +74,7 @@ regression <- function(df.train, formula = NULL, preprocess = NULL,
                    trControl = tc, tuneLength = tune_length,
                    preProcess = preprocess
       )},
-      error = function(e){NULL})
+      error = function(e){print(e); NULL})
   } else {
     fit <- tryCatch({
       caret::train(formula, data = df.train, method = regressor,

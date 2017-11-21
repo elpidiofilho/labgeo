@@ -81,6 +81,39 @@ caret_models <- function(regression = TRUE) {
   return(m)
 }
 
+#' @importFrom caret getModelInfo
+#' @export
+model_tags <- function(is.regression = TRUE) {
+  models = caret_models(regression = is.regression)
+  vtag = character()
+  for (i in 1:length(models)) {
+    vi = caret::getModelInfo(models[i])
+    tags = vi[[1]]$tags
+    vtag = c(vtag, tags)
+  }
+  return(sort(unique(vtag)))
+}
+
+#' @importFrom caret getModelInfo
+#' @export
+select_model <- function(is.regression = TRUE, vtags = c("Boosting","Bagging" )){
+  models = caret_models(regression = is.regression)
+  vsel = character()
+  for (i  in 1:length(models)) {
+    vi = caret::getModelInfo(models[i])
+    tg = vi[[1]]$tags
+    if (length(tg) > 0 ){
+      if (is.null(tg) == FALSE){
+        if (sum(tg %in% vtags) > 0){
+          vsel = c(vsel, models[i])
+        }
+      }
+    }
+  }
+  return(sort(vsel))
+}
+
+
 #' convert numeric data to factor
 #' @title Numeric to Factor
 #' @param vx vector of numeric
