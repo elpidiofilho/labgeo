@@ -69,12 +69,24 @@ run_models <- function(df, models = ifelse(is.factor(df[, 1]),
     }
   }
 
+  plataforma = .Platform$OS.type
+
+  remove <- c('NA'," ")
+  idx = which(vlib %in% remove )
+  if (length(idx) > 0) {
+    vlib = vlib[-idx]
+  }
   pkgList = unique(vlib)
   inst <- vlib %in% installed.packages()
   if (length(pkgList[!inst]) > 0) {
     np = paste(pkgList[!inst], collapse = ", ")
-    print(paste('packages ', np, ' will be installed'))
-    install.packages(pkgList[!inst], dep=TRUE)
+    if (plataforma == "windows") {
+      print(paste('packages ', np, ' will be installed'))
+      install.packages(pkgList[!inst], dep=TRUE)
+    } else {
+      print(paste('Warning : packages ', np, ' needs to installed'))
+
+    }
   }
 
   package.inicio <- search()[ifelse(unlist(gregexpr("package:", search())) == 1, TRUE, FALSE)]
