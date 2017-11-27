@@ -15,7 +15,6 @@
 #' @importFrom ggplot2 scale_x_discrete scale_y_discrete
 #' @importFrom ggplot2 scale_fill_gradientn
 #' @importFrom tidyr gather
-#' @importFrom viridis scale_color_viridis
 #' @importFrom stats var
 #' @examples
 #' \dontrun{
@@ -39,6 +38,7 @@
 #' }
 #' @export
 
+#importFrom viridis scale_color_viridis
 run_models_performance <- function(fit_run_model,
                                    df_valida, verbose = FALSE) {
   package_inicio <- search()[ifelse(
@@ -130,13 +130,13 @@ rmp_classificacao <- function(fit_run_model, df_valida, verbose = FALSE) {
       v <- tryCatch({ predict(fit_md, df_valida)},
                     error = function(e){NULL})
       if (is.null(v) == FALSE) {
-        ddd <- data.frame(observado = df_valida[, 1], predito = v)
+        ddd <- data.frame(vobs = df_valida[, 1], vpred = v)
         summ_model$model[i] <- fit_md$method
         summ_model$fit[i] <- list(fit_md)
 
         summ_model$dfpredobs[i] <- list(ddd)
-        cf <- caret::confusionMatrix(ddd$predito,
-                                     ddd$observado, mode = "everything")
+        cf <- caret::confusionMatrix(ddd$vpred,
+                                     ddd$vobs, mode = "everything")
         summ_model$accuracy[i] <- cf$overall[1]
         summ_model$Kappa[i] <- cf$overall[2]
         summ_model$byclass[i] <- list(cf$byClass)
@@ -253,7 +253,7 @@ rescale <- function(x, to = c(0, 1),
 #' @export
 #'
 plot_predict_observed_residual <- function(result, residual = FALSE) {
-observado <- predito <- residuo <- NULL
+vobs <- vpred <- residuo <- NULL
     nr <- nrow(result)
   i <- 1
   for (i in 1:nr) {
@@ -267,13 +267,13 @@ observado <- predito <- residuo <- NULL
   }
   if (residual == TRUE) {
     g1 <- dresult  %>%
-      ggplot(aes( y = observado, x = predito)) +
-      geom_segment(aes(y = predito,   yend = observado,
-                       x = predito, xend = predito))   +
-      xlim(range(c(ddd$predito, ddd$observado))) +
-      ylim(range(c(ddd$predito, ddd$observado))) +
+      ggplot(aes( y = vobs, x = vpred)) +
+      geom_segment(aes(y = vpred,   yend = vobs,
+                       x = vpred, xend = vpred))   +
+      xlim(range(c(ddd$vpred, ddd$vobs))) +
+      ylim(range(c(ddd$vpred, ddd$vobs))) +
       geom_abline(slope = 1, intercept = 0) +
-      geom_point(aes(y = observado), shape = 1) +
+      geom_point(aes(y = vobs), shape = 1) +
       geom_point(aes(color = abs(residuo))) +
       scale_color_continuous(low = "green", high = "red") +
       theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
@@ -281,9 +281,9 @@ observado <- predito <- residuo <- NULL
       facet_wrap(~model, scales = "free") +  theme_bw()
   } else {
     g1 <- dresult  %>%
-      ggplot(aes( y = observado, x = predito)) +
+      ggplot(aes( y = vobs, x = vpred)) +
       geom_abline(slope = 1, intercept = 0) +
-      geom_point(aes(y = observado), shape = 1) +
+      geom_point(aes(y = vobs), shape = 1) +
       geom_point(aes(color = abs(residuo))) +
       scale_color_continuous(low = "green", high = "red") +
       theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
@@ -335,7 +335,7 @@ plot_confusio_matrix <- function(obs, pred) {
 
 
 rmp_regressao <- function(fit_run_model, df_valida, verbose = FALSE) {
-  predito <- observado <- model <- mbe <- mae <- rmse <- nse <-
+  vpred <- vobs <- model <- mbe <- mae <- rmse <- nse <-
     r2 <- var_exp <- var <- valor <- NULL
   nm <- length(fit_run_model)
   summ_model <- dplyr::tibble(
@@ -357,15 +357,15 @@ rmp_regressao <- function(fit_run_model, df_valida, verbose = FALSE) {
       if (is.null(v)==FALSE) {
         v = unlist(v)
         nr = nrow(df_valida)
-        ddd <- data.frame(model = rep(fit_md$method, nr), observado = df_valida[, 1], predito = v,
+        ddd <- data.frame(model = rep(fit_md$method, nr), vobs = df_valida[, 1], vpred = v,
                           residuo = abs(v - df_valida[, 1]), stringsAsFactors = FALSE) %>% na.omit()
-        names(ddd)[2] <- "observado"
-        names(ddd)[3] <- "predito"
+        names(ddd)[2] <- "vobs"
+        names(ddd)[3] <- "vpred"
         names(ddd)[4] <- "residuo"
         summ_model$model[cont] <- fit_md$method
         summ_model$fit[cont] <- list(fit_md)
         summ_model$dfpredobs[cont] <- list(ddd)
-        acc <- pred_acc(ddd$predito, ddd$observado)
+        acc <- pred_acc(ddd$vpred, ddd$vobs)
         summ_model$r2[cont] <- acc$rsquared
         summ_model$rmse[cont] <- acc$root_mean_square_error
         summ_model$mbe[cont] <- acc$mean_bias_error

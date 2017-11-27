@@ -2,7 +2,7 @@
 % Please edit documentation in R/misc2.R
 \name{space_to_symbol}
 \alias{space_to_symbol}
-\title{Convert string space to any symbol}
+\title{space to symbol}
 \usage{
 space_to_symbol(vx, symbol)
 }

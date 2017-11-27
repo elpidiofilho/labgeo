@@ -2,7 +2,7 @@
 % Please edit documentation in R/misc2.R
 \name{balanced_sample}
 \alias{balanced_sample}
-\title{Balanced Sample}
+\title{balanced sample}
 \usage{
 balanced_sample(df, target, n = 100)
 }

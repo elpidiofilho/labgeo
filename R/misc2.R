@@ -68,7 +68,8 @@ roi <- function(extent, project) {
   return(e)
 }
 
-
+#' Retrive list of caret supported models
+#' @title caret models
 #' @param model.regression TRUE or FALSE
 #' @export
 #' @importFrom caret modelLookup
@@ -81,6 +82,9 @@ caret_models <- function(regression = TRUE) {
   return(m)
 }
 
+# model_tags : return list of models tags supported by caret package
+#' @title models tags
+#' @param is.regression if TRUE return regression models tags if FALSE return classification models tags
 #' @importFrom caret getModelInfo
 #' @export
 model_tags <- function(is.regression = TRUE) {
@@ -94,6 +98,10 @@ model_tags <- function(is.regression = TRUE) {
   return(sort(unique(vtag)))
 }
 
+# Select classification/ regression models by tag
+#' @title select model by tag
+#' @param is.regression if TRUE return regression models tags if FALSE return classification models tags
+#' @param vtags vetctor of taga used in model selection
 #' @importFrom caret getModelInfo
 #' @export
 select_model <- function(is.regression = TRUE, vtags = c("Boosting","Bagging" )){
@@ -136,12 +144,14 @@ remove_accentuation <- function(vx) {
 
 
 #' remove spaces from a character vector
+#' @title spaceless
 #' @param vx character vector
 #' @param symbol symbol or character to replace space
 #' @export
 spaceless <- function(vx, symbol = '-') {x <- gsub(" ", symbol, vx); vx}
 
 #' Eliminate symbol
+#' @title eliminate symbols from string
 #' @param vx character vector
 #' @param replace symbol the will replace eliminated symbol character
 #' @export
@@ -169,8 +179,8 @@ vxclean <- vx %>%
   return(vxclean)
 }
 
-#' Remove first symbol
 #' Remove symbol when it is the first character of a string
+#' @title Remove first symbol
 #' @param vx vector of character
 #' @return vector of character with first symbol removed
 #' @export
@@ -180,6 +190,7 @@ remove_first_symbol <- function(vx) {
 
 
 #' Convert string space to any symbol
+#' @title space to symbol
 #' @param vx character vector
 #' @param symbol symbol the will replace space character
 #' @export
@@ -188,6 +199,7 @@ space_to_symbol <- function(vx, symbol){
 }
 
 #' Convert points to uppercase letter in a string
+#' @title point to camel
 #' @param vx character vector
 #' @return vector with points replaced by uppercase character
 #' @export
@@ -212,6 +224,7 @@ abbrev_colnames <- function(df, maxlength) {
 }
 
 #' Balanced Sample
+#' @title balanced sample
 #' @name  balanced_sample
 #' @param df dataframe
 #' @param target name of outcome variable
@@ -225,4 +238,21 @@ balanced_sample <- function(df, target, n = 100) {
     group_by(!!target) %>% sample_n(size = n, replace = T)  %>%
     na.omit()  %>% data.frame()
   return(dfsample)
+}
+
+
+
+## format code to create Rstudio snnipets
+code_snipett <- function() {
+  x = readClipboard(format = 1, raw = F)
+  vs = character(length(x))
+  for (i in 1:length(x)) {
+    s1 = "`r paste('"
+    s2 = x[i]
+    if (s2 == "") {s2 = "\n"}
+    s3 = "')`"
+    vx[i] = paste(s1,s2,s3,sep = '')
+  }
+  vx
+  writeClipboard(vx,1)
 }

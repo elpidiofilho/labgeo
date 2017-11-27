@@ -1,14 +1,14 @@
 Package: labgeo
 Type: Package
 Title: Collection of functions to  fit models with emphasis in land use and soil mapping
-Version: 0.3.4.2
+Version: 0.3.5.1
 Author: Elpidio I. Fernandes Filho
 Maintainer: Elpidio Filho <elpidio@ufv.br>
 Description: Labgeo is a R package to fit classifications and regressions models in an easy way.
 License: GPL-2
 Encoding: UTF-8
 Depends: R (>= 3.3.0)
-Imports: caret,
+Imports: caret, 
          doParallel,
          foreach, 
          multidplyr, 
@@ -16,13 +16,9 @@ Imports: caret,
          dplyr,
          ggplot2,
          parallel, 
-         Rtsne, 
-         plotrix,
-         glcm, 
          knitr, 
          tidyr, 
          corrplot, 
-         viridis, 
          stringr, 
          progress,  
          raster, 
@@ -31,6 +27,6 @@ Imports: caret,
          vtreat, 
          automap ,
          kableExtra, 
-         tibble  
+         tibble
 LazyData: false
 RoxygenNote: 6.0.1

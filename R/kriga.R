@@ -25,8 +25,6 @@
 #' print(knitr::kable(media))
 #' }
 
-
-
 kriga <- function(df, target_var, nrep = 10,
                   name_px, name_py, p = 0.75, seed = NULL) {
   ng <- nrep

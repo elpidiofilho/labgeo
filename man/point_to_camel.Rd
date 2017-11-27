@@ -2,7 +2,7 @@
 % Please edit documentation in R/misc2.R
 \name{point_to_camel}
 \alias{point_to_camel}
-\title{Convert points to uppercase letter in a string}
+\title{point to camel}
 \usage{
 point_to_camel(vx)
 }

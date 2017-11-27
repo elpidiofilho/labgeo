@@ -180,3 +180,20 @@ rfe_result <- function(fit.rfe) {
   knitr::kable(ddd[1:wm, ], digits = 3, col.names = names(ddd))
   return(ddd)
 }
+
+#'selected features by rfe with tolerance
+#' @title selected features by rfe with tolerance
+#' @param fit  Results from recursive_feature_elimination  function
+#' @param tolerance maximum error tolerance allowed in percentage
+#' @param metric metric to used to fit rfe model
+#' @param maximize maximize (TREUE) or minimize (FALSE) the metric
+#' @importFrom caret pickSizeTolerance
+#' @export
+selec_rfe_tolerance <- function(fit, tolerance, metric = 'Rsquared', maximize = 'TRUE') {
+  tol <- caret::pickSizeTolerance(fit$results, metric = "Rsquared",
+                                  tol = tolerance, maximize = maximize)
+  vs <- fit$optVariables[-c(1:tol)]
+  return(vs)
+}
+
+

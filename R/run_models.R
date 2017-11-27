@@ -7,7 +7,7 @@
 #' @param preprocess pre process
 #' @param index  Users cross validation folds. Default = NULL
 #' @param models chosen models to be used to train model. Uses  algortims names from Caret package.
-#' @param resample_ resample method 'boot', 'boot632', 'optimism_boot', 'boot_all', 'cv', 'repeatedcv', 'LOOCV', 'LGOCV','none', 'oob', 'timeslice', 'adaptive_cv', 'adaptive_boot', 'adaptive_LGOCV'
+#' @param rsample resample method 'boot', 'boot632', 'optimism_boot', 'boot_all', 'cv', 'repeatedcv', 'LOOCV', 'LGOCV','none', 'oob', 'timeslice', 'adaptive_cv', 'adaptive_boot', 'adaptive_LGOCV'
 #' @param nfolds   Number of folds to be build in crossvalidation
 #' @param repeats number of repeats to resample method repeatedcv
 #' @param cpu_cores  Number of CPU cores to be used in parallel processing
@@ -15,7 +15,6 @@
 #' @param metric metric used to evaluate model fit. For numeric outcome ("RMSE", "Rsquared)
 #' @param seeds  generate random seeds to allow reproductible results
 #' @param verbose  prints results during the execution of the function
-#' @importFrom progress progress_bar
 #' @importFrom utils flush.console
 #' @importFrom caret getModelInfo
 #' @keywords  models
@@ -37,7 +36,7 @@ run_models <- function(df, models = ifelse(is.factor(df[, 1]),
                        formula = NULL,
                        preprocess = NULL,
                        index = NULL,
-                       resample_ = 'cv',
+                       rsample = 'cv',
                        nfolds = 10,
                        repeats = NA,
                        tune_length = 5,
@@ -117,7 +116,7 @@ run_models <- function(df, models = ifelse(is.factor(df[, 1]),
         regression(
           df.train = df,
           index = index,
-          resample_ = resample_,
+          rsample = rsample,
           regressor = models[j],
           preprocess = preprocess,
           nfolds = nfolds,
@@ -143,7 +142,7 @@ run_models <- function(df, models = ifelse(is.factor(df[, 1]),
         classification(
           df.train = df,
           index = index,
-          resample_ = resample_,
+          resample_ = rsample,
           classifier = models[j],
           preprocess = preprocess,
           nfolds = nfolds,

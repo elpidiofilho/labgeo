@@ -2,7 +2,7 @@
 % Please edit documentation in R/misc2.R
 \name{eliminate_symbol}
 \alias{eliminate_symbol}
-\title{Eliminate symbol}
+\title{eliminate symbols from string}
 \usage{
 eliminate_symbol(vx, replace = " ")
 }

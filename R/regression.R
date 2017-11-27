@@ -6,7 +6,7 @@
 #' @param formula   A formula of the form y ~ x1 + x2 + ... If users don't inform formula, the first column will be used as Y values and the others columns with x1,x2....xn
 #' @param preprocess pre process
 #' @param regressor Choice of regressor to be used to train model. Uses  algortims names from Caret package.
-#' @param resample_ ressample method 'boot', 'boot632', 'optimism_boot', 'boot_all', 'cv', 'repeatedcv', 'LOOCV', 'LGOCV','none', 'oob', 'timeslice', 'adaptive_cv', 'adaptive_boot', 'adaptive_LGOCV'
+#' @param rsample resample method 'boot', 'boot632', 'optimism_boot', 'boot_all', 'cv', 'repeatedcv', 'LOOCV', 'LGOCV','none', 'oob', 'timeslice', 'adaptive_cv', 'adaptive_boot', 'adaptive_LGOCV'
 #' @param nfolds Number of folds to be build in crossvalidation
 #' @param repeats repeats
 #' @param index index
@@ -31,7 +31,7 @@
 
 
 regression <- function(df.train, formula = NULL, preprocess = NULL,
-                       regressor = "rf", resample_ = 'cv', nfolds = 10,
+                       regressor = "rf", rsample = 'cv', nfolds = 10,
                        repeats =  NA,  index = NULL, cpu_cores = 0,
                        tune_length = 5, metric = "Rsquared",
                        seeds = NULL, verbose = FALSE) {
@@ -39,18 +39,20 @@ regression <- function(df.train, formula = NULL, preprocess = NULL,
                        'repeatedcv', 'LOOCV', 'LGOCV','none', 'oob',
                        'timeslice', 'adaptive_cv', 'adaptive_boot', 'adaptive_LGOCV')
 
-  if  (!any(resample_ %in% resample_methods)) stop(paste("resample method", resample, "does not exist"))
+  if  (!any(rsample %in% resample_methods)) stop(paste("resample method", rsample, "does not exist"))
   #lb = caret::getModelInfo(regressor, regex = FALSE)[[1]]$library
 #  if (is.null(lb) == FALSE){
 #    print(paste("loading library", lb))
 #    suppressPackageStartupMessages(library(lb, character.only = TRUE))
 #  }
 
-  tc = caret::trainControl( method = resample_, number = nfolds,index = index, seeds = seeds)
-  switch(resample_,
-         'cv' = {tc = caret::trainControl( method = resample_, number = nfolds,index = index, seeds = seeds)},
-         'repeatedcv' = { tc <- caret::trainControl( method = resample_, number = nfolds, repeats = repeats,  index = index,  seeds = seeds)},
-         'none' = {tc <- caret::trainControl( method = resample_)})
+  tc = caret::trainControl( method = rsample, number = nfolds,index = index, seeds = seeds)
+  switch(rsample,
+         'cv' = {tc = caret::trainControl( method = rsample, number = nfolds,index = index, seeds = seeds)},
+         'repeatedcv' = { if ((repeats == 'NA') | (repeats < 2)) stop('You must define the number of repeats greater then 1 ')
+           tc <- caret::trainControl( method = rsample, number = nfolds, repeats = repeats,
+                                      index = index,  seeds = seeds)},
+         'none' = {tc <- caret::trainControl( method = rsample)})
 
 
   inicio <- Sys.time()
@@ -65,6 +67,7 @@ regression <- function(df.train, formula = NULL, preprocess = NULL,
     on.exit(stopCluster(cl))
   } else {
     cl = NULL
+    foreach::registerDoSEQ()
   }
 
   if (is.null(formula)) {

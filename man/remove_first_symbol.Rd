@@ -2,8 +2,7 @@
 % Please edit documentation in R/misc2.R
 \name{remove_first_symbol}
 \alias{remove_first_symbol}
-\title{Remove first symbol
-Remove symbol when it is the first character of a string}
+\title{Remove first symbol}
 \usage{
 remove_first_symbol(vx)
 }
@@ -14,6 +13,5 @@ remove_first_symbol(vx)
 vector of character with first symbol removed
 }
 \description{
-Remove first symbol
 Remove symbol when it is the first character of a string
 }

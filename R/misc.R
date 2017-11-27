@@ -1,67 +1,13 @@
 
-
-"%nin%" <- function(x, y) match(x, y, nomatch = 0) == 0
-
-## from scales package
-## https://github.com/hadley/scales
-
-zero_range <- function(x, tol = 1000 * .Machine$double.eps) {
-  if (length(x) == 1)
-    return(TRUE)
-  if (length(x) != 2)
-    stop("x must be length 1 or 2")
-  if (any(is.na(x)))
-    return(NA)
-  if (x[1] == x[2])
-    return(TRUE)
-  if (all(is.infinite(x)))
-    return(FALSE)
-  m <- min(abs(x))
-  if (m == 0)
-    return(FALSE)
-  abs( (x[1] - x[2]) / m) < tol
-}
-
-rescale <- function(x, to = c(0, 1),
-                    from = range(x, na.rm = TRUE, finite = TRUE)) {
-  if (zero_range(from) || zero_range(to)) {
-    return(ifelse(is.na(x), NA, mean(to)))
-  }
-  (x - from[1]) / diff(from) * diff(to) + to[1]
-}
-
-
-## from library MASS
-## https://github.com/cran/MASS/blob/master/R/kde2d.R
-
-kde2d <- function(x, y, h, n = 25, lims = c(range(x), range(y))) {
-  nx <- length(x)
-  if (length(y) != nx)
-    stop("data vectors must be the same length")
-  if (any(!is.finite(x)) || any(!is.finite(y)))
-    stop("missing or infinite values in the data are not allowed")
-  if (any(!is.finite(lims)))
-    stop("only finite values are allowed in 'lims'")
-  n <- rep(n, length.out = 2L)
-  gx <- seq.int(lims[1L], lims[2L], length.out = n[1L])
-  gy <- seq.int(lims[3L], lims[4L], length.out = n[2L])
-  h <- if (missing(h)) c(bandwidth.nrd(x), bandwidth.nrd(y))
-    else rep(h, length.out = 2L)
-  if (any(h <= 0))
-    stop("bandwidths must be strictly positive")
-  h <- h / 4 # for S's bandwidth scale
-  ax <- outer(gx, x, "-") / h[1L]
-  ay <- outer(gy, y, "-") / h[2L]
-  z <- tcrossprod(matrix(dnorm(ax),, nx),
-                  matrix(dnorm(ay),, nx)) / (nx * h[1L] * h[2L])
-  list(x = gx, y = gy, z = z)
-}
-
 ## code by Nathan Russell https://github.com/nathan-russell
 ## https://stackoverflow.com/questions/32100133/print-the-time-a-script-has-been-running-in-r
+
+#' @title hms difrence time
+#' @param start initial time
+#' @param end final time
 #' @export
 hms_span <- function(start, end) {
-  dsec <- as.numeric(difftime(end, start, unit = "secs"))
+  dsec <- as.numeric(difftime(end, start, units = "secs"))
   hours <- floor(dsec / 3600)
   minutes <- floor( (dsec - 3600 * hours) / 60)
   seconds <- dsec - 3600 * hours - 60 * minutes
@@ -73,10 +19,12 @@ hms_span <- function(start, end) {
 }
 
 
+#' @title time until now
+#' @param start initial time
 #' @export
 until_now <- function(start) {
   end = Sys.time()
-  dsec <- as.numeric(difftime(end, start, unit = "secs"))
+  dsec <- as.numeric(difftime(end, start, units =  "secs"))
   hours <- floor(dsec / 3600)
   minutes <- floor( (dsec - 3600 * hours) / 60)
   seconds <- dsec - 3600 * hours - 60 * minutes
@@ -88,6 +36,11 @@ until_now <- function(start) {
 }
 
 
+#' @title  transforma a vector of strings in a table do be printed
+#' @param txt vector of characters (strings)
+#' @param n.col number  of columns to be created
+#' @param num.digits number of decimal places to numeric values
+#' @importFrom knitr kable
 #' @export
 to_table <- function(txt, n.col, num.digits = 3) {
   n.col <- 4
@@ -107,7 +60,15 @@ to_table <- function(txt, n.col, num.digits = 3) {
 }
 
 
-
+#' @title Save ggplot graphics
+#' @param object ggplot graphic
+#' @param graphic_format format to be saved ("jpg", "png")
+#' @param file_path path and file name of graphic arquive to be saved
+#' @param units unit of measure ("cm", "inch")
+#' @param width width of graphic in units of measure
+#' @param height height  of graphic in units of measure
+#' @param dpi dot per inch resoluition
+#' @importFrom ggplot2 ggsave
 #' @export
 save_gggraphics <- function(object, graphic_format = c("jpg", "png"),
                          file_path, width = 15, height = 15,
@@ -120,6 +81,11 @@ save_gggraphics <- function(object, graphic_format = c("jpg", "png"),
   invisible(NULL)
 }
 
+#' @title calculates distance from points
+#' @param px vector of x coordinates
+#' @param py vector of y coordinates
+#' @param nx number of divisions in x axis
+#' @param ny number of divisions in y axis
 #' @export
 getdist_rectangle <- function(px, py, nx, ny) {
   maxy <- max(py)
@@ -175,4 +141,19 @@ library(parallel)
   finally = {
     parallel::stopCluster(cl)
   })
+}
+
+#create code for snipptes using information in clipboar
+clip2snippet <- function() {
+  x = readClipboard(format = 1, raw = F)
+  vs = character(length(x))
+  for (i in 1:length(x)) {
+    s1 = "`r paste('"
+    s2 = x[i]
+    if (s2 == "") {s2 = "\n"}
+    s3 = "')`"
+    vx[i] = paste(s1,s2,s3,sep = '')
+  }
+  vx
+  writeClipboard(vx,1)
 }

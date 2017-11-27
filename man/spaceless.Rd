@@ -2,7 +2,7 @@
 % Please edit documentation in R/misc2.R
 \name{spaceless}
 \alias{spaceless}
-\title{remove spaces from a character vector}
+\title{spaceless}
 \usage{
 spaceless(vx, symbol = "-")
 }

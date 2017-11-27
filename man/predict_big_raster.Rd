@@ -2,7 +2,7 @@
 % Please edit documentation in R/predict_big_raster.R
 \name{predict_big_raster}
 \alias{predict_big_raster}
-\title{Title Predict big raster}
+\title{predict big raster}
 \usage{
 predict_big_raster(model, st, path_file, suffix = "pred_", format = "GTiff",
   tiles = 5, cpu_cores = 7, verbose = TRUE)
