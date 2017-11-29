@@ -142,7 +142,7 @@ run_models <- function(df, models = ifelse(is.factor(df[, 1]),
         classification(
           df.train = df,
           index = index,
-          resample_ = rsample,
+ #         resample_ = rsample,
           classifier = models[j],
           preprocess = preprocess,
           nfolds = nfolds,
