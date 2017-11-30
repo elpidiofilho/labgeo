@@ -2,14 +2,18 @@
 % Please edit documentation in R/misc2.R
 \name{roi}
 \alias{roi}
-\title{code by Jeffrey Evans}
+\title{Create polygon of Region of Interest (ROI)
+code by Jeffrey Evans}
 \usage{
 roi(extent, project)
 }
 \arguments{
 \item{extent}{projection of region of  interest}
+
+\item{project}{projection string (ex: "+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs")}
 }
 \description{
+Create polygon of Region of Interest (ROI)
 code by Jeffrey Evans
 }
 \examples{

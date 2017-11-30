@@ -1,8 +1,10 @@
+#' Train Test split
 #' @title train test split
 #' @importFrom caret createDataPartition
 #' @param df dataframe
 #' @param p proportion between  train and test sets
 #' @param groups numbre of groups to be used in stratified sample
+#' @param seed seed
 #' @export
 train_test <- function(df, p = 0.75, groups = 10, seed = NULL){
   if (is.null(seed) == FALSE) {
@@ -47,13 +49,14 @@ comma_to_point <- function(x, tonumeric = TRUE) {
   }
 }
 
-# Create polygon of Region of Interest (ROI)
+#' Create polygon of Region of Interest (ROI)
 #' code by Jeffrey Evans
 #' @importFrom raster extent
 #' @importFrom sp proj4string
 #' @importFrom sp proj4string
 #' @importFrom raster extent
 #' @param extent projection of region of  interest
+#' @param project projection string (ex: "+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs")
 #' @export
 #' @examples
 #' \dontrun{
@@ -70,7 +73,7 @@ roi <- function(extent, project) {
 
 #' Retrive list of caret supported models
 #' @title caret models
-#' @param model.regression TRUE or FALSE
+#' @param regression model regression TRUE or FALSE
 #' @export
 #' @importFrom caret modelLookup
 caret_models <- function(regression = TRUE) {
@@ -82,7 +85,7 @@ caret_models <- function(regression = TRUE) {
   return(m)
 }
 
-# model_tags : return list of models tags supported by caret package
+#' model_tags : return list of models tags supported by caret package
 #' @title models tags
 #' @param is.regression if TRUE return regression models tags if FALSE return classification models tags
 #' @importFrom caret getModelInfo
@@ -125,7 +128,7 @@ select_model <- function(is.regression = TRUE, vtags = c("Boosting","Bagging" ))
 #' convert numeric data to factor
 #' @title Numeric to Factor
 #' @param vx vector of numeric
-#' @param percentil numeric the number of percintil to be splited the vector vx
+#' @param npercentil numeric the number of percintil to be splited the vector vx
 #' @return vector of factors
 #' @importFrom dplyr ntile
 #' @export
@@ -243,8 +246,9 @@ balanced_sample <- function(df, target, n = 100) {
 
 
 ## format code to create Rstudio snnipets
+#' @importFrom utils writeClipboard readClipboard
 code_snipett <- function() {
-  x = readClipboard(format = 1, raw = F)
+  x = utils::readClipboard(format = 1, raw = F)
   vs = character(length(x))
   for (i in 1:length(x)) {
     s1 = "`r paste('"
@@ -254,5 +258,5 @@ code_snipett <- function() {
     vx[i] = paste(s1,s2,s3,sep = '')
   }
   vx
-  writeClipboard(vx,1)
+  utils::writeClipboard(vx,1)
 }

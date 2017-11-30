@@ -11,3 +11,6 @@ hms_span(start, end)
 
 \item{end}{final time}
 }
+\description{
+format time data
+}

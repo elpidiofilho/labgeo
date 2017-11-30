@@ -27,6 +27,7 @@
 
 kriga <- function(df, target_var, nrep = 10,
                   name_px, name_py, p = 0.75, seed = NULL) {
+  repet= NULL
   ng <- nrep
   if (!is.null(seed)) {
     set.seed(seed)

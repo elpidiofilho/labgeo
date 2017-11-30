@@ -9,11 +9,11 @@ remove_var_na(df, d_count_na, tolerance = 75, verbose = TRUE)
 \arguments{
 \item{df}{dataframe}
 
+\item{d_count_na}{dataframe with NA information created by na.Count}
+
 \item{tolerance}{percentual value of tolerance of NA values in a variable}
 
 \item{verbose}{verbose}
-
-\item{d.count.na}{dataframe with NA information created by na.Count}
 }
 \description{
 This function Remove Columns with too many NA values
