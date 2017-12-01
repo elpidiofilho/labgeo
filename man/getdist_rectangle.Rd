@@ -15,6 +15,3 @@ getdist_rectangle(px, py, nx, ny)
 
 \item{ny}{number of divisions in y axis}
 }
-\description{
-Calculates distance from points
-}

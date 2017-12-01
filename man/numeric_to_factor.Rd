@@ -9,7 +9,7 @@ numeric_to_factor(vx, npercentil = 4)
 \arguments{
 \item{vx}{vector of numeric}
 
-\item{npercentil}{numeric the number of percintil to be splited the vector vx}
+\item{percentil}{numeric the number of percintil to be splited the vector vx}
 }
 \value{
 vector of factors

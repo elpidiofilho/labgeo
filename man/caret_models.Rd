@@ -7,7 +7,7 @@
 caret_models(regression = TRUE)
 }
 \arguments{
-\item{regression}{model regression TRUE or FALSE}
+\item{model.regression}{TRUE or FALSE}
 }
 \description{
 Retrive list of caret supported models

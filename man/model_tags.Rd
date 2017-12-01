@@ -9,6 +9,3 @@ model_tags(is.regression = TRUE)
 \arguments{
 \item{is.regression}{if TRUE return regression models tags if FALSE return classification models tags}
 }
-\description{
-model_tags : return list of models tags supported by caret package
-}

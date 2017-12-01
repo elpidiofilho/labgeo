@@ -17,7 +17,6 @@
 #' @param verbose  prints results during the execution of the function
 #' @importFrom utils flush.console
 #' @importFrom caret getModelInfo
-#' @importFrom utils install.packages installed.packages
 #' @keywords  models
 #' @author Elpidio Filho, \email{elpidio@ufv.br}
 #' @details details
@@ -77,12 +76,12 @@ run_models <- function(df, models = ifelse(is.factor(df[, 1]),
     vlib = vlib[-idx]
   }
   pkgList = unique(vlib)
-  inst <- vlib %in% utils::installed.packages()
+  inst <- vlib %in% installed.packages()
   if (length(pkgList[!inst]) > 0) {
     np = paste(pkgList[!inst], collapse = ", ")
     if (plataforma == "windows") {
       print(paste('packages ', np, ' will be installed'))
-      utils::install.packages(pkgList[!inst], dep=TRUE)
+      install.packages(pkgList[!inst], dep=TRUE)
     } else {
       print(paste('Warning : packages ', np, ' needs to installed'))
 

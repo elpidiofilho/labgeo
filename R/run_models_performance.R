@@ -115,7 +115,7 @@ pred_acc <- function(obs, pred) {
 
 
 rmp_classificacao <- function(fit_run_model, df_valida, verbose = FALSE) {
-  Freq <- var <- valor <- Prediction <- Reference <- model <- time <- NULL
+  Freq <- var <- valor <- Prediction <- Reference <- model <- NULL
   nm <- length(fit_run_model)
   summ_model <- dplyr::tibble(
     model = character(nm), fit = list(nm), dfpredobs = list(nm),

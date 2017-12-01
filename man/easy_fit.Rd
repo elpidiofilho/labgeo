@@ -4,7 +4,7 @@
 \alias{easy_fit}
 \title{This function performs the training of the chosen models to a group of outcomes (y)}
 \usage{
-easy_fit(dy, dx, nfolds = 10, repeats = NA, rsample = "cv",
+easy_fit(dy, dx, nfolds = 10, repeats = NA, resample_ = "cv",
   metric = ifelse(is.factor(dy[, 1]), "Kappa", "Rsquared"), cpu_cores = 7,
   tune_length = 5, fun_RFE = caret::rfFuncs, repeats_RFE = 1,
   metric_RFE = ifelse(is.factor(dy[, 1]), "Kappa", "Rsquared"),
@@ -21,7 +21,7 @@ easy_fit(dy, dx, nfolds = 10, repeats = NA, rsample = "cv",
 
 \item{repeats}{repeats}
 
-\item{rsample}{resample method 'boot', 'boot632', 'optimism_boot', 'boot_all', 'cv', 'repeatedcv', 'LOOCV', 'LGOCV','none', 'oob', 'timeslice', 'adaptive_cv', 'adaptive_boot', 'adaptive_LGOCV'}
+\item{resample_}{resample method 'boot', 'boot632', 'optimism_boot', 'boot_all', 'cv', 'repeatedcv', 'LOOCV', 'LGOCV','none', 'oob', 'timeslice', 'adaptive_cv', 'adaptive_boot', 'adaptive_LGOCV'}
 
 \item{metric}{metric used to evaluate model fit. For numeric outcome ("RMSE", "Rsquared)}
 
