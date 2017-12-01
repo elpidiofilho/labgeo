@@ -9,3 +9,6 @@ until_now(start)
 \arguments{
 \item{start}{initial time}
 }
+\description{
+calculate and format time until now
+}

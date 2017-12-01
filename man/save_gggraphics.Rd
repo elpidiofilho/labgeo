@@ -22,3 +22,6 @@ save_gggraphics(object, graphic_format = c("jpg", "png"), file_path,
 
 \item{dpi}{dot per inch resoluition}
 }
+\description{
+Save ggplot graphics
+}

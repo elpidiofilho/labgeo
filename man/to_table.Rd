@@ -2,7 +2,7 @@
 % Please edit documentation in R/misc.R
 \name{to_table}
 \alias{to_table}
-\title{transforma a vector of strings in a table do be printed}
+\title{transform a vector of strings in a table do be printed}
 \usage{
 to_table(txt, n.col, num.digits = 3)
 }
@@ -12,4 +12,7 @@ to_table(txt, n.col, num.digits = 3)
 \item{n.col}{number  of columns to be created}
 
 \item{num.digits}{number of decimal places to numeric values}
+}
+\description{
+create tablea from a list of strings
 }

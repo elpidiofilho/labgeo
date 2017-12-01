@@ -45,7 +45,7 @@ clean_names <- function(df) {
 #' @description This function Remove Columns with too many NA values
 #' @importFrom dplyr %>% filter select pull
 #' @param df dataframe
-#' @param d.count.na dataframe with NA information created by na.Count
+#' @param d_count_na dataframe with NA information created by na.Count
 #' @param tolerance percentual value of tolerance of NA values in a variable
 #' @param verbose verbose
 #' @details details

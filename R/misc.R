@@ -2,6 +2,7 @@
 ## code by Nathan Russell https://github.com/nathan-russell
 ## https://stackoverflow.com/questions/32100133/print-the-time-a-script-has-been-running-in-r
 
+#' format time data
 #' @title hms difrence time
 #' @param start initial time
 #' @param end final time
@@ -18,7 +19,7 @@ hms_span <- function(start, end) {
     collapse = ":")
 }
 
-
+#' calculate and format time until now
 #' @title time until now
 #' @param start initial time
 #' @export
@@ -35,8 +36,8 @@ until_now <- function(start) {
     collapse = ":")
 }
 
-
-#' @title  transforma a vector of strings in a table do be printed
+#' create tablea from a list of strings
+#' @title  transform a vector of strings in a table do be printed
 #' @param txt vector of characters (strings)
 #' @param n.col number  of columns to be created
 #' @param num.digits number of decimal places to numeric values
@@ -59,7 +60,7 @@ to_table <- function(txt, n.col, num.digits = 3) {
   return(dd)
 }
 
-
+#' Save ggplot graphics
 #' @title Save ggplot graphics
 #' @param object ggplot graphic
 #' @param graphic_format format to be saved ("jpg", "png")
@@ -80,7 +81,7 @@ save_gggraphics <- function(object, graphic_format = c("jpg", "png"),
   }
   invisible(NULL)
 }
-
+#' Calculates distance from points
 #' @title calculates distance from points
 #' @param px vector of x coordinates
 #' @param py vector of y coordinates
@@ -111,7 +112,8 @@ getdist_rectangle <- function(px, py, nx, ny) {
 
 
 
-
+#' @importFrom utils sessionInfo
+#' @importFrom parallel clusterExport makeCluster detectCores parLapply stopCluster
 mclapply.hack <- function(...) {
 library(parallel)
   size_of_list <- length(list(...)[[1]])

@@ -12,4 +12,9 @@ train_test(df, p = 0.75, groups = 10, seed = NULL)
 \item{p}{proportion between  train and test sets}
 
 \item{groups}{numbre of groups to be used in stratified sample}
+
+\item{seed}{seed}
+}
+\description{
+Train Test split
 }

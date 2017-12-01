@@ -27,7 +27,9 @@
 
 predict_to_map <- function(model_list, path_raster, raster_type = ".asc",
                            path_result, namefile, result_type= ".tif") {
+  .outcome <- NULL
   nm <- length(model_list)
+
   for (i in 1:nm) {
     inicio <- Sys.time()
     df_entrada = model_list[[i]]$trainingData %>% select(-.outcome)
