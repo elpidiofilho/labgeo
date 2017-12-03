@@ -39,25 +39,28 @@
 #' @export
 
 #importFrom viridis scale_color_viridis
-run_models_performance <- function(fit_run_model,
-                                   df_valida, verbose = FALSE) {
-  package_inicio <- search()[ifelse(
-    unlist(gregexpr("package:", search())) == 1, TRUE, FALSE)]
+run_models_performance <- function(fit_run_model, df_valida, verbose = FALSE) {
+  package_inicio <- search()[ifelse(unlist(gregexpr("package:", search())) == 1, TRUE, FALSE)]
+
   if (fit_run_model[[1]]$modelType == "Classification") {
     result <- rmp_classificacao(fit_run_model, df_valida, verbose)
-    package_fim <- search()[ifelse(
-      unlist(gregexpr("package:", search())) == 1, TRUE, FALSE)]
+    package_fim <- search()[ifelse(unlist(gregexpr("package:", search())) == 1, TRUE, FALSE)]
     package_list <- setdiff(package_fim, package_inicio)
-    if (length(package_list) > 0) for (package in package_list)
-      detach(package, character.only = TRUE)
+    if (length(package_list) > 0)  {
+      for (package in package_list) {
+        detach(package, character.only = TRUE)
+      }
+    }
     return(result)
   } else {
     result <- rmp_regressao(fit_run_model, df_valida, verbose)
-    package_fim <- search()[ifelse(unlist(
-      gregexpr("package:", search())) == 1, TRUE, FALSE)]
+    package_fim <- search()[ifelse(unlist(gregexpr("package:", search())) == 1, TRUE, FALSE)]
     package_list <- setdiff(package_fim, package_inicio)
-    if (length(package_list) > 0) for (package in package_list)
-      detach(package, character.only = TRUE)
+    if (length(package_list) > 0)  {
+      for (package in package_list) {
+        detach(package, character.only = TRUE)
+      }
+    }
     return(result)
   }
 }

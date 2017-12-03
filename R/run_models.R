@@ -105,6 +105,7 @@ run_models <- function(df, models = ifelse(is.factor(df[, 1]),
   inicio_total <- Sys.time()
   for (j in 1:length(models)) {
     if (verbose == TRUE) {
+
       #print(paste("Begin execution model :",models[j]))
       #flush.console()
       inicio <- Sys.time()
@@ -160,7 +161,7 @@ run_models <- function(df, models = ifelse(is.factor(df[, 1]),
           seeds = vector_seeds(seeds, repeats, nfolds))
         },
         error = function(e){
-          print()
+          print(" ")
           print(e)
           NULL
         }
@@ -205,13 +206,13 @@ vector_seeds <- function(seeds, repeats, nfolds){
   } else {
     set.seed(seeds)
     if (is.na(repeats) == FALSE) {
-      nel <- nfolds * repeats + 1
+      nel <- (nfolds * repeats) + 1
     } else {
       nel <- nfolds + 1
     }
     vseed <- vector(mode = "list", length = nel)
-    for (i in 1:nel) vseed[[i]] <- sample.int(n = nel * 100, nel * 10)
-    vseed[[nel + 1]] <- sample.int(nel * 100, 1)
+    for (i in 1:nel) vseed[[i]] <- sample.int(n = 100000,  1000)
+    vseed[[nel + 1]] <- sample.int(100000, 1)
   }
   return(vseed)
 }
