@@ -28,8 +28,8 @@ descriptive_stat_polygon <- function(df, poligon,
   # "p1", "p10", "p25","p33", "p66", "p75", "p90", "p99")
   polig <- NULL
   inicio <- Sys.time()
-  vpc <- c("p1", "p10", "p25", "p33", "p66", "p75", "p90", "p99")
-  #pdesc <- desc[vpc %in% desc]
+
+
   dfselnum <- df %>%
     dplyr::select_if(is.numeric)
 
@@ -59,7 +59,7 @@ descriptive_stat_polygon <- function(df, poligon,
 }
 
 px <- function(x, q) {
-  #n <- length(x)
+
   vs <- sort(x, method = "shell")
   np <- round(q * length(x), 0)
   if (np > 1) {
@@ -138,7 +138,7 @@ moda <- function(x) {
 
 
 sums <- function(x, pot) {
-  return( sum((x - mean(x)) ^ pot))
+  return( sum( (x - mean(x)) ^ pot))
 }
 
 kurtosis <- function(x) {
@@ -147,8 +147,8 @@ kurtosis <- function(x) {
   }
   summ <- sums(x, 4)
   n <- length(x)
-  p1 <- (n * (n + 1)) / ((n - 1) * (n - 2) * (n - 3))
-  p2 <- (3 * (n - 1) ^ 2) / ((n - 2) * (n - 3))
+  p1 <- (n * (n + 1)) / ( (n - 1) * (n - 2) * (n - 3))
+  p2 <- (3 * (n - 1) ^ 2) / ( (n - 2) * (n - 3))
   kurt <- (p1 * summ) - p2
   return(kurt)
 }
@@ -160,6 +160,6 @@ skewness <- function(x) {
   }
   summ <- sums(x, 3)
   n <- length(x)
-  skew <- (n / ((n - 1) * (n - 2))) * summ
+  skew <- (n / ( (n - 1) * (n - 2))) * summ
   return(skew)
 }

@@ -32,9 +32,9 @@ predict_to_map <- function(model_list, path_raster, raster_type = ".asc",
 
   for (i in 1:nm) {
     inicio <- Sys.time()
-    df_entrada = model_list[[i]]$trainingData %>% select(-.outcome)
-    #vsel <- model_list[[i]]$coefnames
-    vsel = names(df_entrada)
+    df_entrada <- model_list[[i]]$trainingData %>% select( -(.outcome))
+
+    vsel <- names(df_entrada)
     var_file_raster <- paste0(path_raster, vsel, raster_type)
     st <- raster::stack(var_file_raster)
     vachei <- !(names(st) %in% vsel)
@@ -79,13 +79,14 @@ predict_to_map <- function(model_list, path_raster, raster_type = ".asc",
 
 predict_stack_to_map <- function(model_list, stack_var,
                                  path_result, namefile, result_type= ".tif") {
+  .outcome <- NULL
   nm <- length(model_list)
   for (i in 1:nm) {
     inicio <- Sys.time()
-    df_entrada = model_list[[i]]$trainingData %>% select(-.outcome)
-    #vsel <- model_list[[i]]$coefnames
-    vsel = names(df_entrada)
-    vachei <- !((names(stack_var)) %in% vsel)
+    df_entrada <- model_list[[i]]$trainingData %>% select(-.outcome)
+
+    vsel <- names(df_entrada)
+    vachei <- !( (names(stack_var)) %in% vsel)
     if (sum(vachei) > 0) {
       print(paste(names(stack_var)[vachei]))
       stop("covariate not found")
@@ -94,9 +95,10 @@ predict_stack_to_map <- function(model_list, stack_var,
     filename <- gsub(" ", "_", paste0(path_result, namefile,
                                       name_model, result_type))
     print(paste("model : ", name_model, "file name", filename))
-    raster::predict(object = stack_var, model = model_list[[i]], na.rm = T,progress="text",
+    raster::predict(object = stack_var, model = model_list[[i]], na.rm = T,
+                    progress = "text",
                     filename = filename, overwrite = TRUE)
     print(paste( "time prediction", hms_span(inicio, Sys.time())))
-    endCluster()
+    raster::endCluster()
   }
 }

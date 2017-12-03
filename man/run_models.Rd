@@ -2,7 +2,7 @@
 % Please edit documentation in R/run_models.R
 \name{run_models}
 \alias{run_models}
-\title{This function run many models using the same data}
+\title{Run Models}
 \usage{
 run_models(df, models = ifelse(is.factor(df[, 1]), c("qda", "rf", "gbm",
   "C5.0"), c("lm", "cubist", "gbm", "rf")), formula = NULL,
@@ -32,7 +32,7 @@ run_models(df, models = ifelse(is.factor(df[, 1]), c("qda", "rf", "gbm",
 
 \item{cpu_cores}{Number of CPU cores to be used in parallel processing}
 
-\item{metric}{metric used to evaluate model fit. For numeric outcome ("RMSE", "Rsquared)}
+\item{metric}{metric used to evaluate model fit. For numeric outcome ('RMSE', 'Rsquared)}
 
 \item{seeds}{generate random seeds to allow reproductible results}
 
@@ -46,7 +46,7 @@ details
 }
 \examples{
 \dontrun{
-models = c("ridge", "rf", "cubist",'pls','pcr','foba','gbm','glmboost')
+models = c('ridge', 'rf', 'cubist','pls','pcr','foba','gbm','glmboost')
 fit_models = run_models(df,models = models)
 }
 }

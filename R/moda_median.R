@@ -15,7 +15,7 @@
 moda_median <- function(df) {
   Freq <- NULL
   DF <- as.data.frame(df)
-  # x = DF[,2]
+
   MODE2 <- function(x) {
     if (is.numeric(x) == FALSE) {
       df <- as.data.frame(table(x))

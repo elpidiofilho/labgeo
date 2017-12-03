@@ -5,7 +5,7 @@
 \title{Recursive Feature Elimination}
 \usage{
 recursive_feature_elimination(df, sizes = c(2:5, 10), index = NULL,
-  nfolds = 5, repeats = 1, fun = rfFuncs, cpu_cores = 6,
+  nfolds = 5, repeats = 1, fun = caret::rfFuncs, cpu_cores = 6,
   metric = ifelse(is.factor(df[, 1]), "Kappa", "Rsquared"), seeds = NULL,
   verbose = TRUE)
 }

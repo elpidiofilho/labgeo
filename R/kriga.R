@@ -27,12 +27,12 @@
 
 kriga <- function(df, target_var, nrep = 10,
                   name_px, name_py, p = 0.75, seed = NULL) {
-  repet= NULL
+  repet <- NULL
   ng <- nrep
   if (!is.null(seed)) {
     set.seed(seed)
   }
-  ld <- createDataPartition(df[, 1], times = ng)
+  ld <- caret::createDataPartition(df[, 1], times = ng)
   varsel <- c(target_var, name_px, name_py)
   nl <- length(ld)
   dsel <- df %>% select(one_of(varsel))

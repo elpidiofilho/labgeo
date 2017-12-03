@@ -14,3 +14,6 @@ hms_span(start, end)
 \description{
 format time data
 }
+\author{
+Nathan Russell https://github.com/nathan-russell
+}

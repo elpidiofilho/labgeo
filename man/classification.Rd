@@ -5,9 +5,9 @@
 \title{classification}
 \usage{
 classification(df.train, formula = NULL, preprocess = NULL,
-  classifier = "rf", nfolds = 10, repeats = 1, index = NULL,
-  cpu_cores = 4, tune_length = 5, metric = "Kappa", seeds = NULL,
-  verbose = FALSE)
+  classifier = "rf", rsample = "cv", nfolds = 10, repeats = 1,
+  index = NULL, cpu_cores = 4, tune_length = 5, metric = "Kappa",
+  seeds = NULL, verbose = FALSE)
 }
 \arguments{
 \item{df.train}{Training dataframe}
@@ -42,7 +42,21 @@ details
 }
 \examples{
 \dontrun{
-kappa_cv_evaluation(train,"rf",10,6)
+library(dplyr)
+library(labgeo)
+
+data("iris")
+d = iris \%>\% select(Species, everything())
+vt = train_test(df = d, p = 0.75,seed = 313)
+train = vt$train
+test = vt$test
+fit = classification(df.train = train, preprocess = c('center', 'scale'),
+                     classifier = 'rf', nfolds = 5, cpu_cores = 0,
+                     metric = 'Kappa', tune_length = 3,
+                     verbose = T )
+pred = predict(fit, test)
+obs = test[,1]
+plot_confusion_matrix(obs, pred)
 }
 }
 \author{

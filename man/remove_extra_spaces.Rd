@@ -2,7 +2,7 @@
 % Please edit documentation in R/misc2.R
 \name{remove_extra_spaces}
 \alias{remove_extra_spaces}
-\title{remove extra spaces}
+\title{Remove extra spaces}
 \usage{
 remove_extra_spaces(vx)
 }

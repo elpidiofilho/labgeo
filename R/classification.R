@@ -17,12 +17,27 @@
 #' @keywords Train kappa
 #' @importFrom parallel makePSOCKcluster stopCluster
 #' @importFrom doParallel registerDoParallel
+#' @importFrom foreach registerDoSEQ
 #' @importFrom caret trainControl train
 #' @details details
 #' @author Elpidio Filho, \email{elpidio@ufv.br}
 #' @examples
 #' \dontrun{
-#' kappa_cv_evaluation(train,"rf",10,6)
+#' library(dplyr)
+#' library(labgeo)
+#'
+#' data("iris")
+#' d = iris %>% select(Species, everything())
+#' vt = train_test(df = d, p = 0.75,seed = 313)
+#' train = vt$train
+#' test = vt$test
+#' fit = classification(df.train = train, preprocess = c('center', 'scale'),
+#'                      classifier = 'rf', nfolds = 5, cpu_cores = 0,
+#'                      metric = 'Kappa', tune_length = 3,
+#'                      verbose = T )
+#' pred = predict(fit, test)
+#' obs = test[,1]
+#' plot_confusion_matrix(obs, pred)
 #' }
 #' @export
 
@@ -30,6 +45,7 @@ classification <- function(df.train,
                            formula = NULL,
                            preprocess = NULL,
                            classifier = "rf",
+                           rsample = "cv",
                            nfolds = 10,
                            repeats = 1,
                            index = NULL,
@@ -38,28 +54,40 @@ classification <- function(df.train,
                            metric = "Kappa",
                            seeds = NULL,
                            verbose = FALSE) {
-  cl <- NULL
-  if (nfolds == 0) {
-    method <- "none"
-    tune_length <- 1
-  }
-  if (nfolds == nrow(df.train)) {
-    method <- "LOOCV"
-  } else {
-    method <- "CV"
-  }
-  #if (repeats > 1) method <- "repeatedcv"
+
   inicio <- Sys.time()
-  tc <- caret::trainControl(method = method,number = nfolds,
-                            index = index,  seeds = seeds )
+  e <- NULL
+  tc <- caret::trainControl( method = rsample, number = nfolds,
+                             index = index, seeds = seeds)
+  switch(rsample,
+         "cv" = {
+           tc <- caret::trainControl( method = rsample,
+                                      number = nfolds,
+                                      index = index, seeds = seeds)
+         },
+         "repeatedcv" = {
+           if ( ( repeats == "NA") | (repeats < 2)) {
+             stop("You must define the number of repeats greater then 1 ")
+           } else {
+             tc <- caret::trainControl( method = rsample, number = nfolds,
+                                        repeats = repeats,
+                                        index = index,  seeds = seeds)
+           }
+         },
+         "none" = {
+           tc <- caret::trainControl( method = rsample)
+         }
+  )
 
   if (cpu_cores > 0) {
     cl <- parallel::makePSOCKcluster(cpu_cores)
     doParallel::registerDoParallel(cl)
     on.exit(stopCluster(cl))
+  } else {
+    foreach::registerDoSEQ()
   }
 
-  #set.seed(313)
+
   if (is.null(formula == FALSE)) {
     fit <- tryCatch({
       suppressMessages(caret::train(
@@ -69,7 +97,12 @@ classification <- function(df.train,
         tuneLength = tune_length,
         preProcess = preprocess
       ))},
-      error = function(e) NULL)
+      error = {
+        print(" ")
+        print(e)
+        NULL
+      }
+    )
   } else {
     fit <- tryCatch({
       suppressMessages(caret::train(
@@ -81,12 +114,17 @@ classification <- function(df.train,
         tuneLength = tune_length,
         preProcess = preprocess
       ))},
-      error = function(e) NULL)
+      error = function(e){
+        print(" ");
+        print(e);
+        NULL
+      }
+    )
 
   }
-  #if (!is.null(cl)) {
-  #  parallel::stopCluster(cl)
-  #}
+
+
+
   if (verbose == TRUE & is.null(fit) == FALSE) {
     print(paste("Classification variable ", names(df.train)[1]))
     print(paste("time elapsed : ", hms_span(inicio, Sys.time())))

@@ -83,19 +83,19 @@ run_models_performance <- function(fit_run_model,
 #' @export
 pred_acc <- function(obs, pred) {
   mu <- mean(obs)
-  mbe <- mean(obs - pred) ## mean bias error ()
-  mae <- mean(abs(obs - pred)) ## mean absolute error
-  mse <- mean( (obs - pred) ^ 2) ## mean square error
-  rme <- mbe / mu * 100 ## relative mean error
-  rmae <- mae / mu * 100 ## relative mean absolute error
-  rmse <- sqrt(mse) ## root mean square error
-  rrmse <- rmse / mu * 100 ## relative root mean square error
+  mbe <- mean(obs - pred)
+  mae <- mean(abs(obs - pred))
+  mse <- mean( (obs - pred) ^ 2)
+  rme <- mbe / mu * 100
+  rmae <- mae / mu * 100
+  rmse <- sqrt(mse)
+  rrmse <- rmse / mu * 100
   mo <- mean( (obs - mu) ^ 2)
-  nse <- 1 - (mse / mo) ## Nash-Sutcliffe efficiency
+  nse <- 1 - (mse / mo)
   r2 <- stats::cor(obs, pred) ^ 2
-  #t <- stats::t.test(obs, pred, paired = TRUE)
+
   vecv <- (1 - sum( (obs - pred) ^ 2) /
-    sum( (obs - mean(obs)) ^ 2)) * 100 ## variance explained by models
+             sum( (obs - mean(obs)) ^ 2)) * 100
 
   list(
     mean_bias_error = mbe,
@@ -108,96 +108,110 @@ pred_acc <- function(obs, pred) {
     Nash_Sutcliffe_efficiency = nse,
     variance_explained_perc = vecv,
     rsquared = r2
-    #t_test = list(t)
+
   )
 }
 
 
 
 rmp_classificacao <- function(fit_run_model, df_valida, verbose = FALSE) {
+
   Freq <- var <- valor <- Prediction <- Reference <- model <- time <- NULL
+
   nm <- length(fit_run_model)
+
   summ_model <- dplyr::tibble(
     model = character(nm), fit = list(nm), dfpredobs = list(nm),
     accuracy = numeric(nm), Kappa = numeric(nm), time_run = numeric(nm),
     byclass = list(nm), cf = list(nm),
     g1 = list(nm), g2 = list(nm)
   )
-  cont = 1
+
+  cont <- 1
+
   for (i in 1:length(fit_run_model)) {
     fit_md <- fit_run_model[[i]]
     if (is.null(fit_md) == FALSE) {
-      v <- tryCatch({ predict(fit_md, df_valida)},
-                    error = function(e){NULL})
-      if (is.null(v) == FALSE) {
-        ddd <- data.frame(vobs = df_valida[, 1], vpred = v)
-        summ_model$model[i] <- fit_md$method
-        summ_model$fit[i] <- list(fit_md)
+      v <- tryCatch({
+        predict(fit_md, df_valida[, -1])
+      },
+      error = function(e){
+        print(" ")
+        print(e)
+        NULL
+      })
+    }
+    if (is.null(v) == FALSE) {
+      ddd <- data.frame(vobs = df_valida[, 1], vpred = v)
+      summ_model$model[cont] <- fit_md$method
+      summ_model$fit[cont] <- list(fit_md)
 
-        summ_model$dfpredobs[i] <- list(ddd)
-        cf <- caret::confusionMatrix(ddd$vpred,
-                                     ddd$vobs, mode = "everything")
-        summ_model$accuracy[i] <- cf$overall[1]
-        summ_model$Kappa[i] <- cf$overall[2]
-        summ_model$byclass[i] <- list(cf$byClass)
-        summ_model$time_run[i] = fit_md$times$everything[3]
-        summ_model$cf[i] <- list(cf$table)
-        cont = cont + 1
-      }
-      if (verbose == TRUE) {
-        confusion <- data.frame(cf$table)
-        freqcols <- prop.table(cf$table, 2) %>%
-          data.frame() %>%  dplyr::rename(freq_col = Freq)
-        freqrows <- prop.table(cf$table, 1) %>%
-          data.frame() %>%  dplyr::rename(freq_row = Freq)
-        ddd <- dplyr::left_join(freqcols, freqrows,
-                                by = c("Prediction", "Reference")) %>%
-          tidyr::gather(key = var, value = valor, -Prediction, -Reference)
+      summ_model$dfpredobs[cont] <- list(ddd)
+      cf <- caret::confusionMatrix(ddd$vpred,
+                                   ddd$vobs, mode = "everything")
+      summ_model$accuracy[cont] <- cf$overall[1]
+      summ_model$Kappa[cont] <- cf$overall[2]
+      summ_model$byclass[cont] <- list(cf$byClass)
+      summ_model$time_run[cont] <- fit_md$times$everything[3]
+      summ_model$cf[cont] <- list(cf$table)
+      cont <- cont + 1
+    }
+    if (verbose == TRUE) {
+      confusion <- data.frame(cf$table)
+      freqcols <- prop.table(cf$table, 2) %>%
+        data.frame() %>%  dplyr::rename(freq_col = Freq)
+      freqrows <- prop.table(cf$table, 1) %>%
+        data.frame() %>%  dplyr::rename(freq_row = Freq)
+      ddd <- dplyr::left_join(freqcols, freqrows,
+                              by = c("Prediction", "Reference")) %>%
+        tidyr::gather(key = var, value = valor, -Prediction, -Reference)
 
-        g1 <- ggplot(confusion, mapping = aes(x = Reference, y = Prediction)) +
-          geom_tile(colour = "white", fill = "lightyellow2") +
-          scale_x_discrete(name = "Actual Class") +
-          scale_y_discrete(name = "Predicted Class") +
-          geom_tile(
-            aes(x = Reference, y = Prediction),
-            data = subset(confusion, as.character(Reference) ==
-                            as.character(Prediction)),
-            color = "black", size = 1, fill = "red", alpha = 0.2
-          ) +
-          geom_text(aes(label = confusion$Freq), vjust = 1) +
-          ggtitle(fit_md$method)
+      g1 <- ggplot(confusion, mapping = aes(x = Reference, y = Prediction)) +
+        geom_tile(colour = "white", fill = "lightyellow2") +
+        scale_x_discrete(name = "Actual Class") +
+        scale_y_discrete(name = "Predicted Class") +
+        geom_tile(
+          aes(x = Reference, y = Prediction),
+          data = subset(confusion, as.character(Reference) ==
+                          as.character(Prediction)),
+          color = "black", size = 1, fill = "red", alpha = 0.2
+        ) +
+        geom_text(aes(label = confusion$Freq), vjust = 1) +
+        ggtitle(fit_md$method)
 
-        g2 <- ggplot(ddd, mapping = aes(x = Reference, y = Prediction)) +
-          geom_tile(aes(fill = valor), colour = "white") +
-          scale_fill_gradientn(
-            colours = c("lightyellow2", "white", "palegreen"),
-            values = rescale(c(0, 50, 100))
-          ) +
-          scale_x_discrete(name = "Actual Class") +
-          scale_y_discrete(name = "Predicted Class") +
-          labs(fill = "Normalized\nFrequency") +
-          geom_text(aes(label = round(ddd$valor, 2)), vjust = 1) +
-          ggtitle(fit_md$method) +
-          facet_wrap(~var)
-      }
-      if (verbose == TRUE) {
-        print(g1)
-        print(g2)
-      }
+      g2 <- ggplot(ddd, mapping = aes(x = Reference, y = Prediction)) +
+        geom_tile(aes(fill = valor), colour = "white") +
+        scale_fill_gradientn(
+          colours = c("lightyellow2", "white", "palegreen"),
+          values = rescale(c(0, 50, 100))
+        ) +
+        scale_x_discrete(name = "Actual Class") +
+        scale_y_discrete(name = "Predicted Class") +
+        labs(fill = "Normalized\nFrequency") +
+        geom_text(aes(label = round(ddd$valor, 2)), vjust = 1) +
+        ggtitle(fit_md$method) +
+        facet_wrap(~var)
+    }
+    if (verbose == TRUE) {
+      print(g1)
+      print(g2)
     }
   }
-  summ_model = summ_model[1:(cont-1), ]
+
+  summ_model <- summ_model[1:(cont - 1), ]
+
   if (verbose == TRUE) {
     dfresult <- data.frame(model = summ_model$model,
                            accuracy = summ_model$accuracy,
                            kappa = summ_model$Kappa,
                            time = summ_model$time_run) %>%
       print() %>% tidyr::gather(key = var, value = valor, -model, -time)
-    g1 = ggplot(dfresult, aes(x = model, y = valor, fill = model)) +
+    g1 <- ggplot(dfresult, aes(x = model, y = valor, fill = model)) +
       geom_col() +
       geom_text(aes(label = round(valor, 3)), size = 2.5, vjust = 1.5) +
-      theme(axis.text.x = element_text(angle = 45, hjust = 1), legend.position="none") +
-      facet_wrap(~ var, scales = 'free')
+      theme(axis.text.x = element_text(angle = 45, hjust = 1),
+            legend.position = "none") +
+      facet_wrap(~ var, scales = "free")
     print(g1)
   }
   return(summ_model)
@@ -205,8 +219,8 @@ rmp_classificacao <- function(fit_run_model, df_valida, verbose = FALSE) {
 
 
 
-## from scales package
-## https://github.com/hadley/scales
+
+
 
 zero_range <- function(x, tol = 1000 * .Machine$double.eps) {
   if (length(x) == 1)
@@ -253,8 +267,8 @@ rescale <- function(x, to = c(0, 1),
 #' @export
 #'
 plot_predict_observed_residual <- function(result, residual = FALSE) {
-vobs <- vpred <- residuo <- NULL
-    nr <- nrow(result)
+  vobs <- vpred <- residuo <- NULL
+  nr <- nrow(result)
   i <- 1
   for (i in 1:nr) {
     ddd <- result$dfpredobs[[i]]
@@ -290,7 +304,7 @@ vobs <- vpred <- residuo <- NULL
       guides(color = FALSE) +
       facet_wrap(~model, scales = "free") +  theme_bw()
   }
-  #print(g1)
+
   return(g1)
 }
 
@@ -304,33 +318,56 @@ vobs <- vpred <- residuo <- NULL
 #' @param obs  observed values
 #' @param pred predicted values
 #' @importFrom ggplot2 ggplot geom_tile geom_text scale_fill_gradient theme
-#' @importFrom ggplot2 ggtitle  element_text
+#' @importFrom ggplot2 ggtitle element_text aes
 #' @importFrom tidyr gather
 #' @importFrom caret confusionMatrix
 #' @importFrom tibble rownames_to_column
 #' @importFrom knitr kable
-#' @importFrom  kableExtra kable_styling scroll_box
+#' @importFrom kableExtra kable_styling scroll_box
 #' @export
-plot_confusio_matrix <- function(obs, pred) {
-  actual  <- prediction <- freq <- y_test <- preds <- NULL
-  caret::confusionMatrix(pred, obs)$table %>%
+plot_confusion_matrix <- function(obs, pred) {
+  actual  <- prediction <- freq  <- NULL
+  g1 <- caret::confusionMatrix(pred, obs)$table %>%
     prop.table(margin = 1) %>%
     as.data.frame.matrix() %>%
-    rownames_to_column(var = "actual") %>%
+    tibble::rownames_to_column(var = "actual") %>%
     tidyr::gather(key = "prediction", value = "freq", -actual) %>%
-    ggplot2::ggplot(aes(x = actual, y = prediction, fill = freq)) +
-    geom_tile() +
-    geom_text(aes(label = round(freq, 2)), size = 3, color = "gray20") +
-    scale_fill_gradient(low = "yellow", high = "red", limits = c(0, 1),
-                        name = "Relative Frequency") +
-    theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
-    ggtitle("Confusion Matrix - Random Forest (100 Trees)")
+    ggplot2::ggplot(ggplot2::aes(x = actual, y = prediction, fill = freq)) +
+    ggplot2::geom_tile() +
+    ggplot2::geom_text(ggplot2::aes(label = round(freq, 2)), size = 3,
+                       color = "gray20") +
+    ggplot2::scale_fill_gradient(low = "yellow", high = "red", limits = c(0, 1),
+                                 name = "Relative Frequency") +
+    ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 45, hjust = 1)) +
+    ggplot2::ggtitle("Confusion Matrix")
+  print(g1)
 
-  caret::confusionMatrix(y_test, preds)$table %>%
+  kp <- caret::confusionMatrix(pred, obs)$table %>%
     as.data.frame.matrix() %>%
-    kable("html") %>%
-    kable_styling(bootstrap_options = c("striped"), font_size = 8) %>%
-    scroll_box(height = "400px")
+    knitr::kable() %>%
+    kableExtra::kable_styling(bootstrap_options = c("striped"), font_size = 8)
+
+  print(" ")
+  print("----------------------------------------------------------")
+  print("confusion matrix")
+  print(kp)
+  ddd <- caret::confusionMatrix(pred, obs)$overall
+  dddf <- data.frame(names(ddd), ddd)
+  rownames(dddf) <- NULL
+  names(dddf) <- c("metric", "value")
+  print(" ")
+  print("----------------------------------------------------------")
+  print("metrics")
+  print(knitr::kable(dddf))
+
+  ddd <- data.frame( (caret::confusionMatrix(pred, obs))$byClass)
+  ddd <- data.frame(labgeo::abbrev_colnames(ddd, 16))
+  print(" ")
+  print("----------------------------------------------------------")
+  print("metrics")
+  print(knitr::kable(ddd[, 1:4]))
+  print(knitr::kable(ddd[, 5:8]))
+  print(knitr::kable(ddd[, 9:11]))
 }
 
 
@@ -339,26 +376,31 @@ rmp_regressao <- function(fit_run_model, df_valida, verbose = FALSE) {
     r2 <- var_exp <- var <- valor <- NULL
   nm <- length(fit_run_model)
   summ_model <- dplyr::tibble(
-    model = character(nm), r2 = numeric(nm), rmse = numeric(nm),
-    mbe = numeric(nm), mae = numeric(nm), nse = numeric(nm),
-    var_exp = numeric(nm), time = numeric(nm),
-    fit = list(nm), dfpredobs = list(nm)
+    model <- character(nm), r2 = numeric(nm), rmse = numeric(nm),
+    mbe <- numeric(nm), mae = numeric(nm), nse = numeric(nm),
+    var_exp <- numeric(nm), time = numeric(nm),
+    fit <- list(nm), dfpredobs = list(nm)
   )
 
-  cont = 1
+  cont <- 1
   for (i in 1:length(fit_run_model)) {
-
     fit_md <- fit_run_model[[i]]
     if (is.null(fit_md) == FALSE) {
-      v <- tryCatch({ predict(fit_md, df_valida[ ,-1])},
-                    error = function(e){
-                      print(paste( "Error:", conditionMessage(e)))
-                      return(NULL)})
-      if (is.null(v)==FALSE) {
-        v = unlist(v)
-        nr = nrow(df_valida)
-        ddd <- data.frame(model = rep(fit_md$method, nr), vobs = df_valida[, 1], vpred = v,
-                          residuo = abs(v - df_valida[, 1]), stringsAsFactors = FALSE) %>% na.omit()
+      v <- tryCatch({
+        predict(fit_md, df_valida[, -1])
+      },
+      error = function(e){
+        print(paste( "Error:", conditionMessage(e)))
+        return(NULL)
+      }
+      )
+      if (is.null(v) == FALSE) {
+        v <- unlist(v)
+        nr <- nrow(df_valida)
+        ddd <- data.frame(model = rep(fit_md$method, nr),
+                          vobs = df_valida[, 1], vpred = v,
+                          residuo = abs(v - df_valida[, 1]),
+                          stringsAsFactors = FALSE) %>% na.omit()
         names(ddd)[2] <- "vobs"
         names(ddd)[3] <- "vpred"
         names(ddd)[4] <- "residuo"
@@ -373,21 +415,23 @@ rmp_regressao <- function(fit_run_model, df_valida, verbose = FALSE) {
         summ_model$nse[cont] <- acc$Nash_Sutcliffe_efficiency
         summ_model$var_exp[cont] <- acc$variance_explained_perc
         summ_model$time[cont] <- fit_md$times$everything[3]
-        cont = cont + 1
+        cont <- cont + 1
       }
     }
   }
-  summ_model = summ_model[1:(cont-1), ]
+  summ_model <- summ_model[1:(cont - 1), ]
   if (verbose == TRUE) {
     dgr <- summ_model %>%
       select(model, mbe, mae, rmse, nse, r2, var_exp) %>% na.omit() %>%
       tidyr::gather(key = var, value = valor, -model)
 
-    g1 <- ggplot2::ggplot(dgr, aes(x = model , y = valor, fill = model)) +
+    g1 <- ggplot2::ggplot(dgr, aes(x = model, y = valor, fill = model)) +
       ggplot2::geom_col() +
-      ggplot2::geom_text(aes(label = round(valor, 3)), size = 2.5, vjust = 1.5) +
+      ggplot2::geom_text(aes(label = round(valor, 3)),
+                         size = 2.5, vjust = 1.5) +
       ggplot2::facet_wrap(~var, scales = "free") +
-      theme(axis.text.x = element_text(angle = 45, hjust = 1), legend.position="none") +
+      ggplot2::theme(axis.text.x = element_text(angle = 45, hjust = 1),
+                     legend.position = "none") +
       ggplot2::ggtitle(model)
     print(g1)
   }
@@ -406,8 +450,7 @@ rmp_regressao <- function(fit_run_model, df_valida, verbose = FALSE) {
 #' }
 #' @export
 null_model <- function(train_y, test_y) {
-  media = mean(train_y)
-  vr = postResample(rep(media, length(test_y)), test_y)
+  media <- mean(train_y)
+  vr <- caret::postResample(rep(media, length(test_y)), test_y)
   return(RMSE = vr[1])
 }
-

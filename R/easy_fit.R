@@ -40,13 +40,14 @@
 easy_fit <- function(dy, dx,
                      nfolds= 10,
                      repeats = NA,
-                     rsample = 'cv',
+                     rsample = "cv",
                      metric = ifelse(is.factor(dy[, 1]), "Kappa", "Rsquared"),
                      cpu_cores = 7,
                      tune_length = 5,
                      fun_RFE = caret::rfFuncs,
                      repeats_RFE = 1,
-                     metric_RFE = ifelse(is.factor(dy[, 1]), "Kappa", "Rsquared"),
+                     metric_RFE = ifelse(is.factor(dy[, 1]),
+                                         "Kappa", "Rsquared"),
                      nfolds_RFE = 5,
                      sizes_RFE = c(2:10, 15),
                      tolerance_RFE = 0,
@@ -57,7 +58,7 @@ easy_fit <- function(dy, dx,
                      verbose = TRUE) {
 
 
-  dy = data.frame(dy)
+  dy <- data.frame(dy)
   ny <- ncol(dy)
 
   list.model <- dplyr::tibble(

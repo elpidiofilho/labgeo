@@ -10,7 +10,8 @@ train_test <- function(df, p = 0.75, groups = 10, seed = NULL){
   if (is.null(seed) == FALSE) {
     set.seed(seed)
   }
-  vcdp <- caret::createDataPartition(df[, 1], p = p, list = FALSE, groups = groups)
+  vcdp <- caret::createDataPartition(df[, 1], p = p,
+                                     list = FALSE, groups = groups)
   train <- df[vcdp, ]
   test <- df[-vcdp, ]
   return(list(train = train, test = test))
@@ -18,7 +19,7 @@ train_test <- function(df, p = 0.75, groups = 10, seed = NULL){
 
 #' convert factor to dummy variables
 #' @title convert factor to dummy variables
-#' @importFrom caret dummyVars
+#' @importFrom caret dummyVars contr.ltfr
 #' @importFrom dplyr '%>%'
 #' @param df dataframe
 #' @export
@@ -29,6 +30,7 @@ factor_to_dummy <- function(df) {
 }
 
 #' remove extra spaces
+#' @title Remove extra spaces
 #' @param vx character vector
 #' @export
 remove_extra_spaces <- function(vx) {
@@ -78,9 +80,9 @@ roi <- function(extent, project) {
 #' @importFrom caret modelLookup
 caret_models <- function(regression = TRUE) {
   if (regression == FALSE) {
-    m <- unique(modelLookup()[modelLookup()$forClass, c(1)])
+    m <- unique(caret::modelLookup()[caret::modelLookup()$forClass, c(1)])
   } else {
-    m <- unique(modelLookup()[modelLookup()$forReg, c(1)])
+    m <- unique(caret::modelLookup()[caret::modelLookup()$forReg, c(1)])
   }
   return(m)
 }
@@ -91,12 +93,12 @@ caret_models <- function(regression = TRUE) {
 #' @importFrom caret getModelInfo
 #' @export
 model_tags <- function(is.regression = TRUE) {
-  models = caret_models(regression = is.regression)
-  vtag = character()
+  models <- caret_models(regression = is.regression)
+  vtag <- character()
   for (i in 1:length(models)) {
-    vi = caret::getModelInfo(models[i])
-    tags = vi[[1]]$tags
-    vtag = c(vtag, tags)
+    vi <- caret::getModelInfo(models[i])
+    tags <- vi[[1]]$tags
+    vtag <- c(vtag, tags)
   }
   return(sort(unique(vtag)))
 }
@@ -107,16 +109,17 @@ model_tags <- function(is.regression = TRUE) {
 #' @param vtags vetctor of taga used in model selection
 #' @importFrom caret getModelInfo
 #' @export
-select_model <- function(is.regression = TRUE, vtags = c("Boosting","Bagging" )){
-  models = caret_models(regression = is.regression)
-  vsel = character()
+select_model <- function(is.regression = TRUE,
+                         vtags = c("Boosting", "Bagging" )){
+  models <- caret_models(regression = is.regression)
+  vsel <- character()
   for (i  in 1:length(models)) {
-    vi = caret::getModelInfo(models[i])
-    tg = vi[[1]]$tags
+    vi <- caret::getModelInfo(models[i])
+    tg <- vi[[1]]$tags
     if (length(tg) > 0 ){
       if (is.null(tg) == FALSE){
         if (sum(tg %in% vtags) > 0){
-          vsel = c(vsel, models[i])
+          vsel <- c(vsel, models[i])
         }
       }
     }
@@ -151,7 +154,10 @@ remove_accentuation <- function(vx) {
 #' @param vx character vector
 #' @param symbol symbol or character to replace space
 #' @export
-spaceless <- function(vx, symbol = '-') {x <- gsub(" ", symbol, vx); vx}
+spaceless <- function(vx, symbol = "-") {
+  vx <- gsub(" ", symbol, vx)
+  return(vx)
+  }
 
 #' Eliminate symbol
 #' @title eliminate symbols from string
@@ -209,7 +215,8 @@ space_to_symbol <- function(vx, symbol){
 point_to_camel <- function(vx){
   capit <- function(vx) paste0(toupper(substring(vx, 1, 1)),
                               substring(vx, 2, nchar(vx)))
-  s1 = sapply(strsplit(vx, "\\."), function(vx) paste(capit(vx), collapse = ""))
+  s1 <- sapply(strsplit(vx, "\\."),
+               function(vx) paste(capit(vx), collapse = ""))
   return(s1)
 }
 
@@ -222,7 +229,8 @@ point_to_camel <- function(vx){
 #' @export
 
 abbrev_colnames <- function(df, maxlength) {
-  colnames(df) <- df %>%  names() %>% abbreviate()
+  `.` <- NULL
+  colnames(df) <- df %>%  names() %>% abbreviate(., maxlength)
   return(df)
 }
 
@@ -243,20 +251,41 @@ balanced_sample <- function(df, target, n = 100) {
   return(dfsample)
 }
 
+#' Group rare levels of a factor variable
+#' @param vx vector with factor variable
+#' @param min_num minumun frequency of a factor
+#' @param other name of group of rare factos
+#' @importFrom dplyr %>%  select filter pull
+#' @importFrom forcats fct_collapse
+#' @export
+#vx = train$solo_tex; min_num = 20; other = 99
+group_rare_levels <- function(vx, min_num = 20, other = 99) {
+  dd = vx
+  ddt =table(dd)
+  lev = as.character(names(table(dd)))
+  ddd = data.frame(lev = lev, freq = as.matrix(ddt))
+  ddd$lev = as.character(ddd$lev)
+  group_lev = ddd %>% dplyr::filter(freq < min_num) %>%  dplyr::pull(lev)
+  newf = forcats::fct_collapse(dd, other = group_lev)
+  return(newf)
+}
+
 
 
 ## format code to create Rstudio snnipets
 #' @importFrom utils writeClipboard readClipboard
 code_snipett <- function() {
-  x = utils::readClipboard(format = 1, raw = F)
-  vs = character(length(x))
+  x <- utils::readClipboard(format = 1, raw = F)
+
   for (i in 1:length(x)) {
-    s1 = "`r paste('"
-    s2 = x[i]
-    if (s2 == "") {s2 = "\n"}
-    s3 = "')`"
-    vx[i] = paste(s1,s2,s3,sep = '')
+    s1 <- "`r paste('"
+    s2 <- x[i]
+    if (s2 == "") s2 <- "\n"
+    s3 <- "')`"
+    vx[i] <- paste(s1, s2, s3, sep = "")
   }
   vx
-  utils::writeClipboard(vx,1)
+  utils::writeClipboard(vx, 1)
 }
+
+

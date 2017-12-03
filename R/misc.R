@@ -1,11 +1,12 @@
 
-## code by Nathan Russell https://github.com/nathan-russell
-## https://stackoverflow.com/questions/32100133/print-the-time-a-script-has-been-running-in-r
+
+
 
 #' format time data
 #' @title hms difrence time
 #' @param start initial time
 #' @param end final time
+#' @author  Nathan Russell https://github.com/nathan-russell
 #' @export
 hms_span <- function(start, end) {
   dsec <- as.numeric(difftime(end, start, units = "secs"))
@@ -24,7 +25,7 @@ hms_span <- function(start, end) {
 #' @param start initial time
 #' @export
 until_now <- function(start) {
-  end = Sys.time()
+  end <- Sys.time()
   dsec <- as.numeric(difftime(end, start, units =  "secs"))
   hours <- floor(dsec / 3600)
   minutes <- floor( (dsec - 3600 * hours) / 60)
@@ -147,15 +148,17 @@ library(parallel)
 
 #create code for snipptes using information in clipboar
 clip2snippet <- function() {
-  x = readClipboard(format = 1, raw = F)
-  vs = character(length(x))
+  x <- readClipboard(format = 1, raw = F)
+
   for (i in 1:length(x)) {
-    s1 = "`r paste('"
-    s2 = x[i]
-    if (s2 == "") {s2 = "\n"}
-    s3 = "')`"
-    vx[i] = paste(s1,s2,s3,sep = '')
+    s1 <- "`r paste('"
+    s2 <- x[i]
+    if (s2 == "") {
+      s2 <- "\n"
+    }
+    s3 <- "')`"
+    vx[i] <- paste(s1, s2, s3, sep = "")
   }
   vx
-  writeClipboard(vx,1)
+  writeClipboard(vx, 1)
 }

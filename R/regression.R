@@ -31,42 +31,45 @@
 
 
 regression <- function(df.train, formula = NULL, preprocess = NULL,
-                       regressor = "rf", rsample = 'cv', nfolds = 10,
+                       regressor = "rf", rsample = "cv", nfolds = 10,
                        repeats =  NA,  index = NULL, cpu_cores = 0,
                        tune_length = 5, metric = "Rsquared",
                        seeds = NULL, verbose = FALSE) {
-  resample_methods = c('boot', 'boot632', 'optimism_boot', 'boot_all', 'cv',
-                       'repeatedcv', 'LOOCV', 'LGOCV','none', 'oob',
-                       'timeslice', 'adaptive_cv', 'adaptive_boot', 'adaptive_LGOCV')
+  resample_methods <- c("boot", "boot632", "optimism_boot", "boot_all", "cv",
+                       "repeatedcv", "LOOCV", "LGOCV", "none", "oob",
+                       "timeslice", "adaptive_cv", "adaptive_boot",
+                       "adaptive_LGOCV")
 
-  if  (!any(rsample %in% resample_methods)) stop(paste("resample method", rsample, "does not exist"))
-  #lb = caret::getModelInfo(regressor, regex = FALSE)[[1]]$library
-#  if (is.null(lb) == FALSE){
-#    print(paste("loading library", lb))
-#    suppressPackageStartupMessages(library(lb, character.only = TRUE))
-#  }
+  if  (!any(rsample %in% resample_methods))
+    stop(paste("resample method", rsample, "does not exist"))
 
-  tc = caret::trainControl( method = rsample, number = nfolds,index = index, seeds = seeds)
+  tc <- caret::trainControl( method = rsample, number = nfolds,
+                             index = index, seeds = seeds)
   switch(rsample,
-         'cv' = {tc = caret::trainControl( method = rsample, number = nfolds,index = index, seeds = seeds)},
-         'repeatedcv' = { if ((repeats == 'NA') | (repeats < 2)) stop('You must define the number of repeats greater then 1 ')
-           tc <- caret::trainControl( method = rsample, number = nfolds, repeats = repeats,
-                                      index = index,  seeds = seeds)},
-         'none' = {tc <- caret::trainControl( method = rsample)})
-
+         "cv" = {
+           tc <- caret::trainControl( method = rsample, number = nfolds,
+                                     index = index, seeds = seeds)
+           },
+         "repeatedcv" = {
+           if ( (repeats == "NA") | (repeats < 2))
+             stop("You must define the number of repeats greater then 1 ")
+           tc <- caret::trainControl( method = rsample, number = nfolds,
+                                      repeats = repeats,
+                                      index = index,  seeds = seeds)
+           },
+         "none" = {
+           tc <- caret::trainControl( method = rsample)
+           }
+         )
 
   inicio <- Sys.time()
-#  if (resample_ == 'cv') {
-#    tc <- caret::trainControl( method = resample_, number = nfolds,
-#                               index = index, seeds = seeds)}
 
-
-  if (cpu_cores > 0) {
+    if (cpu_cores > 0) {
     cl <- parallel::makePSOCKcluster(cpu_cores)
     doParallel::registerDoParallel(cl)
     on.exit(stopCluster(cl))
   } else {
-    cl = NULL
+    cl <- NULL
     foreach::registerDoSEQ()
   }
 
@@ -77,23 +80,33 @@ regression <- function(df.train, formula = NULL, preprocess = NULL,
                    trControl = tc, tuneLength = tune_length,
                    preProcess = preprocess
       )},
-      error = function(e){print(e); NULL})
+      error = function(e) {
+        print(" ")
+        print(e)
+        NULL
+        }
+      )
   } else {
     fit <- tryCatch({
       caret::train(formula, data = df.train, method = regressor,
-                   metric = metric,trControl = tc, tuneLength = tune_length,
+                   metric = metric, trControl = tc, tuneLength = tune_length,
                    preProcess = preprocess
       )},
-      error = function(e){NULL})
+      error = function(e){
+        print(" ")
+        print(e)
+        NULL
+        }
+      )
   }
 
   if (!is.null(cl)) {
-    #parallel::stopCluster(cl)
+
     foreach::registerDoSEQ()
   }
   if (verbose == TRUE) {
-    #  print(paste("time elapsed : ", hms_span(inicio, Sys.time())))
-    #   print(caret::getTrainPerf(fit))
+    #print(paste("time elapsed : ", hms_span(inicio, Sys.time())))
+    # print(caret::getTrainPerf(fit))
   }
   return(fit)
 }

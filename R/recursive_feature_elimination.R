@@ -44,7 +44,7 @@ recursive_feature_elimination <- function(df,
                                           index = NULL,
                                           nfolds = 5,
                                           repeats = 1,
-                                          fun = rfFuncs,
+                                          fun = caret::rfFuncs,
                                           cpu_cores = 6,
                                           metric = ifelse(is.factor(df[, 1]),
                                                           "Kappa", "Rsquared"),
@@ -81,7 +81,8 @@ recursive_feature_elimination <- function(df,
   } else {
     set.seed(seeds)
     vseeds <- vector(mode = "list", length = (nfolds * repeats) + 1)
-    vseeds <- lapply(vseeds, function(x) sample.int(n = 100000, size = totalsize))
+    vseeds <- lapply(vseeds, function(x) sample.int(n = 100000,
+                                                    size = totalsize))
     vseeds[[nfolds * repeats + 1]] <- sample.int(n = 100000, size = 1)
     seedsvec <- vseeds
   }
@@ -95,7 +96,7 @@ recursive_feature_elimination <- function(df,
   if (is.null(index)) {
     fit.rfe <- caret::rfe(
       formula = formula, data = df, sizes = sizes, metric = metric,
-      rfeControl = rfeControl(
+      rfeControl = caret::rfeControl(
         method = "cv", functions = fun, number = nfolds,
         seeds = seedsvec
       )
@@ -103,7 +104,7 @@ recursive_feature_elimination <- function(df,
   } else {
     fit.rfe <- caret::rfe(
       formula = formula, data = df, sizes = sizes, metric = metric,
-      rfeControl = rfeControl(
+      rfeControl = caret::rfeControl(
         method = "cv", functions = fun, number = nfolds,
         seeds = seedsvec, index = index
       )
@@ -148,9 +149,9 @@ recursive_feature_elimination <- function(df,
 #' @export
 
 rfe_result <- function(fit.rfe) {
-  value <- variables <- tol <- Value <- Variables <- NULL
+  tol <- Value <- Variables <- NULL
   ddd <- fit.rfe$results
-  mx <- max(ddd$results[, 3])
+
   wm <- which.max(ddd[, 3])
   ddd$tol <- NA
   for (i in 1:wm) {
@@ -189,11 +190,10 @@ rfe_result <- function(fit.rfe) {
 #' @param maximize maximize (TREUE) or minimize (FALSE) the metric
 #' @importFrom caret pickSizeTolerance
 #' @export
-selec_rfe_tolerance <- function(fit, tolerance, metric = 'Rsquared', maximize = 'TRUE') {
+selec_rfe_tolerance <- function(fit, tolerance, metric = "Rsquared",
+                                maximize = "TRUE") {
   tol <- caret::pickSizeTolerance(fit$results, metric = "Rsquared",
                                   tol = tolerance, maximize = maximize)
   vs <- fit$optVariables[-c(1:tol)]
   return(vs)
 }
-
-
