@@ -32,15 +32,4 @@ devtools::install_github("hadley/multidplyr")
 
 2 - Install via github labgeo package devtools::install_github("elpidiofilho/labgeo")
 
-3 - Warning : Caret Version 6.0.77 in CRAN has a bug. Max Kuhn the caret pakcage manteiner write that a new CRAN version of caret with bug correctionm will be submitted around December. Use version 6.0.76 instead, until correction in CRAN.
-
-To install a prior version use the code bellow : 
-devtools::install_version("caret", version = "6.0-76") 
-
-*OR* 
-
-To install 6.0.77 with bug correction version from gitub :
-devtools::install_github('topepo/caret/pkg/caret')
-
-
  
