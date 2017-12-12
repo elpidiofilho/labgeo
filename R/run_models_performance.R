@@ -143,21 +143,22 @@ rmp_classificacao <- function(fit_run_model, df_valida, verbose = FALSE) {
         print(e)
         NULL
       })
-    }
-    if (is.null(v) == FALSE) {
-      ddd <- data.frame(vobs = df_valida[, 1], vpred = v)
-      summ_model$model[cont] <- fit_md$method
-      summ_model$fit[cont] <- list(fit_md)
 
-      summ_model$dfpredobs[cont] <- list(ddd)
-      cf <- caret::confusionMatrix(ddd$vpred,
-                                   ddd$vobs, mode = "everything")
-      summ_model$accuracy[cont] <- cf$overall[1]
-      summ_model$Kappa[cont] <- cf$overall[2]
-      summ_model$byclass[cont] <- list(cf$byClass)
-      summ_model$time_run[cont] <- fit_md$times$everything[3]
-      summ_model$cf[cont] <- list(cf$table)
-      cont <- cont + 1
+      if (is.null(v) == FALSE) {
+        ddd <- data.frame(vobs = df_valida[, 1], vpred = v)
+        summ_model$model[cont] <- fit_md$method
+        summ_model$fit[cont] <- list(fit_md)
+
+        summ_model$dfpredobs[cont] <- list(ddd)
+        cf <- caret::confusionMatrix(ddd$vpred,
+                                     ddd$vobs, mode = "everything")
+        summ_model$accuracy[cont] <- cf$overall[1]
+        summ_model$Kappa[cont] <- cf$overall[2]
+        summ_model$byclass[cont] <- list(cf$byClass)
+        summ_model$time_run[cont] <- fit_md$times$everything[3]
+        summ_model$cf[cont] <- list(cf$table)
+        cont <- cont + 1
+      }
     }
     if (verbose == TRUE) {
       confusion <- data.frame(cf$table)
