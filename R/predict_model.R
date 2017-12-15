@@ -35,18 +35,18 @@ predict_to_map <- function(model_list, path_raster, raster_type = ".asc",
     df_entrada <- model_list[[i]]$trainingData %>% select( -(.outcome))
 
     vsel <- names(df_entrada)
-    var_file_raster <- paste0(path_raster, vsel, raster_type)
+    var_file_raster <- paste0(path_raster, vsel, result_type)
     st <- raster::stack(var_file_raster)
     vachei <- !(names(st) %in% vsel)
     if (sum(vachei) > 0) {
       print(paste(names(st)[vachei]))
       stop("covariate no found")
     }
-    name_model <- model_list$model[i]
+    name_model <- model_list[[i]]$method
     filename <- gsub(" ", "_", paste0(path_result, namefile,
                                       name_model, result_type))
     print(paste("model : ", name_model, "file name", filename))
-    raster::predict(object = st, model = model_list$fit[[i]],
+    raster::predict(object = st, model = model_list[[i]],
                     filename = filename, overwrite = TRUE)
     print(paste( "time prediction", hms_span(inicio, Sys.time())))
   }
