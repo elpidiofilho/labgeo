@@ -58,7 +58,7 @@ band_ratio <- function(df) {
 band_ratio_to_raster <- function(raster_ext, raster_input_path,
                                  raster_output_path) {
   l <- list.files(path = raster_input_path,
-                  pattern = glob2rx(paste0("*", raster_ext)), full.names = T)
+                  pattern = glob2rx(paste0("*", raster_ext)), full.names = TRUE)
   st <- raster::stack(l)
   nf <- names(st)
   nb <- length(nf)

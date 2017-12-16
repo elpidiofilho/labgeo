@@ -29,7 +29,7 @@ predict_big_raster <- function(model, st, path_file, suffix = "pred_",
   tile_stack(st = st, dir = td, num_tiles = tiles)
   i <- 1
 
-  for (i in 1:length(model)) {
+  for (i in seq_along(model)) {
     nm <- model[[i]]$modelInfo$label
     tile_predict(
       model <- model[[i]], dir = td, cpu_cores = cpu_cores,
@@ -76,14 +76,14 @@ tile_stack <- function(st, dir, num_tiles, verbose = TRUE) {
   }
   inicio <- Sys.time()
   print("creating tiles")
-  for (i in 1:nrow(cs)) {
+  for (i in seq_len(nrow(cs))) {
     #  for(i in 1:4) {
     ex1 <- c(cs[i, 1], cs[i, 1] + dx, cs[i, 2], cs[i, 2] + dy)
     cl1 <- raster::crop(st, ex1)
     raster::writeRaster(
       x = cl1, format = "raster",
       filename = paste0(dir, "/tiles/tl_", i, ".grd"),
-      overwrite = T
+      overwrite = TRUE
     )
     if (verbose == TRUE) {
       pb$tick()
@@ -96,7 +96,7 @@ tile_predict <- function(model, dir, cpu_cores =  4, verbose = TRUE) {
   dir_tile <- paste0(dir, "/tiles/")
   dir_predict <- paste0(dir, "/predict/")
   rasters0 <- list.files(
-    dir_tile, pattern = "*.grd", full.names = F,
+    dir_tile, pattern = "*.grd", full.names = FALSE,
     recursive = TRUE
   )
   i <- 1
@@ -122,7 +122,7 @@ tile_predict <- function(model, dir, cpu_cores =  4, verbose = TRUE) {
       raster::res(rna) <- raster::res(rt)
       raster::writeRaster(
         rna, filename <- paste0(dir_predict, s1, ".tif"),
-        format = "GTiff", overwrite = T
+        format = "GTiff", overwrite = TRUE
       )
     } else {
       raster::beginCluster(cpu_cores)
@@ -130,7 +130,7 @@ tile_predict <- function(model, dir, cpu_cores =  4, verbose = TRUE) {
         rt, raster::predict, args = list(model),
         filename = paste0(dir_predict, s1, ".tif"),
         format = "GTiff",
-        progress = T, overwrite = T
+        progress = TRUE, overwrite = TRUE
       )
       raster::endCluster()
     }
@@ -150,7 +150,7 @@ mosaic_tiles <- function(dir, name_mosaic, format = "GTiff") {
     full.names = TRUE, recursive = TRUE
   )
   rast.list <- list()
-  for (i in 1:length(rasters1)) {
+  for (i in seq_along(rasters1)) {
     rast.list[i] <- list(raster(rasters1[i]))
   }
   rast.list$fun <- mean

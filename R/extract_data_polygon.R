@@ -32,7 +32,7 @@ extract_data_polygon <- function(path_raster, raster_type = ".asc",
   inicio <- Sys.time()
   l <- list.files(
     path_raster, pattern = raster_type,
-    include.dirs = T, full.names = T
+    include.dirs = TRUE, full.names = TRUE
   )
   st <- raster::stack(l)
   shpfile <- rgdal::readOGR(path_poligon, name_poligon)

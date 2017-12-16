@@ -54,7 +54,7 @@ run_models <- function(df, models = ifelse(is.factor(df[, 1]),
   }
 
   vlib <- character()
-  for (i in 1:length(models)) {
+  for (i in seq_along(models)) {
     md <- caret::getModelInfo(models[i], regex = FALSE)[[1]]
     vlib <- c(vlib, md$library)
     if (length(md) == 0) {
@@ -113,7 +113,7 @@ run_models <- function(df, models = ifelse(is.factor(df[, 1]),
   failed <- character()
 
   inicio_total <- Sys.time()
-  for (j in 1:length(models)) {
+  for (j in seq_along(models)) {
     if (verbose == TRUE) {
 
       inicio <- Sys.time()

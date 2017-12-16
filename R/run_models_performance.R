@@ -133,7 +133,7 @@ rmp_classificacao <- function(fit_run_model, df_valida, verbose = FALSE) {
 
   cont <- 1
 
-  for (i in 1:length(fit_run_model)) {
+  for (i in seq_along(fit_run_model)) {
     fit_md <- fit_run_model[[i]]
     if (is.null(fit_md) == FALSE) {
       v <- tryCatch({
@@ -412,7 +412,7 @@ rmp_regressao <- function(fit_run_model, df_valida, verbose = FALSE) {
   )
 
   cont <- 1
-  for (i in 1:length(fit_run_model)) {
+  for (i in seq_along(fit_run_model)) {
     fit_md <- fit_run_model[[i]]
     if (is.null(fit_md) == FALSE) {
       v <- tryCatch({

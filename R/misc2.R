@@ -97,7 +97,7 @@ caret_models <- function(regression = TRUE) {
 model_tags <- function(is.regression = TRUE) {
   models <- caret_models(regression = is.regression)
   vtag <- character()
-  for (i in 1:length(models)) {
+  for (i in seq_along(models)) {
     vi <- caret::getModelInfo(models[i])
     tags <- vi[[1]]$tags
     vtag <- c(vtag, tags)
@@ -115,7 +115,7 @@ select_model <- function(is.regression = TRUE,
                          vtags = c("Boosting", "Bagging")) {
   models <- caret_models(regression = is.regression)
   vsel <- character()
-  for (i in 1:length(models)) {
+  for (i in seq_along(models)) {
     vi <- caret::getModelInfo(models[i])
     tg <- vi[[1]]$tags
     if (length(tg) > 0) {
@@ -196,7 +196,7 @@ eliminate_symbol <- function(vx, replace = " ") {
 #' @return vector of character with first symbol removed
 #' @export
 remove_first_symbol <- function(vx) {
-  return(gsub("^\\P{L}*", "", vx, perl = T))
+  return(gsub("^\\P{L}*", "", vx, perl = TRUE))
 }
 
 
@@ -253,7 +253,7 @@ abbrev_colnames <- function(df, maxlength) {
 balanced_sample <- function(df, target, n = 100) {
   dfsample <- df %>%
     group_by(!! target) %>%
-    sample_n(size = n, replace = T) %>%
+    sample_n(size = n, replace = TRUE) %>%
     na.omit() %>%
     data.frame()
   return(dfsample)
@@ -287,9 +287,9 @@ group_rare_levels <- function(vx, min_num = 20, other = 99) {
 ## format code to create Rstudio snnipets
 #' @importFrom utils writeClipboard readClipboard
 code_snipett <- function() {
-  x <- utils::readClipboard(format = 1, raw = F)
+  x <- utils::readClipboard(format = 1, raw = FALSE)
 
-  for (i in 1:length(x)) {
+  for (i in seq_along(x)) {
     s1 <- "`r paste('"
     s2 <- x[i]
     if (s2 == "") s2 <- "\n"

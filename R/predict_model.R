@@ -102,7 +102,7 @@ predict_stack_to_map <- function(model_list, stack_var,
     ))
     print(paste("model : ", name_model, "file name", filename))
     raster::predict(
-      object = stack_var, model = model_list[[i]], na.rm = T,
+      object = stack_var, model = model_list[[i]], na.rm = TRUE,
       progress = "text",
       filename = filename, overwrite = TRUE
     )

@@ -158,9 +158,9 @@ mclapply.hack <- function(...) {
 
 # create code for snipptes using information in clipboar
 clip2snippet <- function() {
-  x <- readClipboard(format = 1, raw = F)
+  x <- readClipboard(format = 1, raw = FALSE)
 
-  for (i in 1:length(x)) {
+  for (i in seq_along(x)) {
     s1 <- "`r paste('"
     s2 <- x[i]
     if (s2 == "") {

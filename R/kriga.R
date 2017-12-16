@@ -54,7 +54,7 @@ kriga <- function(df, target_var, nrep = 10,
     repet = numeric(ng),
     r2 = numeric(ng), rmse = numeric(ng),
     mae = numeric(ng), mbe = numeric(ng),
-    stringsAsFactors = F
+    stringsAsFactors = FALSE
   )
   cont <- 1
   i <- 1
