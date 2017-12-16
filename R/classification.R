@@ -54,29 +54,34 @@ classification <- function(df.train,
                            metric = "Kappa",
                            seeds = NULL,
                            verbose = FALSE) {
-
   inicio <- Sys.time()
   e <- NULL
-  tc <- caret::trainControl( method = rsample, number = nfolds,
-                             index = index, seeds = seeds)
+  tc <- caret::trainControl(
+    method = rsample, number = nfolds,
+    index = index, seeds = seeds
+  )
   switch(rsample,
-         "cv" = {
-           tc <- caret::trainControl( method = rsample,
-                                      number = nfolds,
-                                      index = index, seeds = seeds)
-         },
-         "repeatedcv" = {
-           if ( ( repeats == "NA") | (repeats < 2)) {
-             stop("You must define the number of repeats greater then 1 ")
-           } else {
-             tc <- caret::trainControl( method = rsample, number = nfolds,
-                                        repeats = repeats,
-                                        index = index,  seeds = seeds)
-           }
-         },
-         "none" = {
-           tc <- caret::trainControl( method = rsample)
-         }
+    "cv" = {
+      tc <- caret::trainControl(
+        method = rsample,
+        number = nfolds,
+        index = index, seeds = seeds
+      )
+    },
+    "repeatedcv" = {
+      if ( (repeats == "NA") | (repeats < 2)) {
+        stop("You must define the number of repeats greater then 1 ")
+      } else {
+        tc <- caret::trainControl(
+          method = rsample, number = nfolds,
+          repeats = repeats,
+          index = index, seeds = seeds
+        )
+      }
+    },
+    "none" = {
+      tc <- caret::trainControl(method = rsample)
+    }
   )
 
   if (cpu_cores > 0) {
@@ -96,12 +101,13 @@ classification <- function(df.train,
         trControl = tc,
         tuneLength = tune_length,
         preProcess = preprocess
-      ))},
-      error = {
-        print(" ")
-        print(e)
-        NULL
-      }
+      ))
+    },
+    error = {
+      print(" ")
+      print(e)
+      NULL
+    }
     )
   } else {
     fit <- tryCatch({
@@ -113,14 +119,14 @@ classification <- function(df.train,
         trControl = tc,
         tuneLength = tune_length,
         preProcess = preprocess
-      ))},
-      error = function(e){
-        print(" ");
-        print(e);
-        NULL
-      }
+      ))
+    },
+    error = function(e) {
+      print(" ")
+      print(e)
+      NULL
+    }
     )
-
   }
 
 

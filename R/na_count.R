@@ -32,12 +32,14 @@ na_count <- function(df, verbose = TRUE) {
   na_count$na_absolute <- sapply(df, function(y) sum(length(which(is.na(y)))))
   na_count$na_relative <- na_count$na_absolute / nrow(df) * 100
   na_count$uniques_values <- sapply(df, function(y) length(unique(y)))
-  na_count$classe_NA <- cut( (na_count$na_relative + 0.001),
-                            breaks = c(0, 25, 50, 75, 100))
+  na_count$classe_NA <- cut(
+    (na_count$na_relative + 0.001),
+    breaks = c(0, 25, 50, 75, 100)
+  )
 
   if (verbose == TRUE) {
     nr <- nrow(df)
-    na_filter <- na_count %>% filter(na_absolute  > 0)
+    na_filter <- na_count %>% filter(na_absolute > 0)
     g1 <- ggplot2::ggplot(data = na_filter, ggplot2::aes(
       x = stats::reorder(variav, na_relative),
       y = na_relative,
@@ -53,8 +55,10 @@ na_count <- function(df, verbose = TRUE) {
     )) +
       ggplot2::geom_col() + ggplot2::ylab("Valid Samples") +
       ggplot2::xlab("Variables") +
-      ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90,
-                                                         hjust = 1)) +
+      ggplot2::theme(axis.text.x = ggplot2::element_text(
+        angle = 90,
+        hjust = 1
+      )) +
       ggplot2::labs(fill = "% NA")
     print(g1)
     print(g2)

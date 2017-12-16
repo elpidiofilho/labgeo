@@ -41,7 +41,8 @@ easy_fit <- function(dy, dx,
                      nfolds= 10,
                      repeats = NA,
                      rsample = "cv",
-                     metric = ifelse(is.factor(dy[, 1]), "Kappa", "Rsquared"),
+                     metric = ifelse(is.factor(dy[, 1]),
+                                     "Kappa", "Rsquared"),
                      cpu_cores = 7,
                      tune_length = 5,
                      fun_RFE = caret::rfFuncs,
@@ -56,14 +57,13 @@ easy_fit <- function(dy, dx,
                      preprocess = NULL,
                      seeds = NULL,
                      verbose = TRUE) {
-
-
   dy <- data.frame(dy)
   ny <- ncol(dy)
 
   list.model <- dplyr::tibble(
     var = character(ny), selec = character(ny),
-    models = vector(mode = "list", length = ny))
+    models = vector(mode = "list", length = ny)
+  )
 
   vm <- caret::dummyVars(~ ., data = dx)
   dxm <- predict(vm, dx) %>%

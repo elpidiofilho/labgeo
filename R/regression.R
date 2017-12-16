@@ -32,39 +32,49 @@
 
 regression <- function(df.train, formula = NULL, preprocess = NULL,
                        regressor = "rf", rsample = "cv", nfolds = 10,
-                       repeats =  NA,  index = NULL, cpu_cores = 0,
+                       repeats =  NA, index = NULL, cpu_cores = 0,
                        tune_length = 5, metric = "Rsquared",
                        seeds = NULL, verbose = FALSE) {
-  resample_methods <- c("boot", "boot632", "optimism_boot", "boot_all", "cv",
-                       "repeatedcv", "LOOCV", "LGOCV", "none", "oob",
-                       "timeslice", "adaptive_cv", "adaptive_boot",
-                       "adaptive_LGOCV")
+  resample_methods <- c(
+    "boot", "boot632", "optimism_boot", "boot_all", "cv",
+    "repeatedcv", "LOOCV", "LGOCV", "none", "oob",
+    "timeslice", "adaptive_cv", "adaptive_boot",
+    "adaptive_LGOCV"
+  )
 
-  if  (!any(rsample %in% resample_methods))
+  if (!any(rsample %in% resample_methods)) {
     stop(paste("resample method", rsample, "does not exist"))
+  }
 
-  tc <- caret::trainControl( method = rsample, number = nfolds,
-                             index = index, seeds = seeds)
+  tc <- caret::trainControl(
+    method = rsample, number = nfolds,
+    index = index, seeds = seeds
+  )
   switch(rsample,
-         "cv" = {
-           tc <- caret::trainControl( method = rsample, number = nfolds,
-                                     index = index, seeds = seeds)
-           },
-         "repeatedcv" = {
-           if ( (repeats == "NA") | (repeats < 2))
-             stop("You must define the number of repeats greater then 1 ")
-           tc <- caret::trainControl( method = rsample, number = nfolds,
-                                      repeats = repeats,
-                                      index = index,  seeds = seeds)
-           },
-         "none" = {
-           tc <- caret::trainControl( method = rsample)
-           }
-         )
+    "cv" = {
+      tc <- caret::trainControl(
+        method = rsample, number = nfolds,
+        index = index, seeds = seeds
+      )
+    },
+    "repeatedcv" = {
+      if ((repeats == "NA") | (repeats < 2)) {
+        stop("You must define the number of repeats greater then 1 ")
+      }
+      tc <- caret::trainControl(
+        method = rsample, number = nfolds,
+        repeats = repeats,
+        index = index, seeds = seeds
+      )
+    },
+    "none" = {
+      tc <- caret::trainControl(method = rsample)
+    }
+  )
 
-  inicio <- Sys.time()
+  #inicio <- Sys.time()
 
-    if (cpu_cores > 0) {
+  if (cpu_cores > 0) {
     cl <- parallel::makePSOCKcluster(cpu_cores)
     doParallel::registerDoParallel(cl)
     on.exit(stopCluster(cl))
@@ -75,37 +85,40 @@ regression <- function(df.train, formula = NULL, preprocess = NULL,
 
   if (is.null(formula)) {
     fit <- tryCatch({
-      caret::train(x = df.train[, -1], y = df.train[, 1],
-                   method = regressor, metric = metric,
-                   trControl = tc, tuneLength = tune_length,
-                   preProcess = preprocess
-      )},
+        caret::train(
+          x = df.train[, -1], y = df.train[, 1],
+          method = regressor, metric = metric,
+          trControl = tc, tuneLength = tune_length,
+          preProcess = preprocess
+        )
+      },
       error = function(e) {
         print(" ")
         print(e)
         NULL
-        }
-      )
+      }
+    )
   } else {
     fit <- tryCatch({
-      caret::train(formula, data = df.train, method = regressor,
-                   metric = metric, trControl = tc, tuneLength = tune_length,
-                   preProcess = preprocess
-      )},
-      error = function(e){
+        caret::train(
+          formula, data = df.train, method = regressor,
+          metric = metric, trControl = tc, tuneLength = tune_length,
+          preProcess = preprocess
+        )
+      },
+      error = function(e) {
         print(" ")
         print(e)
         NULL
-        }
-      )
+      }
+    )
   }
 
   if (!is.null(cl)) {
-
     foreach::registerDoSEQ()
   }
   if (verbose == TRUE) {
-    #print(paste("time elapsed : ", hms_span(inicio, Sys.time())))
+    # print(paste("time elapsed : ", hms_span(inicio, Sys.time())))
     # print(caret::getTrainPerf(fit))
   }
   return(fit)

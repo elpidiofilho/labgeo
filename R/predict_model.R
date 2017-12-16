@@ -43,12 +43,16 @@ predict_to_map <- function(model_list, path_raster, raster_type = ".asc",
       stop("covariate no found")
     }
     name_model <- model_list[[i]]$method
-    filename <- gsub(" ", "_", paste0(path_result, namefile,
-                                      name_model, result_type))
+    filename <- gsub(" ", "_", paste0(
+      path_result, namefile,
+      name_model, result_type
+    ))
     print(paste("model : ", name_model, "file name", filename))
-    raster::predict(object = st, model = model_list[[i]],
-                    filename = filename, overwrite = TRUE)
-    print(paste( "time prediction", hms_span(inicio, Sys.time())))
+    raster::predict(
+      object = st, model = model_list[[i]],
+      filename = filename, overwrite = TRUE
+    )
+    print(paste("time prediction", hms_span(inicio, Sys.time())))
   }
 }
 
@@ -92,13 +96,17 @@ predict_stack_to_map <- function(model_list, stack_var,
       stop("covariate not found")
     }
     name_model <- model_list[[i]]$modelInfo$label
-    filename <- gsub(" ", "_", paste0(path_result, namefile,
-                                      name_model, result_type))
+    filename <- gsub(" ", "_", paste0(
+      path_result, namefile,
+      name_model, result_type
+    ))
     print(paste("model : ", name_model, "file name", filename))
-    raster::predict(object = stack_var, model = model_list[[i]], na.rm = T,
-                    progress = "text",
-                    filename = filename, overwrite = TRUE)
-    print(paste( "time prediction", hms_span(inicio, Sys.time())))
+    raster::predict(
+      object = stack_var, model = model_list[[i]], na.rm = T,
+      progress = "text",
+      filename = filename, overwrite = TRUE
+    )
+    print(paste("time prediction", hms_span(inicio, Sys.time())))
     raster::endCluster()
   }
 }

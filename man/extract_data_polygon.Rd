@@ -9,8 +9,6 @@ extract_data_polygon(path_raster, raster_type = ".asc", path_poligon,
   remove_NA = TRUE)
 }
 \arguments{
-\item{path_raster}{Path para a pasta onde estão os rasters}
-
 \item{raster_type}{Tipo do arquivo raster a ser lido (.tif, .asc, .img ... )}
 
 \item{path_poligon}{Path para a pasta onde esta os poligonos da amostragem}

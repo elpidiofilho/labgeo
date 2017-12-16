@@ -30,20 +30,22 @@
 #' }
 
 run_models <- function(df, models = ifelse(is.factor(df[, 1]),
-                                           c("qda", "rf", "gbm", "C5.0"),
-                                           c("lm", "cubist", "gbm", "rf")),
-                       formula = NULL,
-                       preprocess = NULL,
-                       index = NULL,
-                       rsample = "cv",
-                       nfolds = 10,
-                       repeats = NA,
-                       tune_length = 5,
-                       cpu_cores = 0,
-                       metric = ifelse(is.factor(df[, 1]),
-                                       "Kappa", "Rsquared"),
-                       seeds = NULL,
-                       verbose = TRUE) {
+                       c("qda", "rf", "gbm", "C5.0"),
+                       c("lm", "cubist", "gbm", "rf")
+                     ),
+                     formula = NULL,
+                     preprocess = NULL,
+                     index = NULL,
+                     rsample = "cv",
+                     nfolds = 10,
+                     repeats = NA,
+                     tune_length = 5,
+                     cpu_cores = 0,
+                     metric = ifelse(is.factor(df[, 1]),
+                       "Kappa", "Rsquared"
+                     ),
+                     seeds = NULL,
+                     verbose = TRUE) {
   if (class(df) != "data.frame") stop("df is not a data frame.")
   if (is.factor(df[, 1]) == TRUE) {
     mod <- 1
@@ -54,19 +56,27 @@ run_models <- function(df, models = ifelse(is.factor(df[, 1]),
   vlib <- character()
   for (i in 1:length(models)) {
     md <- caret::getModelInfo(models[i], regex = FALSE)[[1]]
-    vlib <-  c(vlib, md$library)
+    vlib <- c(vlib, md$library)
     if (length(md) == 0) {
-      stop(paste("Model", models[i],
-                 "is not in caret's built-in library"), call. = FALSE)
+      stop(paste(
+        "Model", models[i],
+        "is not in caret's built-in library"
+      ), call. = FALSE)
     } else {
-      if (mod == 0 ) {
-        if (!("Regression" %in% md$type))
-          stop(paste("Model", models[i],
-                     "is not in a regression model"), call. = FALSE)
+      if (mod == 0) {
+        if (!("Regression" %in% md$type)) {
+          stop(paste(
+            "Model", models[i],
+            "is not in a regression model"
+          ), call. = FALSE)
+        }
       } else {
-        if (!("Classification" %in% md$type))
-          stop(paste("Model", models[i],
-                     "is not in a classification model"), call. = FALSE)
+        if (!("Classification" %in% md$type)) {
+          stop(paste(
+            "Model", models[i],
+            "is not in a classification model"
+          ), call. = FALSE)
+        }
       }
     }
   }
@@ -74,7 +84,7 @@ run_models <- function(df, models = ifelse(is.factor(df[, 1]),
   plataforma <- .Platform$OS.type
 
   remove <- c("NA", " ")
-  idx <- which(vlib %in% remove )
+  idx <- which(vlib %in% remove)
   if (length(idx) > 0) {
     vlib <- vlib[-idx]
   }
@@ -87,12 +97,12 @@ run_models <- function(df, models = ifelse(is.factor(df[, 1]),
       utils::install.packages(pkglist[!inst], dep = TRUE)
     } else {
       print(paste("Warning : packages ", np, " needs to installed"))
-
     }
   }
 
   package.inicio <- search()[ifelse(unlist(
-    gregexpr("package:", search())) == 1, TRUE, FALSE)]
+    gregexpr("package:", search())
+  ) == 1, TRUE, FALSE)]
 
   if (verbose == TRUE) {
     label1 <- models[i]
@@ -106,8 +116,6 @@ run_models <- function(df, models = ifelse(is.factor(df[, 1]),
   for (j in 1:length(models)) {
     if (verbose == TRUE) {
 
-      #print(paste("Begin execution model :",models[j]))
-      #flush.console()
       inicio <- Sys.time()
       if (j == 1) {
         nm <- length(models)
@@ -119,54 +127,56 @@ run_models <- function(df, models = ifelse(is.factor(df[, 1]),
 
     if (mod == 0) {
       fit.reg <- tryCatch({
-        regression(
-          df.train = df,
-          index = index,
-          rsample = rsample,
-          regressor = models[j],
-          preprocess = preprocess,
-          nfolds = nfolds,
-          cpu_cores = cpu_cores,
-          repeats = repeats,
-          metric = metric,
-          tune_length = tune_length,
-          seeds = vector_seeds(seeds, repeats, nfolds))
+          regression(
+            df.train = df,
+            index = index,
+            rsample = rsample,
+            regressor = models[j],
+            preprocess = preprocess,
+            nfolds = nfolds,
+            cpu_cores = cpu_cores,
+            repeats = repeats,
+            metric = metric,
+            tune_length = tune_length,
+            seeds = vector_seeds(seeds, repeats, nfolds)
+          )
         },
-        error = function(e){
-          print(paste( "Error:", conditionMessage(e)))
+        error = function(e) {
+          print(paste("Error:", conditionMessage(e)))
           return(NULL)
         }
       )
 
-      if (is.null(fit.reg) == FALSE ) {
+      if (is.null(fit.reg) == FALSE) {
         list.model[cont] <- list(fit.reg)
         names(list.model)[cont] <- models[j]
         cont <- cont + 1
       } else {
-        failed <- c(failed, models[j] )
+        failed <- c(failed, models[j])
       }
     } else {
       fit.class <- tryCatch({
-        classification(
-          df.train = df,
-          index = index,
-          #         resample_ = rsample,
-          classifier = models[j],
-          preprocess = preprocess,
-          nfolds = nfolds,
-          cpu_cores = cpu_cores,
-          repeats = repeats,
-          metric = metric,
-          tune_length = tune_length,
-          seeds = vector_seeds(seeds, repeats, nfolds))
+          classification(
+            df.train = df,
+            rsample = rsample,
+            index = index,
+            classifier = models[j],
+            preprocess = preprocess,
+            nfolds = nfolds,
+            cpu_cores = cpu_cores,
+            repeats = repeats,
+            metric = metric,
+            tune_length = tune_length,
+            seeds = vector_seeds(seeds, repeats, nfolds)
+          )
         },
-        error = function(e){
+        error = function(e) {
           print(" ")
           print(e)
           NULL
         }
       )
-      if (is.null(fit.class) == FALSE ) {
+      if (is.null(fit.class) == FALSE) {
         list.model[cont] <- list(fit.class)
         names(list.model)[cont] <- models[j]
         cont <- cont + 1
@@ -184,11 +194,15 @@ run_models <- function(df, models = ifelse(is.factor(df[, 1]),
       if (j == nm) cat("\n")
     }
   }
-  package.fim <- search()[ifelse(unlist(gregexpr("package:",
-                                                 search())) == 1, TRUE, FALSE)]
+  package.fim <- search()[ifelse(unlist(gregexpr(
+    "package:",
+    search()
+  )) == 1, TRUE, FALSE)]
   package.list <- setdiff(package.fim, package.inicio)
-  if (length(package.list) > 0) for (package in package.list)
-    detach(package, character.only = TRUE)
+  if (length(package.list) > 0) {
+    for (package in package.list)
+      detach(package, character.only = TRUE)
+  }
   list.model <- list.model[!sapply(list.model, is.null)]
   if (verbose == TRUE) {
     if (length(failed) > 0) {
@@ -200,7 +214,7 @@ run_models <- function(df, models = ifelse(is.factor(df[, 1]),
 }
 
 
-vector_seeds <- function(seeds, repeats, nfolds){
+vector_seeds <- function(seeds, repeats, nfolds) {
   if (is.null(seeds)) {
     vseed <- NULL
   } else {
@@ -211,7 +225,7 @@ vector_seeds <- function(seeds, repeats, nfolds){
       nel <- nfolds + 1
     }
     vseed <- vector(mode = "list", length = nel)
-    for (i in 1:nel) vseed[[i]] <- sample.int(n = 100000,  1000)
+    for (i in 1:nel) vseed[[i]] <- sample.int(n = 100000, 1000)
     vseed[[nel + 1]] <- sample.int(100000, 1)
   }
   return(vseed)

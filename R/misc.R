@@ -17,7 +17,8 @@ hms_span <- function(start, end) {
     sapply(c(hours, minutes, seconds), function(x) {
       formatC(x, width = 2, format = "d", flag = "0")
     }),
-    collapse = ":")
+    collapse = ":"
+  )
 }
 
 #' calculate and format time until now
@@ -26,7 +27,7 @@ hms_span <- function(start, end) {
 #' @export
 until_now <- function(start) {
   end <- Sys.time()
-  dsec <- as.numeric(difftime(end, start, units =  "secs"))
+  dsec <- as.numeric(difftime(end, start, units = "secs"))
   hours <- floor(dsec / 3600)
   minutes <- floor( (dsec - 3600 * hours) / 60)
   seconds <- dsec - 3600 * hours - 60 * minutes
@@ -34,7 +35,8 @@ until_now <- function(start) {
     sapply(c(hours, minutes, seconds), function(x) {
       formatC(x, width = 2, format = "d", flag = "0")
     }),
-    collapse = ":")
+    collapse = ":"
+  )
 }
 
 #' create tablea from a list of strings
@@ -73,12 +75,14 @@ to_table <- function(txt, n.col, num.digits = 3) {
 #' @importFrom ggplot2 ggsave
 #' @export
 save_gggraphics <- function(object, graphic_format = c("jpg", "png"),
-                         file_path, width = 15, height = 15,
-                         units = "cm", dpi = 100) {
+                            file_path, width = 15, height = 15,
+                            units = "cm", dpi = 100) {
   nf <- length(format)
   for (i in 1:nf) {
-    ggplot2::ggsave(object, file = paste0(file_path, ".", graphic_format[i]),
-                    width = width, height = height, units = units, dpi = dpi)
+    ggplot2::ggsave(
+      object, file = paste0(file_path, ".", graphic_format[i]),
+      width = width, height = height, units = units, dpi = dpi
+    )
   }
   invisible(NULL)
 }
@@ -116,37 +120,43 @@ getdist_rectangle <- function(px, py, nx, ny) {
 #' @importFrom utils sessionInfo
 #' @importFrom parallel clusterExport makeCluster detectCores parLapply stopCluster
 mclapply.hack <- function(...) {
-library(parallel)
+  library(parallel)
   size_of_list <- length(list(...)[[1]])
-  cl <- parallel::makeCluster( min(size_of_list, parallel::detectCores()) )
+  cl <- parallel::makeCluster(min(size_of_list, parallel::detectCores()))
   loaded_package_names <- c(
     utils::sessionInfo()$basePkgs,
-    names( utils::sessionInfo()$otherPkgs ))
-  tryCatch( {
-    this_env <- environment()
-    while (identical( this_env, globalenv() ) == FALSE ) {
-      parallel::clusterExport(cl,
-                    ls(all_names = TRUE, env = this_env),
-                    envir = this_env)
-      this_env <- parent.env(environment())
-    }
-    parallel::clusterExport(cl,
-                  ls(all.names = TRUE, env = globalenv()),
-                  envir = globalenv())
+    names(utils::sessionInfo()$otherPkgs)
+  )
+  tryCatch({
+      this_env <- environment()
+      while (identical(this_env, globalenv()) == FALSE) {
+        parallel::clusterExport(
+          cl,
+          ls(all_names = TRUE, env = this_env),
+          envir = this_env
+        )
+        this_env <- parent.env(environment())
+      }
+      parallel::clusterExport(
+        cl,
+        ls(all.names = TRUE, env = globalenv()),
+        envir = globalenv()
+      )
 
-    parallel::parLapply( cl, 1:length(cl), function(xx){
-      lapply(loaded_package_names, function(yy) {
-        require(yy, character.only = TRUE)
+      parallel::parLapply(cl, 1:length(cl), function(xx) {
+        lapply(loaded_package_names, function(yy) {
+          require(yy, character.only = TRUE)
         })
-    })
-    return( parallel::parLapply( cl, ...) )
-  },
-  finally = {
-    parallel::stopCluster(cl)
-  })
+      })
+      return(parallel::parLapply(cl, ...))
+    },
+    finally = {
+      parallel::stopCluster(cl)
+    }
+  )
 }
 
-#create code for snipptes using information in clipboar
+# create code for snipptes using information in clipboar
 clip2snippet <- function() {
   x <- readClipboard(format = 1, raw = F)
 

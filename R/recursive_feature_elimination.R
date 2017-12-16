@@ -47,11 +47,12 @@ recursive_feature_elimination <- function(df,
                                           fun = caret::rfFuncs,
                                           cpu_cores = 6,
                                           metric = ifelse(is.factor(df[, 1]),
-                                                          "Kappa", "Rsquared"),
+                                            "Kappa", "Rsquared"
+                                          ),
                                           seeds = NULL,
                                           verbose = TRUE) {
-
   cl <- NULL
+  method <- NULL
   if (!is.data.frame(df)) stop("df is not a dataframe")
   if (is.null(metric)) {
     if (is.numeric(df[, 1])) {
@@ -74,15 +75,20 @@ recursive_feature_elimination <- function(df,
   }
 
 
-  totalsize <- if (any(sizes == (ncol(df)) - 1)) length(sizes)
-  else length(sizes) + 1
-  if (is.null(seeds)){
+  totalsize <- if (any(sizes == (ncol(df)) - 1)) {
+    length(sizes)
+  } else {
+    length(sizes) + 1
+  }
+  if (is.null(seeds)) {
     seedsvec <- NULL
   } else {
     set.seed(seeds)
     vseeds <- vector(mode = "list", length = (nfolds * repeats) + 1)
-    vseeds <- lapply(vseeds, function(x) sample.int(n = 100000,
-                                                    size = totalsize))
+    vseeds <- lapply(vseeds, function(x) sample.int(
+        n = 100000,
+        size = totalsize
+      ))
     vseeds[[nfolds * repeats + 1]] <- sample.int(n = 100000, size = 1)
     seedsvec <- vseeds
   }
@@ -97,7 +103,7 @@ recursive_feature_elimination <- function(df,
     fit.rfe <- caret::rfe(
       formula = formula, data = df, sizes = sizes, metric = metric,
       rfeControl = caret::rfeControl(
-        method = "cv", functions = fun, number = nfolds,
+        method = method, functions = fun, number = nfolds,
         seeds = seedsvec
       )
     )
@@ -105,7 +111,7 @@ recursive_feature_elimination <- function(df,
     fit.rfe <- caret::rfe(
       formula = formula, data = df, sizes = sizes, metric = metric,
       rfeControl = caret::rfeControl(
-        method = "cv", functions = fun, number = nfolds,
+        method = method, functions = fun, number = nfolds,
         seeds = seedsvec, index = index
       )
     )
@@ -144,7 +150,7 @@ recursive_feature_elimination <- function(df,
 #' @importFrom knitr kable
 #' @examples
 #' \dontrun{
-#' rfe_result(fi.rfe)
+#' rfe_result(fit.rfe)
 #' }
 #' @export
 
@@ -157,16 +163,18 @@ rfe_result <- function(fit.rfe) {
   for (i in 1:wm) {
     ddd$tol[i] <- abs(ddd[i, 3] - ddd[wm, 3]) / ddd[wm, 3] * 100
   }
-  dddg <- ddd %>% na.omit %>% tidyr::gather(key = var,
-                                            value = Value, -Variables )
+  dddg <- ddd %>% na.omit() %>% tidyr::gather(
+    key = var,
+    value = Value, -Variables
+  )
   g1 <- ggplot2::ggplot(dddg, aes(x = Variables, y = Value)) +
-    ggplot2::geom_line()  +
+    ggplot2::geom_line() +
     ggplot2::geom_point() +
     ggplot2::geom_smooth() +
     ggplot2::scale_x_continuous(breaks = dddg$Variables) +
     ggplot2::facet_wrap(~var, scales = "free")
 
-  ddd.na <- ddd %>% na.omit
+  ddd.na <- ddd %>% na.omit()
   g2 <- ggplot2::ggplot(data = ddd.na, aes(x = Variables, y = tol)) +
     ggplot2::geom_point() +
     ggplot2::geom_line() +
@@ -182,7 +190,7 @@ rfe_result <- function(fit.rfe) {
   return(ddd)
 }
 
-#'selected features by rfe with tolerance
+#' selected features by rfe with tolerance
 #' @title selected features by rfe with tolerance
 #' @param fit  Results from recursive_feature_elimination  function
 #' @param tolerance maximum error tolerance allowed in percentage
@@ -192,8 +200,10 @@ rfe_result <- function(fit.rfe) {
 #' @export
 selec_rfe_tolerance <- function(fit, tolerance, metric = "Rsquared",
                                 maximize = "TRUE") {
-  tol <- caret::pickSizeTolerance(fit$results, metric = "Rsquared",
-                                  tol = tolerance, maximize = maximize)
+  tol <- caret::pickSizeTolerance(
+    fit$results, metric = "Rsquared",
+    tol = tolerance, maximize = maximize
+  )
   vs <- fit$optVariables[-c(1:tol)]
   return(vs)
 }

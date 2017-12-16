@@ -44,20 +44,21 @@ kriga <- function(df, target_var, nrep = 10,
     if (i == 1) {
       dftreino <- df1
       dfvalida <- df2
-
     } else {
       dftreino <- rbind(dftreino, df1)
       dfvalida <- rbind(dfvalida, df2)
     }
   }
-  dfresult <- data.frame(model = character(ng), vars = character(ng),
-                         repet = numeric(ng),
-                        r2 = numeric(ng), rmse = numeric(ng),
-                        mae = numeric(ng), mbe = numeric(ng),
-                        stringsAsFactors = F)
+  dfresult <- data.frame(
+    model = character(ng), vars = character(ng),
+    repet = numeric(ng),
+    r2 = numeric(ng), rmse = numeric(ng),
+    mae = numeric(ng), mbe = numeric(ng),
+    stringsAsFactors = F
+  )
   cont <- 1
   i <- 1
-  for (i in 1:ng){
+  for (i in 1:ng) {
     dsel.treino <- dftreino %>% filter(repet == i)
     dsel.valida <- dfvalida %>% filter(repet == i)
     f1 <- as.formula(paste("~", name_px, "+", name_py))
@@ -65,14 +66,16 @@ kriga <- function(df, target_var, nrep = 10,
     sp::coordinates(dsel.treino) <- f1
     sp::coordinates(dsel.valida) <- f1
     kr <- automap::autoKrige(f2, dsel.treino, dsel.valida, model = c("Ste"))
-    ddd <- data.frame(predito = kr$krige_output$var1.pred,
-                      observado = select(dsel.valida@data, one_of(target_var)))
+    ddd <- data.frame(
+      predito = kr$krige_output$var1.pred,
+      observado = select(dsel.valida@data, one_of(target_var))
+    )
     names(ddd) <- c("predito", "observado")
     result <- pred_acc(ddd$observado, ddd$predito)
     dfresult$model[cont] <- "krigging"
     dfresult$vars[cont] <- as.character(kr$var_model[2, 1])
     dfresult$repet[cont] <- i
-    dfresult$r2[cont]  <- result$rsquared
+    dfresult$r2[cont] <- result$rsquared
     dfresult$rmse[cont] <- result$root_mean_square_error
     dfresult$mae[cont] <- result$mean_absolute_error
     dfresult$mbe[cont] <- result$mean_bias_error

@@ -21,7 +21,7 @@
 
 data_preparation_categoric <- function(df, p = 0.75, positivo = 1,
                                        prune = 0.99, seed = 313) {
-  outcome <- df %>%  pull(1)
+  outcome <- df %>% pull(1)
   nome.out <- names(df)[1]
   names(outcome) <- nome.out
   set.seed(seed)

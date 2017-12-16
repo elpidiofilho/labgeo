@@ -16,3 +16,8 @@ group_rare_levels(vx, min_num = 20, other = 99)
 \description{
 Group rare levels of a factor variable
 }
+\examples{
+\dontrun{
+vx = train$solo_tex; min_num = 20; other = 99
+}
+}

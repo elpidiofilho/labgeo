@@ -2,7 +2,7 @@
 #'
 #' @title extract_data_polygon
 #' @description This function allows extract data from raster layers from polygon areas
-#' @param path_raster  Path para a pasta onde estão os rasters
+
 #' @param raster_type  Tipo do arquivo raster a ser lido (.tif, .asc, .img ... )
 #' @param path_poligon Path para a pasta onde esta os poligonos da amostragem
 #' @param name_poligon nome do arquivo de poligono sem a raster_type
@@ -30,8 +30,10 @@ extract_data_polygon <- function(path_raster, raster_type = ".asc",
                                  field_class = "gridcode",
                                  field_poligon = "Id", remove_NA = TRUE) {
   inicio <- Sys.time()
-  l <- list.files(path_raster, pattern = raster_type,
-                  include.dirs = T, full.names = T)
+  l <- list.files(
+    path_raster, pattern = raster_type,
+    include.dirs = T, full.names = T
+  )
   st <- raster::stack(l)
   shpfile <- rgdal::readOGR(path_poligon, name_poligon)
   r <- raster::raster(extent(shpfile))
@@ -47,8 +49,10 @@ extract_data_polygon <- function(path_raster, raster_type = ".asc",
   pt <- dplyr::left_join(pclasse, ppolig) %>%
     data.frame()
   xy <- pt[, c(1, 2)]
-  spdf <- sp::SpatialPointsDataFrame(coords = xy, data = pt,
-                                     proj4string = shpfile@proj4string)
+  spdf <- sp::SpatialPointsDataFrame(
+    coords = xy, data = pt,
+    proj4string = shpfile@proj4string
+  )
   dp <- raster::extract(st, spdf)
   dp <- data.frame(pt, dp)
   if (remove_NA == TRUE) {

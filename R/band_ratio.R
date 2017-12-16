@@ -55,19 +55,21 @@ band_ratio <- function(df) {
 #' }
 #' @export
 
-band_ratio_to_raster <- function(raster_ext, raster_input_path, raster_output_path) {
-  l = list.files(path = raster_input_path, pattern =glob2rx(paste0('*',raster_ext)), full.names = T)
-  st = raster::stack(l)
-  nf = names(st)
+band_ratio_to_raster <- function(raster_ext, raster_input_path,
+                                 raster_output_path) {
+  l <- list.files(path = raster_input_path,
+                  pattern = glob2rx(paste0("*", raster_ext)), full.names = T)
+  st <- raster::stack(l)
+  nf <- names(st)
   nb <- length(nf)
   for (i in 1:(nb - 1)) {
     for (j in (i + 1):nb) {
       rb <- (st[[j]] - st[[i]]) / (st[[j]] + st[[i]])
       ni <- gsub("band", "", nf[i])
       nj <- gsub("band", "", nf[j])
-      nfile <- paste0("br_", ni, "_", nj,raster_ext)
+      nfile <- paste0("br_", ni, "_", nj, raster_ext)
       print(nfile)
-      path_nf = paste0(raster_output_path,'/',nfile)
+      path_nf <- paste0(raster_output_path, "/", nfile)
       raster::writeRaster(rb, filename = path_nf, overwrite = TRUE)
     }
   }

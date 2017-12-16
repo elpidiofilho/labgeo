@@ -59,7 +59,6 @@ descriptive_stat_polygon <- function(df, poligon,
 }
 
 px <- function(x, q) {
-
   vs <- sort(x, method = "shell")
   np <- round(q * length(x), 0)
   if (np > 1) {
@@ -138,7 +137,7 @@ moda <- function(x) {
 
 
 sums <- function(x, pot) {
-  return( sum( (x - mean(x)) ^ pot))
+  return(sum( (x - mean(x)) ^ pot))
 }
 
 kurtosis <- function(x) {

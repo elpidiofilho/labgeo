@@ -17,7 +17,7 @@ details
 }
 \examples{
 \dontrun{
-rfe_result(fi.rfe)
+rfe_result(fit.rfe)
 }
 }
 \author{
