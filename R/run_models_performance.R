@@ -405,10 +405,10 @@ rmp_regressao <- function(fit_run_model, df_valida, verbose = FALSE) {
     r2 <- var_exp <- var <- valor <- NULL
   nm <- length(fit_run_model)
   summ_model <- dplyr::tibble(
-    model <- character(nm), r2 = numeric(nm), rmse = numeric(nm),
-    mbe <- numeric(nm), mae = numeric(nm), nse = numeric(nm),
-    var_exp <- numeric(nm), time = numeric(nm),
-    fit <- list(nm), dfpredobs = list(nm)
+    model =  character(nm), r2 = numeric(nm), rmse = numeric(nm),
+    mbe =  numeric(nm), mae = numeric(nm), nse = numeric(nm),
+    var_exp =  numeric(nm), time = numeric(nm),
+    fit =  list(nm), dfpredobs = list(nm)
   )
 
   cont <- 1
