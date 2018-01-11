@@ -18,7 +18,7 @@ band_ratio <- function(df) {
   cont <- 1
   for (i in 1:(nb - 1)) {
     for (j in (i + 1):nb) {
-      rb <- (df[, i] - df[j]) / (df[, i] + df[j])
+      rb <- (df[, j] - df[,i]) / (df[, j] + df[, i])
       if (cont == 1) {
         drb <- data.frame(rb)
       } else {

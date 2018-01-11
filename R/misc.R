@@ -94,10 +94,10 @@ save_gggraphics <- function(object, graphic_format = c("jpg", "png"),
 #' @param ny number of divisions in y axis
 #' @export
 getdist_rectangle <- function(px, py, nx, ny) {
-  maxy <- max(py)
-  maxx <- max(px)
-  miny <- min(py)
-  minx <- min(px)
+  maxy <- max(py, na.rm = T)
+  maxx <- max(px, na.rm = T)
+  miny <- min(py, na.rm = T)
+  minx <- min(px, na.rm = T)
   vx <- seq(from = minx, to = maxx, length.out = nx)
   vy <- seq(from = miny, to = maxy, length.out = ny)
   gr <- expand.grid(x = vx, y = vy)
