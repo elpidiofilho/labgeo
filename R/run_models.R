@@ -230,3 +230,23 @@ vector_seeds <- function(seeds, repeats, nfolds) {
   }
   return(vseed)
 }
+
+
+run_nested_models <- function(df, models ,
+                              formula = NULL,
+                              preprocess = NULL,
+                              index = NULL,
+                              rsample = "cv",
+                              nfolds = 10,
+                              repeats = NA,
+                              tune_length = 5,
+                              cpu_cores = 0,
+                              metric = ifelse(is.factor(df[, 1]),
+                                              "Kappa", "Rsquared"
+                              ),
+                              seeds = NULL,
+                              verbose = T)
+{
+
+
+}
