@@ -5,14 +5,18 @@
 \title{This function performs the separation of training samples and validation for samples collected in the form of polygons.
 Note that the class has to be the first column and the polygon number has to be the second column of the dataframe.}
 \usage{
-train_validation_poligon(dfall, p = 0.75, seed = 313)
+train_validation_poligon(dfall, class, poligon, p = 0.75, seed = 313)
 }
 \arguments{
 \item{dfall}{Dataframe with class and poligon columns}
 
-\item{p}{the percentage of data that goes to training}
+\item{class}{string with name of variable with class value}
 
-\item{seed}{seed to control random numbers generation}
+\item{poligon}{string with name of variable with poligon id}
+
+\item{p}{double the percentage of data that goes to training}
+
+\item{seed}{numeric seed to control random numbers generation}
 }
 \description{
 This function performs the separation of training samples and validation for samples collected in the form of polygons.
@@ -21,7 +25,7 @@ Note that the class has to be the first column and the polygon number has to be 
 \examples{
 \dontrun{
 dfall = df \%>\% select(classe, poligono, everything())
-vt = treino_validacao_poligono(dfall, p = 0.80, seed = 123)
+vt = treino_validacao_poligono(dfall, class = 'classe', poligon = 'poligono', p = 0.80, seed = 123)
 treino = dfall[treino,]
 valida = dfall[-treino,]
 }

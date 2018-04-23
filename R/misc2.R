@@ -284,18 +284,3 @@ group_rare_levels <- function(vx, min_num = 20, other = 99) {
 }
 
 
-## format code to create Rstudio snnipets
-#' @importFrom utils writeClipboard readClipboard
-code_snipett <- function() {
-  x <- utils::readClipboard(format = 1, raw = FALSE)
-
-  for (i in seq_along(x)) {
-    s1 <- "`r paste('"
-    s2 <- x[i]
-    if (s2 == "") s2 <- "\n"
-    s3 <- "')`"
-    vx[i] <- paste(s1, s2, s3, sep = "")
-  }
-  vx
-  utils::writeClipboard(vx, 1)
-}
