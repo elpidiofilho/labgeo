@@ -93,7 +93,7 @@ classification <- function(df.train,
   }
 
 
-  if (is.null(formula == FALSE)) {
+  if (is.null(formula) == FALSE) {
     fit <- tryCatch({
       suppressMessages(caret::train(
         form = formula, data = df.train, method = classifier,
