@@ -129,6 +129,7 @@ run_models <- function(df, models = ifelse(is.factor(df[, 1]),
       fit.reg <- tryCatch({
           regression(
             df.train = df,
+            formula = formula,
             index = index,
             rsample = rsample,
             regressor = models[j],
@@ -158,6 +159,7 @@ run_models <- function(df, models = ifelse(is.factor(df[, 1]),
       fit.class <- tryCatch({
           classification(
             df.train = df,
+            formula = formula,
             rsample = rsample,
             index = index,
             classifier = models[j],
