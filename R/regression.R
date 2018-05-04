@@ -75,7 +75,12 @@ regression <- function(df.train, formula = NULL, preprocess = NULL,
   #inicio <- Sys.time()
 
   if (cpu_cores > 0) {
-    cl <- parallel::makePSOCKcluster(cpu_cores)
+    if (get_os() == 'windows'){
+    #  cl <- parallel::makePSOCKcluster(cpu_cores)
+      cl <- parallel::makeCluster(cpu_cores)
+    } else {
+      cl <- parallel::makeCluster(cpu_cores, type="FORK")
+    }
     doParallel::registerDoParallel(cl)
     on.exit(stopCluster(cl))
   } else {
@@ -122,4 +127,21 @@ regression <- function(df.train, formula = NULL, preprocess = NULL,
     # print(caret::getTrainPerf(fit))
   }
   return(fit)
+}
+
+
+get_os <- function(){
+  sysinf <- Sys.info()
+  if (!is.null(sysinf)){
+    os <- sysinf['sysname']
+    if (os == 'Darwin')
+      os <- "osx"
+  } else { ## mystery machine
+    os <- .Platform$OS.type
+    if (grepl("^darwin", R.version$os))
+      os <- "osx"
+    if (grepl("linux-gnu", R.version$os))
+      os <- "linux"
+  }
+  tolower(os)
 }
