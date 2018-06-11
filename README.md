@@ -34,17 +34,22 @@ devtools::install_github("hadley/multidplyr")
 
 ## Example 
 
+``` r
 library(labgeo)
 library(dplyr)
 
 d = iris %>% select(Species, everything())
+# train and teest samples
 vt = train_test(d, y = d$Species,  p = 0.75, seed = 311)
 train = vt$train
 test = vt$test
+#fit models
 fit = run_models(df = train, 
                  formula = as.formula('Species ~ . '), 
                  models = c("qda", "rf", "gbm","C5.0"),
                  rsample = 'cv', nfolds = 10,
                 seed = 123,  cpu_cores = 4)
 
+# Calculate models perfomance in test set
 perf = run_models_performance(fit_run_model = fit, df_valida = test, verbose = T)
+```
