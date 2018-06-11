@@ -30,10 +30,7 @@
 #' fit_models = run_models(df,models = models)
 #' }
 
-run_models <- function(df, models = ifelse(is.factor(df[, 1]),
-                       c("qda", "rf", "gbm", "C5.0"),
-                       c("lm", "cubist", "gbm", "rf")
-                     ),
+run_models <- function(df, models = 'rf',
                      formula = NULL,
                      preprocess = NULL,
                      index = NULL,
@@ -43,17 +40,21 @@ run_models <- function(df, models = ifelse(is.factor(df[, 1]),
                      tune_length = 5,
                      search = "grid",
                      cpu_cores = 0,
-                     metric = ifelse(is.factor(df[, 1]),
-                       "Kappa", "Rsquared"
-                     ),
+                     metric = NULL,
                      seeds = NULL,
                      verbose = TRUE) {
   if (class(df) != "data.frame") stop("df is not a data frame.")
-  if (is.factor(df[, 1]) == TRUE) {
-    mod <- 1
-  } else {
-    mod <- 0
+  if (is.null(formula) == FALSE) {
+    if (class(formula) != 'formula') {
+      formula =as.formula(formula)
+    }
   }
+  mod = is_factor_income(df, formula)
+#  if (is.factor(df[, 1]) == TRUE) {
+#    mod <- 1
+#  } else {
+#    mod <- 0
+#  }
 
   vlib <- character()
   for (i in seq_along(models)) {
@@ -94,12 +95,12 @@ run_models <- function(df, models = ifelse(is.factor(df[, 1]),
   inst <- vlib %in% utils::installed.packages()
   if (length(pkglist[!inst]) > 0) {
     np <- paste(pkglist[!inst], collapse = ", ")
-    if (plataforma == "windows") {
-      print(paste("packages ", np, " will be installed"))
-      utils::install.packages(pkglist[!inst], dep = TRUE)
-    } else {
+#    if (plataforma == "windows") {
+#      print(paste("packages ", np, " will be installed"))
+#      utils::install.packages(pkglist[!inst], dep = TRUE)
+#    } else {
       print(paste("Warning : packages ", np, " needs to installed"))
-    }
+    #}
   }
 
   package.inicio <- search()[ifelse(unlist(
@@ -128,6 +129,7 @@ run_models <- function(df, models = ifelse(is.factor(df[, 1]),
     }
 
     if (mod == 0) {
+      if (is.null(metric)) { metric = 'Rsquared'}
       fit.reg <- tryCatch({
           regression(
             df.train = df,
@@ -159,6 +161,7 @@ run_models <- function(df, models = ifelse(is.factor(df[, 1]),
         failed <- c(failed, models[j])
       }
     } else {
+      if (is.null(metric)) { metric = 'Kappa'}
       fit.class <- tryCatch({
           classification(
             df.train = df,
@@ -179,7 +182,7 @@ run_models <- function(df, models = ifelse(is.factor(df[, 1]),
         error = function(e) {
           print(" ")
           print(e)
-          NULL
+
         }
       )
       if (is.null(fit.class) == FALSE) {
@@ -255,4 +258,27 @@ run_nested_models <- function(df, models ,
 {
 
 
+}
+
+
+is_factor_income <- function(d, formula = NULL){
+  if (is.null(formula)) {
+    if (is.factor(d[, 1]) == TRUE) {
+      mod <- 1
+    } else {
+      mod <- 0
+    }
+  } else {
+    if (class(formula) != 'formula') {
+      formula =as.formula(formula)
+    }
+    v = all.vars(formula)[1]
+    qc = d %>% dplyr::select(one_of(v)) %>%  dplyr::pull() %>% class
+    if (qc == 'factor') {
+      mod <- 1
+    } else {
+      mod <- 0
+    }
+  }
+  return(mod)
 }

@@ -2,18 +2,16 @@
 #' @title train test split
 #' @importFrom caret createDataPartition
 #' @param df dataframe
+#' @param y outcome variable
 #' @param p proportion between  train and test sets
 #' @param groups numbre of groups to be used in stratified sample
 #' @param seed seed
 #' @export
-train_test <- function(df, p = 0.75, groups = 10, seed = NULL) {
+train_test <- function(df, y,  p = 0.75,   groups = 10, seed = NULL) {
   if (is.null(seed) == FALSE) {
     set.seed(seed)
   }
-  vcdp <- caret::createDataPartition(
-    df[, 1], p = p,
-    list = FALSE, groups = groups
-  )
+  vcdp <- caret::createDataPartition(y = y, p = p,  list = FALSE, groups = groups)
   train <- df[vcdp, ]
   test <- df[-vcdp, ]
   return(list(train = train, test = test))

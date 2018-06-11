@@ -120,7 +120,7 @@ pred_acc <- function(obs, pred) {
 
 
 rmp_classificacao <- function(fit_run_model, df_valida, verbose = FALSE) {
-  Freq <- var <- valor <- Prediction <- Reference <- model <- time <- NULL
+  Freq <- var <- value <- Prediction <- Reference <- model <- time <- NULL
 
   nm <- length(fit_run_model)
 
@@ -176,7 +176,7 @@ rmp_classificacao <- function(fit_run_model, df_valida, verbose = FALSE) {
         freqcols, freqrows,
         by = c("Prediction", "Reference")
       ) %>%
-        tidyr::gather(key = var, value = valor, -Prediction, -Reference)
+        tidyr::gather(key = var, value = value, -Prediction, -Reference)
 
       g1 <- ggplot(confusion, mapping = aes(x = Reference, y = Prediction)) +
         geom_tile(colour = "white", fill = "lightyellow2") +
@@ -192,7 +192,7 @@ rmp_classificacao <- function(fit_run_model, df_valida, verbose = FALSE) {
         ggtitle(fit_md$method)
 
       g2 <- ggplot(ddd, mapping = aes(x = Reference, y = Prediction)) +
-        geom_tile(aes(fill = valor), colour = "white") +
+        geom_tile(aes(fill = value), colour = "white") +
         scale_fill_gradientn(
           colours = c("lightyellow2", "white", "palegreen"),
           values = rescale(c(0, 50, 100))
@@ -200,7 +200,7 @@ rmp_classificacao <- function(fit_run_model, df_valida, verbose = FALSE) {
         scale_x_discrete(name = "Actual Class") +
         scale_y_discrete(name = "Predicted Class") +
         labs(fill = "Normalized\nFrequency") +
-        geom_text(aes(label = round(ddd$valor, 2)), vjust = 1) +
+        geom_text(aes(label = round(ddd$value, 3)), vjust = 1) +
         ggtitle(fit_md$method) +
         facet_wrap(~var)
     }
@@ -220,10 +220,10 @@ rmp_classificacao <- function(fit_run_model, df_valida, verbose = FALSE) {
       time = summ_model$time_run
     ) %>%
       print() %>%
-      tidyr::gather(key = var, value = valor, -model, -time)
-    g1 <- ggplot(dfresult, aes(x = model, y = valor, fill = model)) +
+      tidyr::gather(key = var, value = value, -model, -time)
+    g1 <- ggplot(dfresult, aes(x = model, y = value, fill = model)) +
       geom_col() +
-      geom_text(aes(label = round(valor, 3)), size = 2.5, vjust = 1.5) +
+      geom_text(aes(label = round(value, 3)), size = 2.5, vjust = 1.5) +
       theme(
         axis.text.x = element_text(angle = 45, hjust = 1),
         legend.position = "none"
@@ -402,7 +402,7 @@ plot_confusion_matrix <- function(obs, pred) {
 
 rmp_regressao <- function(fit_run_model, df_valida, verbose = FALSE) {
   vpred <- vobs <- model <- mbe <- mae <- rmse <- nse <-
-    r2 <- var_exp <- var <- valor <- NULL
+    r2 <- var_exp <- var <- value <- NULL
   nm <- length(fit_run_model)
   summ_model <- dplyr::tibble(
     model =  character(nm), r2 = numeric(nm), rmse = numeric(nm),
@@ -455,12 +455,12 @@ rmp_regressao <- function(fit_run_model, df_valida, verbose = FALSE) {
     dgr <- summ_model %>%
       select(model, mbe, mae, rmse, nse, r2, var_exp) %>%
       na.omit() %>%
-      tidyr::gather(key = var, value = valor, -model)
+      tidyr::gather(key = var, value = value, -model)
 
-    g1 <- ggplot2::ggplot(dgr, aes(x = model, y = valor, fill = model)) +
+    g1 <- ggplot2::ggplot(dgr, aes(x = model, y = value, fill = model)) +
       ggplot2::geom_col() +
       ggplot2::geom_text(
-        aes(label = round(valor, 3)),
+        aes(label = round(value, 3)),
         size = 2.5, vjust = 1.5
       ) +
       ggplot2::facet_wrap(~var, scales = "free") +

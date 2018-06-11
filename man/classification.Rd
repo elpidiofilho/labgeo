@@ -5,7 +5,7 @@
 \title{classification}
 \usage{
 classification(df.train, formula = NULL, preprocess = NULL,
-  classifier = "rf", rsample = "cv", nfolds = 10, repeats = 1,
+  classifier = "rf", rsample = "cv", nfolds = 10, repeats = NA,
   index = NULL, cpu_cores = 4, tune_length = 5, search = "grid",
   metric = "Kappa", seeds = NULL, verbose = FALSE)
 }

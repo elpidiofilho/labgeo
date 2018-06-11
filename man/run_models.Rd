@@ -4,12 +4,10 @@
 \alias{run_models}
 \title{Run Models}
 \usage{
-run_models(df, models = ifelse(is.factor(df[, 1]), c("qda", "rf", "gbm",
-  "C5.0"), c("lm", "cubist", "gbm", "rf")), formula = NULL,
-  preprocess = NULL, index = NULL, rsample = "cv", nfolds = 10,
-  repeats = NA, tune_length = 5, search = "grid", cpu_cores = 0,
-  metric = ifelse(is.factor(df[, 1]), "Kappa", "Rsquared"), seeds = NULL,
-  verbose = TRUE)
+run_models(df, models = "rf", formula = NULL, preprocess = NULL,
+  index = NULL, rsample = "cv", nfolds = 10, repeats = NA,
+  tune_length = 5, search = "grid", cpu_cores = 0, metric = NULL,
+  seeds = NULL, verbose = TRUE)
 }
 \arguments{
 \item{df}{Training dataframe}

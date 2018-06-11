@@ -43,73 +43,82 @@
 #' @export
 
 classification <- function(df.train,
-                           formula = NULL,
-                           preprocess = NULL,
-                           classifier = "rf",
-                           rsample = "cv",
-                           nfolds = 10,
-                           repeats = 1,
-                           index = NULL,
-                           cpu_cores = 4,
-                           tune_length = 5,
-                           search = "grid",
-                           metric = "Kappa",
-                           seeds = NULL,
-                           verbose = FALSE) {
-  inicio <- Sys.time()
-  e <- NULL
+                       formula = NULL,
+                       preprocess = NULL,
+                       classifier = "rf",
+                       rsample = "cv",
+                       nfolds = 10,
+                       repeats =  NA,
+                       index = NULL,
+                       cpu_cores = 4,
+                       tune_length = 5,
+                       search = "grid",
+                       metric = "Kappa",
+                       seeds = NULL,
+                       verbose = FALSE) {
+  resample_methods <- c(
+    "boot", "boot632", "optimism_boot", "boot_all", "cv",
+    "repeatedcv", "LOOCV", "LGOCV", "none", "oob",
+    "timeslice", "adaptive_cv", "adaptive_boot",
+    "adaptive_LGOCV"
+  )
+
+  if (!any(rsample %in% resample_methods)) {
+    stop(paste("resample method", rsample, "does not exist"))
+  }
+
   tc <- caret::trainControl(
     method = rsample, number = nfolds,
     index = index, seeds = seeds, search = search
   )
   switch(rsample,
-    "cv" = {
-      tc <- caret::trainControl(
-        method = rsample,
-        number = nfolds,
-        index = index,
-        search = search,
-        seeds = seeds
-      )
-    },
-    "repeatedcv" = {
-      if ( (repeats == "NA") | (repeats < 2)) {
-        stop("You must define the number of repeats greater then 1 ")
-      } else {
-        tc <- caret::trainControl(
-          method = rsample, number = nfolds,
-          repeats = repeats,
-          search = search,
-          index = index, seeds = seeds
-        )
-      }
-    },
-    "none" = {
-      tc <- caret::trainControl(method = rsample)
-    }
+         "cv" = {
+           tc <- caret::trainControl(
+             method = rsample, number = nfolds,
+             index = index, seeds = seeds, search = search
+           )
+         },
+         "repeatedcv" = {
+           if ((repeats == "NA") | (repeats < 2)) {
+             stop("You must define the number of repeats greater then 1 ")
+           }
+           tc <- caret::trainControl(
+             method = rsample, number = nfolds,
+             repeats = repeats,
+             index = index, seeds = seeds, search = search
+           )
+         },
+         "none" = {
+           tc <- caret::trainControl(method = rsample)
+         }
   )
 
+  #inicio <- Sys.time()
+
   if (cpu_cores > 0) {
-    cl <- parallel::makePSOCKcluster(cpu_cores)
+    if (get_os() == 'windows'){
+      #  cl <- parallel::makePSOCKcluster(cpu_cores)
+      cl <- parallel::makeCluster(cpu_cores)
+    } else {
+      cl <- parallel::makeCluster(cpu_cores, type="FORK")
+    }
     doParallel::registerDoParallel(cl)
     on.exit(stopCluster(cl))
   } else {
+    cl <- NULL
     foreach::registerDoSEQ()
   }
 
-
-  if (is.null(formula) == FALSE) {
-    print(formula)
+  if (is.null(formula)) {
     fit <- tryCatch({
-      suppressMessages(caret::train(
-        form = formula, data = df.train, method = classifier,
-        metric = metric,
-        trControl = tc,
-        tuneLength = tune_length,
+      caret::train(
+        x = df.train[, -1], y = df.train[, 1],
+        method = classifier, metric = metric,
+        trControl = tc, tuneLength = tune_length,
         preProcess = preprocess
-      ))
+      )
     },
-    error = {
+    error = function(e) {
       print(" ")
       print(e)
       NULL
@@ -117,15 +126,11 @@ classification <- function(df.train,
     )
   } else {
     fit <- tryCatch({
-      suppressMessages(caret::train(
-        x = df.train[, -1],
-        y = df.train[, 1],
-        method = classifier,
-        metric = metric,
-        trControl = tc,
-        tuneLength = tune_length,
+      caret::train(
+        form = formula, data = df.train, method = classifier,
+        metric = metric, trControl = tc, tuneLength = tune_length,
         preProcess = preprocess
-      ))
+      )
     },
     error = function(e) {
       print(" ")
@@ -135,12 +140,29 @@ classification <- function(df.train,
     )
   }
 
-
-
-  if (verbose == TRUE & is.null(fit) == FALSE) {
-    print(paste("Classification variable ", names(df.train)[1]))
-    print(paste("time elapsed : ", hms_span(inicio, Sys.time())))
-    print(caret::getTrainPerf(fit))
+  if (!is.null(cl)) {
+    foreach::registerDoSEQ()
+  }
+  if (verbose == TRUE) {
+    # print(paste("time elapsed : ", hms_span(inicio, Sys.time())))
+    # print(caret::getTrainPerf(fit))
   }
   return(fit)
+}
+
+
+get_os <- function(){
+  sysinf <- Sys.info()
+  if (!is.null(sysinf)){
+    os <- sysinf['sysname']
+    if (os == 'Darwin')
+      os <- "osx"
+  } else { ## mystery machine
+    os <- .Platform$OS.type
+    if (grepl("^darwin", R.version$os))
+      os <- "osx"
+    if (grepl("linux-gnu", R.version$os))
+      os <- "linux"
+  }
+  tolower(os)
 }

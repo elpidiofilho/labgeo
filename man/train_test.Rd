@@ -4,10 +4,12 @@
 \alias{train_test}
 \title{train test split}
 \usage{
-train_test(df, p = 0.75, groups = 10, seed = NULL)
+train_test(df, y, p = 0.75, groups = 10, seed = NULL)
 }
 \arguments{
 \item{df}{dataframe}
+
+\item{y}{outcome variable}
 
 \item{p}{proportion between  train and test sets}
 
