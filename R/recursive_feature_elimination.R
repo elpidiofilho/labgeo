@@ -18,6 +18,7 @@
 #' @param sizes A numeric vector of integers corresponding to the number of features
 #'  that should be retained. Default = c(2:5,10)
 #' @param fun Default = rfFuncs , get importance values from Random Forest model.
+#' @param method_rfe regression/classificiatio method to be used when fun = caretFuncs
 #' @param cpu_cores  Number of CPU cores to be used in parallel processing.
 #'                   Default = 6. For avoid parallel execution set this parameter to zero.
 #' @param metric metric used to evaluate model fit. For numeric outcome possible values are
@@ -45,6 +46,7 @@ recursive_feature_elimination <- function(df,
                                           nfolds = 5,
                                           repeats = 1,
                                           fun = caret::rfFuncs,
+                                          method_rfe = NULL,
                                           cpu_cores = 6,
                                           metric = ifelse(is.factor(df[, 1]),
                                             "Kappa", "Rsquared"
@@ -101,7 +103,11 @@ recursive_feature_elimination <- function(df,
   }
   if (is.null(index)) {
     fit.rfe <- caret::rfe(
-      formula = formula, data = df, sizes = sizes, metric = metric,
+      formula = formula,
+      data = df,
+      sizes = sizes,
+      metric = metric,
+      method = method_rfe,
       rfeControl = caret::rfeControl(
         method = method, functions = fun, number = nfolds,
         seeds = seedsvec
@@ -109,7 +115,11 @@ recursive_feature_elimination <- function(df,
     )
   } else {
     fit.rfe <- caret::rfe(
-      formula = formula, data = df, sizes = sizes, metric = metric,
+      formula = formula,
+      data = df,
+      sizes = sizes,
+      metric = metric,
+      method = method_rfe,
       rfeControl = caret::rfeControl(
         method = method, functions = fun, number = nfolds,
         seeds = seedsvec, index = index
