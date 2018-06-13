@@ -5,9 +5,9 @@
 \title{Recursive Feature Elimination}
 \usage{
 recursive_feature_elimination(df, sizes = c(2:5, 10), index = NULL,
-  nfolds = 5, repeats = 1, fun = caret::rfFuncs, cpu_cores = 6,
-  metric = ifelse(is.factor(df[, 1]), "Kappa", "Rsquared"), seeds = NULL,
-  verbose = TRUE)
+  nfolds = 5, repeats = 1, fun = caret::rfFuncs, method_rfe = NULL,
+  cpu_cores = 6, metric = ifelse(is.factor(df[, 1]), "Kappa", "Rsquared"),
+  seeds = NULL, verbose = TRUE)
 }
 \arguments{
 \item{df}{dataframe, with income variable in the first column}
@@ -22,6 +22,8 @@ that should be retained. Default = c(2:5,10)}
 \item{repeats}{repeats}
 
 \item{fun}{Default = rfFuncs , get importance values from Random Forest model.}
+
+\item{method_rfe}{regression/classificiatio method to be used when fun = caretFuncs}
 
 \item{cpu_cores}{Number of CPU cores to be used in parallel processing.
 Default = 6. For avoid parallel execution set this parameter to zero.}
