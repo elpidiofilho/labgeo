@@ -282,3 +282,26 @@ group_rare_levels <- function(vx, min_num = 20, other = 99) {
 }
 
 
+#' Separete Train and test samples whit group variable
+#' @param df dataframe
+#' @param perfilt groupp vector
+#' @param p sample proportion
+#' @param seed random number seed
+#' @importFrom dplyr %>%  filter
+#' @examples
+#' \dontrun{
+#' vs = train_validatio_perfil(d, d$perfil, p = 0.8, seed = 313)
+#' }
+#' @export
+
+train_validation_perfil <- function(df, perfil, p = 0.8, seed = NULL) {
+  vu = unique(perfil)
+  n = length(vu)
+  np = round(n * p)
+  set.seed(seed)
+  snp = sample(vu,np)
+  treino = df %>% filter( perfil %in% snp)
+  teste = df %>% filter(!(perfil %in% snp))
+  return(list(train = treino, test = teste))
+}
+
