@@ -148,7 +148,7 @@ predict_stack_to_map_parallel <- function(model_list, cpu_cores = 2, stack_var,
     df_entrada <- model_list[[i]]$trainingData %>% select(-.outcome)
 
     vsel <- names(df_entrada)
-    vachei <- !( (names(stack_var)) %in% vsel)
+    vachei <- !(vsel %in% names(stack_var))
     if (sum(vachei) > 0) {
       print(paste(names(stack_var)[vachei]))
       stop("covariate not found")
