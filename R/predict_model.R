@@ -4,8 +4,6 @@
 #'
 #'
 #' @param model_list list of fit models by function run_models
-#' @param path_raster path of rasters with co-variates
-#' @param raster_type extension of raster files with co-variates
 #' @param path_result path to store maps with results of prediction
 #' @param namefile sufix of name of file with results of prediction
 #' @param result_type type of file (extension) to be saved after prediction
@@ -40,7 +38,7 @@ predict_to_map <- function(model_list, path_raster, raster_type = ".asc",
     vachei <- !(names(st) %in% vsel)
     if (sum(vachei) > 0) {
       print(paste(names(st)[vachei]))
-      stop("covariate no found")
+      stop("covariate not found")
     }
     name_model <- model_list[[i]]$method
     filename <- gsub(" ", "_", paste0(
@@ -64,7 +62,8 @@ predict_to_map <- function(model_list, path_raster, raster_type = ".asc",
 #'
 #'
 #' @param model_list list of fit models by function run_models
-#' @param stack_var Stack with all vars used to fit them model
+#' @param path_raster path of rasters with co-variates
+#' @param raster_type extension of raster files with co-variates
 #' @param path_result path to store maps with results of prediction
 #' @param namefile sufix of name of file with results of prediction
 #' @param result_type type of file (extension) to be saved after prediction
@@ -81,15 +80,16 @@ predict_to_map <- function(model_list, path_raster, raster_type = ".asc",
 #' }
 #' @export
 
-predict_stack_to_map <- function(model_list, stack_var,
+predict_stack_to_map <- function(model_list, path_raster, raster_type = ".asc",
                                  path_result, namefile, result_type= ".tif") {
   .outcome <- NULL
   nm <- length(model_list)
   for (i in 1:nm) {
     inicio <- Sys.time()
-    df_entrada <- model_list[[i]]$trainingData %>% select(-.outcome)
-
+    df_entrada <- model_list[[i]]$trainingData %>% select( -(.outcome))
     vsel <- names(df_entrada)
+    var_file_raster <- paste0(path_raster, vsel, result_type)
+    stack_var <- raster::stack(var_file_raster)
     vachei <- !(vsel %in% names(stack_var))
     if (sum(vachei) > 0) {
       print(paste(names(stack_var)[vachei]))

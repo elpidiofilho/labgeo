@@ -11,4 +11,3 @@
 #' \dontrun{
 #' df = landuse
 #' }
-"landuse"

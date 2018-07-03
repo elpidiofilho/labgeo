@@ -4,13 +4,15 @@
 \alias{predict_stack_to_map}
 \title{predict stack to map}
 \usage{
-predict_stack_to_map(model_list, stack_var, path_result, namefile,
-  result_type = ".tif")
+predict_stack_to_map(model_list, path_raster, raster_type = ".asc",
+  path_result, namefile, result_type = ".tif")
 }
 \arguments{
 \item{model_list}{list of fit models by function run_models}
 
-\item{stack_var}{Stack with all vars used to fit them model}
+\item{path_raster}{path of rasters with co-variates}
+
+\item{raster_type}{extension of raster files with co-variates}
 
 \item{path_result}{path to store maps with results of prediction}
 
