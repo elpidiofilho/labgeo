@@ -41,3 +41,49 @@ train_validation_poligon = function (dfall, class, poligon, p = 0.75, seed = 313
                 dplyr::select(idam))[, 1]
   return(vtreino)
 }
+
+
+
+
+# create_folds_poligon
+#'
+#'
+#' This function  creates folds  for samples collected in the form of polygons.In this case
+#' all samples inside a polygon are placed in a fold avoiding the division in multiples
+#' folds..
+#'
+#' @param outcome vector with  outcome variable
+#' @param poligon vector with  poligon id
+#' @param nfolds number of folds to be created
+#' @param seed  numeric seed to control random numbers generation
+#' @importFrom caret createFolds
+#' @importFrom dplyr group_by_ slice filter select pull
+#' @author Elpidio Filho, \email{elpidio@ufv.br}
+#' @examples
+#' \dontrun{
+#' dfall = df %>% select(classe, poligono, everything())
+#' index = create_folds_poligon(dfall, class = classe, poligon = poligono, nfolds = 5, seed = 123)
+#' }
+#' @export
+
+
+create_folds_poligon <- function(outcome, polig, nfolds = 10, seeds = 313){
+  groupfolds = list()
+  vpol <- unique(polig)
+  vclass <- unique(outcome)
+  dffold <- data.frame(polig, outcome,stringsAsFactors = F)
+  dffold$id <- seq(1:nrow(dffold))
+  vclass <- dffold %>% group_by(polig, outcome) %>% slice(1) %>% dplyr::select(outcome, polig)
+  set.seed(seeds)
+  folds <- caret::createFolds(y = vclass$outcome, list = T, k = nfolds, returnTrain = F)
+  for (i in 1:nfolds) {
+    vlpolig <- vpol[folds[[i]]]
+    f1 <- dffold %>% filter(id %in% vlpolig)
+    groupfolds[[i]] <- dffold %>% dplyr::filter(polig %in% vlpolig ) %>% pull(id)
+    names(groupfolds)[i] <- paste0("Fold",str_pad(i,2,"left","0"))
+
+  }
+  return(groupfolds)
+}
+
+
