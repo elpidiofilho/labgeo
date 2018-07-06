@@ -73,7 +73,8 @@ predict_to_map <- function(model_list, path_raster, raster_type = ".asc",
 #' @examples
 #' \dontrun{
 #' predict_stack_to_map(fit.models,
-#'               stack_var = predicao,
+#'               path_raster = './raster/',
+#'               result_type = '.asc',
 #'               path_result = './result/',
 #'               namefile = 'uso_',
 #'               result_type = ".tif")

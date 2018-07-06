@@ -29,7 +29,8 @@ details
 \examples{
 \dontrun{
 predict_stack_to_map(fit.models,
-              stack_var = predicao,
+              path_raster = './raster/',
+              result_type = '.asc',
               path_result = './result/',
               namefile = 'uso_',
               result_type = ".tif")
