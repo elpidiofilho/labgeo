@@ -9,6 +9,7 @@
 #' @param field_class nome do campo do shape de poligonos conte a identificacao da classe
 #' @param field_poligon nome do campo do shape de poligonos conte a identificacao do poligono
 #' @param remove_NA remover os valores NA durante a extracao dos dados
+#' @param cpu_cores number of cpu cores used in processing
 #' @keywords extract raster data
 #' @importFrom  rgdal readOGR
 #' @importFrom dplyr left_join
@@ -28,7 +29,7 @@
 extract_data_polygon <- function(path_raster, raster_type = ".asc",
                                  path_poligon, name_poligon,
                                  field_class = "gridcode",
-                                 field_poligon = "Id", remove_NA = TRUE) {
+                                 field_poligon = "Id", cpu_cores = 1,  remove_NA = TRUE) {
   inicio <- Sys.time()
   l <- list.files(
     path_raster, pattern = raster_type,
@@ -53,7 +54,13 @@ extract_data_polygon <- function(path_raster, raster_type = ".asc",
     coords = xy, data = pt,
     proj4string = shpfile@proj4string
   )
+  if (cpu_cores > 1) {
+    raster::beginCluster(cpu_cores)
+  }
   dp <- raster::extract(st, spdf)
+  if (cpu_cores > 1) {
+    raster::endCluster()
+  }
   dp <- data.frame(pt, dp)
   if (remove_NA == TRUE) {
     dp <- na.omit(dp)

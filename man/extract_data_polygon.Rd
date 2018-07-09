@@ -6,7 +6,7 @@
 \usage{
 extract_data_polygon(path_raster, raster_type = ".asc", path_poligon,
   name_poligon, field_class = "gridcode", field_poligon = "Id",
-  remove_NA = TRUE)
+  cpu_cores = 1, remove_NA = TRUE)
 }
 \arguments{
 \item{raster_type}{Tipo do arquivo raster a ser lido (.tif, .asc, .img ... )}
@@ -18,6 +18,8 @@ extract_data_polygon(path_raster, raster_type = ".asc", path_poligon,
 \item{field_class}{nome do campo do shape de poligonos conte a identificacao da classe}
 
 \item{field_poligon}{nome do campo do shape de poligonos conte a identificacao do poligono}
+
+\item{cpu_cores}{number of cpu cores used in processing}
 
 \item{remove_NA}{remover os valores NA durante a extracao dos dados}
 }

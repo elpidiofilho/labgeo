@@ -68,13 +68,13 @@ classification <- function(df.train,
   }
 
   tc <- caret::trainControl(
-    method = rsample, number = nfolds,
+    method = rsample, number = nfolds,verboseIter = FALSE,
     index = index, seeds = seeds, search = search
   )
   switch(rsample,
          "cv" = {
            tc <- caret::trainControl(
-             method = rsample, number = nfolds,
+             method = rsample, number = nfolds, verboseIter = FALSE,
              index = index, seeds = seeds, search = search
            )
          },
@@ -83,13 +83,13 @@ classification <- function(df.train,
              stop("You must define the number of repeats greater then 1 ")
            }
            tc <- caret::trainControl(
-             method = rsample, number = nfolds,
+             method = rsample, number = nfolds,verboseIter = FALSE,
              repeats = repeats,
-             index = index, seeds = seeds, search = search
+             index = index, seeds = seeds, search = search, verboseIter =
            )
          },
          "none" = {
-           tc <- caret::trainControl(method = rsample)
+           tc <- caret::trainControl(method = rsample, verboseIter = FALSE)
          }
   )
 
@@ -114,7 +114,7 @@ classification <- function(df.train,
       caret::train(
         x = df.train[, -1], y = df.train[, 1],
         method = classifier, metric = metric,
-        trControl = tc, tuneLength = tune_length,
+        trControl = tc, tuneLength = tune_length, verbose = FALSE,
         preProcess = preprocess
       )
     },
@@ -128,7 +128,7 @@ classification <- function(df.train,
     fit <- tryCatch({
       caret::train(
         form = formula, data = df.train, method = classifier,
-        metric = metric, trControl = tc, tuneLength = tune_length,
+        metric = metric, trControl = tc, tuneLength = tune_length, verbose = FALSE,
         preProcess = preprocess
       )
     },
