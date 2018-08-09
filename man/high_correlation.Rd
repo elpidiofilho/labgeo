@@ -4,7 +4,8 @@
 \alias{high_correlation}
 \title{high_correlation}
 \usage{
-high_correlation(df, cutoff = 0.95, correl = "linear", verbose = FALSE)
+high_correlation(df, cutoff = 0.95, correl = "linear",
+  verbose = FALSE)
 }
 \arguments{
 \item{df}{input dataframe}

@@ -4,8 +4,8 @@
 \alias{predict_big_raster}
 \title{predict big raster}
 \usage{
-predict_big_raster(model, st, path_file, suffix = "pred_", format = "GTiff",
-  tiles = 5, cpu_cores = 7, verbose = TRUE)
+predict_big_raster(model, st, path_file, suffix = "pred_",
+  format = "GTiff", tiles = 5, cpu_cores = 7, verbose = TRUE)
 }
 \arguments{
 \item{model}{model to be predicted}

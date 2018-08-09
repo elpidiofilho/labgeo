@@ -1,7 +1,7 @@
 Package: labgeo
 Type: Package
 Title: Collection of functions to  fit models with emphasis in land use and soil mapping
-Version: 0.3.8.2
+Version: 0.3.9.0
 Author: Elpidio I. Fernandes Filho
 Maintainer: Elpidio Filho <elpidio@ufv.br>
 Description: Labgeo is a R package to fit classifications and regressions models in an easy way. 
@@ -38,4 +38,4 @@ Imports: caret,
          tibble
 Suggests: testthat (>= 0.9.1)    
 LazyData: false
-RoxygenNote: 6.0.1
+RoxygenNote: 6.1.0

@@ -4,8 +4,8 @@
 \alias{extract_data_point}
 \title{extract_data_point}
 \usage{
-extract_data_point(path_raster, raster_type = "*.asc", path_point, name_point,
-  cpu_cores = 1, remove_NA = TRUE)
+extract_data_point(path_raster, raster_type = "*.asc", path_point,
+  name_point, cpu_cores = 1, remove_NA = TRUE)
 }
 \arguments{
 \item{path_raster}{Path para a pasta onde estão os rasters}

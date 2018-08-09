@@ -11,3 +11,6 @@ select_model(is.regression = TRUE, vtags = c("Boosting", "Bagging"))
 
 \item{vtags}{vetctor of taga used in model selection}
 }
+\description{
+select model by tag
+}

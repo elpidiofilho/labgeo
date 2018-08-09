@@ -114,6 +114,33 @@ getdist_rectangle <- function(px, py, nx, ny) {
   return(df1)
 }
 
+#' Rasterize coordinates
+#' @title Rasterize coordinates
+#' @description  Create rasters of coordinates x and y
+#' @param fileraster raster file raster to extract bounds, resolution and projection information
+#' @param path_output path to output rasters files
+#' @param prefix_nama prefix to use to create name of rasters files
+#' @param format format of raster files ('.asc', '.tif', '.grd', '.sdat'..etc). See Help of writeRaster function of raster package to more formats
+#' @importFrom raster rasterToPoints rasterFromXYZ writeRaster raster
+#' @examples
+#' \dontrun{0
+#' rasterize_coordinates(fileraster = './raster/bio_14.asc', path_output = './raster', prefix_name = 'coord_', format = '.tif')
+#' }
+#' @export
+rasterize_coordinates <- function(fileraster, path_output = '.', prefix_name = 'coord_', format = '.asc') {
+  r <- raster::raster(fileraster)
+  p <- raster::rasterToPoints(r, spatial = T)
+  xyzx <- data.frame(x = p@coords[,1], y = p@coords[,2], z = p@coords[,1], stringsAsFactors = F)
+  xyzy <- data.frame(x = p@coords[,1], y = p@coords[,2], z = p@coords[,2], stringsAsFactors = F)
+  rx <- raster::rasterFromXYZ(xyz = xyzx, res = c(xres(r), yres(r)), crs = r@crs)
+  ry <- raster::rasterFromXYZ(xyz = xyzy, res = c(xres(r), yres(r)), crs = r@crs)
+  fnx = paste0(path_output,'/',prefix_name,'x',format)
+  fny = paste0(path_output,'/',prefix_name,'y',format)
+  raster::writeRaster(rx, fnx,  overwrite = TRUE)
+  raster::writeRaster(ry, fny,  overwrite = TRUE)
+}
+
+
 
 
 

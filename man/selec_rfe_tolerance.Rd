@@ -4,7 +4,8 @@
 \alias{selec_rfe_tolerance}
 \title{selected features by rfe with tolerance}
 \usage{
-selec_rfe_tolerance(fit, tolerance, metric = "Rsquared", maximize = "TRUE")
+selec_rfe_tolerance(fit, tolerance, metric = "Rsquared",
+  maximize = "TRUE")
 }
 \arguments{
 \item{fit}{Results from recursive_feature_elimination  function}

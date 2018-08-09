@@ -6,8 +6,8 @@
 \usage{
 recursive_feature_elimination(df, sizes = c(2:5, 10), index = NULL,
   nfolds = 5, repeats = 1, fun = caret::rfFuncs, method_rfe = NULL,
-  cpu_cores = 6, metric = ifelse(is.factor(df[, 1]), "Kappa", "Rsquared"),
-  seeds = NULL, verbose = TRUE)
+  cpu_cores = 6, metric = ifelse(is.factor(df[, 1]), "Kappa",
+  "Rsquared"), seeds = NULL, verbose = TRUE)
 }
 \arguments{
 \item{df}{dataframe, with income variable in the first column}

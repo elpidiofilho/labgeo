@@ -5,12 +5,13 @@
 \title{This function performs the training of the chosen models to a group of outcomes (y)}
 \usage{
 easy_fit(dy, dx, nfolds = 10, repeats = NA, rsample = "cv",
-  metric = ifelse(is.factor(dy[, 1]), "Kappa", "Rsquared"), cpu_cores = 7,
-  tune_length = 5, fun_RFE = caret::rfFuncs, repeats_RFE = 1,
-  metric_RFE = ifelse(is.factor(dy[, 1]), "Kappa", "Rsquared"),
-  nfolds_RFE = 5, sizes_RFE = c(2:10, 15), tolerance_RFE = 0,
-  models = c("ridge", "rf", "cubist", "pls", "foba", "gbm", "glmboost"),
-  preprocess = NULL, seeds = NULL, verbose = TRUE)
+  metric = ifelse(is.factor(dy[, 1]), "Kappa", "Rsquared"),
+  cpu_cores = 7, tune_length = 5, fun_RFE = caret::rfFuncs,
+  repeats_RFE = 1, metric_RFE = ifelse(is.factor(dy[, 1]), "Kappa",
+  "Rsquared"), nfolds_RFE = 5, sizes_RFE = c(2:10, 15),
+  tolerance_RFE = 0, models = c("ridge", "rf", "cubist", "pls", "foba",
+  "gbm", "glmboost"), preprocess = NULL, seeds = NULL,
+  verbose = TRUE)
 }
 \arguments{
 \item{dy}{outcomes}

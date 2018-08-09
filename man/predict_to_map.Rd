@@ -4,8 +4,8 @@
 \alias{predict_to_map}
 \title{predict to map}
 \usage{
-predict_to_map(model_list, path_raster, raster_type = ".asc", path_result,
-  namefile, result_type = ".tif")
+predict_to_map(model_list, path_raster, raster_type = ".asc",
+  path_result, namefile, result_type = ".tif")
 }
 \arguments{
 \item{model_list}{list of fit models by function run_models}

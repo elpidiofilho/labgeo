@@ -4,10 +4,10 @@
 \alias{regression}
 \title{This function performs the training of the chosen regressor}
 \usage{
-regression(df.train, formula = NULL, preprocess = NULL, regressor = "rf",
-  rsample = "cv", nfolds = 10, repeats = NA, index = NULL,
-  cpu_cores = 4, tune_length = 5, search = "grid", metric = "Rsquared",
-  seeds = NULL, verbose = FALSE)
+regression(df.train, formula = NULL, preprocess = NULL,
+  regressor = "rf", rsample = "cv", nfolds = 10, repeats = NA,
+  index = NULL, cpu_cores = 4, tune_length = 5, search = "grid",
+  metric = "Rsquared", seeds = NULL, verbose = FALSE)
 }
 \arguments{
 \item{df.train}{Training dataframe}

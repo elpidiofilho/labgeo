@@ -4,7 +4,8 @@
 \alias{kriga}
 \title{kriga - Automatric krige}
 \usage{
-kriga(df, target_var, nrep = 10, name_px, name_py, p = 0.75, seed = NULL)
+kriga(df, target_var, nrep = 10, name_px, name_py, p = 0.75,
+  seed = NULL)
 }
 \arguments{
 \item{df}{dataframe with targer variable, coordinate x  and coordinate y}

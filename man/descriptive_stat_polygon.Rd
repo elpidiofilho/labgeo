@@ -4,7 +4,8 @@
 \alias{descriptive_stat_polygon}
 \title{Descriptive statistics polygon}
 \usage{
-descriptive_stat_polygon(df, poligon, desc = c("min", "mean", "max", "sd"))
+descriptive_stat_polygon(df, poligon, desc = c("min", "mean", "max",
+  "sd"))
 }
 \arguments{
 \item{df}{dataframe}
