@@ -141,6 +141,41 @@ rasterize_coordinates <- function(fileraster, path_output = '.', prefix_name = '
 }
 
 
+#' grid distance rasterize
+#' @title Grid Distance rasterize
+#' @description  Create rasters of distances to a grid
+#' @param fileraster raster file raster to extract bounds, resolution and projection information
+#' @param path_output path to output rasters files
+#' @param nx number of divisions in x axis
+#' @param ny number of divisions in y axis
+#' @param format format of raster files ('.asc', '.tif', '.grd', '.sdat'..etc). See Help of writeRaster function of raster package to more formats
+#' @importFrom raster rasterToPoints rasterFromXYZ writeRaster raster
+#' @examples
+#' \dontrun{0
+#' grid_rasterize('bio_14.asc', path_output = '.', nx = 3, ny = 4, format = '.asc')
+#' }
+#' @export
+
+grid_dist_rasterize <- function(fileraster, path_output = '.', nx = 3, ny = 3,
+                           format = '.asc') {
+  r <- raster(fileraster)
+  p <- raster::rasterToPoints(r, spatial = T)
+  xy <- data.frame(p@coords)
+  dxy <- labgeo::getdist_rectangle(xy$x, xy$y, nx, ny)
+  nr <- nx * ny
+  for (i in 1:nr) {
+    xyz <- data.frame(xy,dxy[i])
+    nv <- names(dxy)[i]
+    names(xyz)[3] = nv
+    rx <- raster::rasterFromXYZ(xyz = xyz, res = c(xres(r), yres(r)), crs = r@crs)
+    fnx <- paste0(path_output,'/', nv, format)
+    raster::writeRaster(rx, fnx,  overwrite = TRUE)
+    print(fnx)
+  }
+
+}
+
+
 
 
 
