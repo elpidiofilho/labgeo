@@ -33,7 +33,7 @@ predict_to_map <- function(model_list, path_raster, raster_type = ".asc",
     df_entrada <- model_list[[i]]$trainingData %>% select( -(.outcome))
 
     vsel <- names(df_entrada)
-    var_file_raster <- paste0(path_raster, vsel, result_type)
+    var_file_raster <- paste0(path_raster, vsel, raster_type)
     st <- raster::stack(var_file_raster)
     vachei <- !(names(st) %in% vsel)
     if (sum(vachei) > 0) {
@@ -89,7 +89,7 @@ predict_stack_to_map <- function(model_list, path_raster, raster_type = ".asc",
     inicio <- Sys.time()
     df_entrada <- model_list[[i]]$trainingData %>% select( -(.outcome))
     vsel <- names(df_entrada)
-    var_file_raster <- paste0(path_raster, vsel, result_type)
+    var_file_raster <- paste0(path_raster, vsel, raster_type)
     stack_var <- raster::stack(var_file_raster)
     vachei <- !(vsel %in% names(stack_var))
     if (sum(vachei) > 0) {
