@@ -167,7 +167,7 @@ grid_dist_rasterize <- function(fileraster, path_output = '.', nx = 3, ny = 3,
     xyz <- data.frame(xy,dxy[i])
     nv <- names(dxy)[i]
     names(xyz)[3] = nv
-    rx <- raster::rasterFromXYZ(xyz = xyz, res = c(xres(r), yres(r)), crs = r@crs)
+    rx <- raster::rasterFromXYZ(xyz = xyz, crs = r@crs)
     fnx <- paste0(path_output,'/', nv, format)
     raster::writeRaster(rx, fnx,  overwrite = TRUE)
     print(fnx)
