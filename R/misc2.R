@@ -7,13 +7,44 @@
 #' @param groups numbre of groups to be used in stratified sample
 #' @param seed seed
 #' @export
-train_test <- function(df, y,  p = 0.75,   groups = 10, seed = NULL) {
+train_test <- function(df, y,  p = 0.75, groups = min(5,length(y)), seed = NULL) {
   if (is.null(seed) == FALSE) {
     set.seed(seed)
   }
   vcdp <- caret::createDataPartition(y = y, p = p,  list = FALSE, groups = groups)
   train <- df[vcdp, ]
   test <- df[-vcdp, ]
+  dffactor = df %>% select_if((is.factor)) %>% data.frame()
+  nc = ncol(dffactor)
+  if (nc > 0) {
+    dfftrain = train %>% select_if((is.factor)) %>% data.frame()
+    dfftest  = test %>%  select_if((is.factor)) %>% data.frame()
+    i = 1
+    for(i in 1:nc) {
+      lg = levels(droplevels(dffactor[,i]))
+      lt = levels(droplevels(dfftrain[,i]))
+      lv = levels(droplevels(dfftest[,i]))
+      v_train = (!(lg %in% lt))
+      v_test = (!(lg %in% lv))
+
+      if (sum(v_train) > 0) {
+        print('---------- Warning --------------------------')
+        print(paste('train set - factor', names(dffactor))[i])
+        print(paste('total levels', paste(lg, collapse = ',')))
+        print(paste('test levels', paste(lt, collapse = ',')))
+        print(paste('missing levels', paste(lg[v_train], collapse = ',')))
+      }
+
+      if (sum(v_test) > 0) {
+        print('---------- Warning --------------------------')
+        print(paste('test set - factor', names(dffactor))[i])
+        print(paste('total levels', paste(lg, collapse = ',')))
+        print(paste('test levels', paste(lv, collapse = ',')))
+        print(paste('missing levels', paste(lg[v_test], collapse = ',')))
+      }
+    }
+  }
+
   return(list(train = train, test = test))
 }
 

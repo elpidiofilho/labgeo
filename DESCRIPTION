@@ -1,7 +1,7 @@
 Package: labgeo
 Type: Package
 Title: Collection of functions to  fit models with emphasis in land use and soil mapping
-Version: 0.3.9.2
+Version: 0.3.9.3
 Author: Elpidio I. Fernandes Filho
 Maintainer: Elpidio Filho <elpidio@ufv.br>
 Description: Labgeo is a R package to fit classifications and regressions models in an easy way. 
@@ -9,7 +9,7 @@ Description: Labgeo is a R package to fit classifications and regressions models
              1- Reduction of data dimensionality through the removal of variables highly correlated and/or removal of few importance variables.
              2- Comparation between several models and selection of the best model for a certain set of data, automatically.
              3- Model a large number of response variables (outcome) by comparing the several models for each one.
-             4 - Carry out the prediction of the best adjusted models using co-variables in the form of rasters files and satellite images. (Under construction)
+             4 - Carry out the prediction of the best adjusted models using co-variables in the form of rasters files and satellite images.
              The functions were written for automatic execution in parallel whenever possible, taking advantage of multi-core CPUs, aiming agility in more complex modeling.
              The model settings are made using the Caret package written by Max Kuhn (https://github.com/topepo/caret). The Caret package creates a standard interface for accessing a few hundred models, is a Swiss Army knife of data modeling.
 License: GPL-2

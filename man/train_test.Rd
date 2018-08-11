@@ -4,7 +4,7 @@
 \alias{train_test}
 \title{train test split}
 \usage{
-train_test(df, y, p = 0.75, groups = 10, seed = NULL)
+train_test(df, y, p = 0.75, groups = min(5, length(y)), seed = NULL)
 }
 \arguments{
 \item{df}{dataframe}
